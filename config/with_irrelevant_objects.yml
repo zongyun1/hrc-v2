@@ -1,0 +1,6 @@
+# Opt-in setting for random background tabletop objects.
+#
+# Use with scripts/collect.py or scripts/eval.py via:
+#   --config config/with_irrelevant_objects.yml
+table_random_objects: true
+task_irrelevant_objects: true

@@ -1,0 +1,17 @@
+env:
+  arm_tag: "right"
+  max_joint_delta: 0.1
+  action_substeps: 25
+  max_episode_steps: 150        # longer than lift_bottle — needs both XY + tilt
+  settle_steps: 20
+  vis: false
+  reward_mode: "dense"
+  # Progress-dominated XY closure + height-above-rim + tilt shaping.
+  # Mug is kinematically attached at reset; no grasp/lift terms.
+  reward_weights:
+    progress: 30.0
+    reach: 1.0
+    height: 1.0
+    tilt: 2.0
+    success: 10.0
+    action_penalty: 0.001

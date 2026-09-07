@@ -1,0 +1,12 @@
+# Raytracer config: church_meeting_room_4k EXR scene (stamp_documents luisa sweep)
+renderer: raytracer
+
+raytracer:
+  spp: 32
+  tracing_depth: 16
+  env_radius: 30.0
+  env_pos: [0.0, 0.0, 1.0]
+  env_euler: [0.0, 0.0, 250.0]
+  env_texture: "assets/exr/church_meeting_room_4k.exr"
+  lights:
+    - {pos: [-5, 0, 10], color: [1, 1, 1], intensity: 6, radius: 4}

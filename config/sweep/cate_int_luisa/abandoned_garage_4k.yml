@@ -1,0 +1,16 @@
+# Raytracer config: abandoned_garage_4k EXR scene
+#
+# Usage:
+#   python scripts/collect.py --task pour_water --config config/exr/abandoned_garage_4k.yml --episodes 1
+
+renderer: raytracer
+
+raytracer:
+  spp: 32
+  tracing_depth: 16
+  env_radius: 30.0
+  env_pos: [0.0, 0.0, 1.0]
+  env_euler: [0.0, 0.0, 225.0]
+  env_texture: "assets/exr/abandoned_garage_4k.exr"
+  lights:
+    - {pos: [-5, 0, 10], color: [1, 1, 1], intensity: 6, radius: 4}

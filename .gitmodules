@@ -1,0 +1,15 @@
+[submodule "baseline/openvla-oft"]
+	path = baseline/openvla-oft
+	url = https://github.com/moojink/openvla-oft.git
+[submodule "baseline/3d_diffusion_policy"]
+	path = baseline/3d_diffusion_policy
+	url = https://github.com/YanjieZe/3D-Diffusion-Policy.git
+[submodule "baseline/diffusion_policy"]
+	path = baseline/diffusion_policy
+	url = https://github.com/real-stanford/diffusion_policy.git
+[submodule "baseline/rdt"]
+	path = baseline/rdt
+	url = https://github.com/thu-ml/RoboticsDiffusionTransformer.git
+[submodule "baseline/lerobot"]
+	path = baseline/lerobot
+	url = https://github.com/huggingface/lerobot

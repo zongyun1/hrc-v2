@@ -1,0 +1,24 @@
+show_viewer: false
+robot_config: null
+camera_config:
+  default: {w: 640, h: 480, fovy: 60}
+  D435: {w: 640, h: 480, fovy: 60}
+avatar:
+  motion_data: "avatars/motions/motion.pkl"
+  skin_options:
+    glb_path: "avatars/models/celebrity_Bruce_Lee.glb"
+    euler: [-90, 0, 90]
+    pos: [0.0, 0.0, -0.959008030]
+  frame_ratio: 1.0
+collect: {episodes: 1, save_dir: "data", save_video: true}
+renderer: raytracer
+raytracer:
+  spp: 128
+  tracing_depth: 32
+  env_radius: 30.0
+  env_pos: [-15.0, 0.0, 0.0]
+  env_euler: [0.0, 0.0, 240.0]
+  env_texture: "assets/exr/brown_photostudio_02_4k.exr"
+  lights:
+    - {pos: [-5, 0, 10], color: [1, 1, 1], intensity: 6, radius: 4}
+eval: {episodes: 1, max_steps: 300}

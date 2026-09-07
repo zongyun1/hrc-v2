@@ -1,0 +1,2 @@
+robot_type: arx_x5
+planner_override: mplib

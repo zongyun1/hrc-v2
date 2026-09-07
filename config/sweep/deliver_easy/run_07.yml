@@ -1,0 +1,17 @@
+# NOTE: renderer intentionally NOT set here — inherit the default (nyx)
+# from config/default.yml. Re-declaring `renderer: rasterizer` here used to
+# silently disable NYX + the HDRI background. Pass --renderer to override.
+show_viewer: false
+robot_config: null
+camera_config:
+  default: {w: 640, h: 480, fovy: 60}
+  D435: {w: 640, h: 480, fovy: 60}
+avatar:
+  motion_data: "avatars/motions/motion.pkl"
+  skin_options:
+    glb_path: "avatars/models/celebrity_Marie_Curie.glb"
+    euler: [-90, 0, 90]
+    pos: [0.0, 0.0, -0.959008030]
+  frame_ratio: 1.0
+collect: {episodes: 1, save_dir: "data", save_video: true}
+eval: {episodes: 1, max_steps: 300}

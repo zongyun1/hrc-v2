@@ -1,0 +1,13 @@
+# NOTE: renderer intentionally NOT set here — inherit the default (nyx)
+# from config/default.yml. Re-declaring `renderer: rasterizer` here used to
+# silently disable NYX + the HDRI background. Pass --renderer to override.
+robot_type: xarm7
+planner_override: mplib
+show_viewer: false
+min_final_gripper_z: 0.1
+final_gripper_xy: [0.339, 0.549]
+final_gripper_xy_threshold: 0.05
+final_gripper_lift_steps: 30
+final_gripper_lift_sim_per_step: 10
+final_gripper_hold_steps: 60
+video_stride: 25

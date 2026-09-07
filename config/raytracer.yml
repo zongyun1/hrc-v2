@@ -1,0 +1,19 @@
+# Genesis HR Bench - Raytracer (LuisaRender) Configuration
+#
+# Usage:
+#   python scripts/collect.py --task pick_and_place --config config/raytracer.yml --episodes 1
+#   python scripts/collect.py --task pour_water --renderer raytracer --episodes 1
+#
+# Requires: GENESIS_BACKEND=gpu (set automatically when renderer=raytracer)
+
+renderer: raytracer
+
+raytracer:
+  spp: 128                # samples per pixel (higher = less noise, slower)
+  tracing_depth: 32       # max ray bounce depth
+  env_radius: 30.0        # environment sphere radius (smaller = closer background)
+  env_pos: [-15.0, 0.0, 0.0]   # sphere center offset
+  env_euler: [0.0, 0.0, 240.0] # sphere rotation (roll, pitch, yaw) degrees
+  env_texture: "assets/exr/brown_photostudio_02_4k.exr"  # path to HDR/EXR environment map (skybox)
+  lights:
+    - {pos: [-5, 0, 10], color: [1, 1, 1], intensity: 6, radius: 4}

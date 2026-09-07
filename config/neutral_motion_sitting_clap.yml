@@ -1,0 +1,12 @@
+# Force the seated clapping neutral motion (chair only).
+# Usage:
+#   scripts/collect.py --task <task>_neutral --config config/neutral_motion_sitting_clap.yml
+neutral_avatar_motion: sitting_clap
+neutral_avatar_motion_pkl: "retarget/output_motion_claping/motion.pkl"
+neutral_avatar_motion_meta: "assets/neutral_motions/sitting_clap_clip.json"
+neutral_avatar_debug_layout: true
+neutral_avatar_strict_layout: false
+neutral_clap_table_distance: 0.34
+neutral_clap_body_z_offset: -0.075
+neutral_clap_chair_z_offset: -0.10
+neutral_clap_visual_yaw_offset_deg: 0

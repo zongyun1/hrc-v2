@@ -1,0 +1,5 @@
+show_viewer: false
+video_stride: 8
+randomize_avatar: false
+track_avatar_collision: false
+neutral_avatar_strict_layout: false

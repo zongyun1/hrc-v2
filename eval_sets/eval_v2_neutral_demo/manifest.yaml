@@ -1,0 +1,41 @@
+schema_version: genesis_hr_bench.eval_set.v1
+name: eval_v2_neutral_demo
+description: Strict neutral-layout scene-init demo for v2 neutral task videos.
+contains_rollouts: false
+episodes_per_task: 1
+seed_offset: null
+defaults:
+  renderer: rasterizer
+  setting: sim
+  action_type: ee
+  action_substeps: 25
+  max_steps: 260
+episodes:
+- id: eval_v2_neutral_demo__neutral__blocks_ranking_size_neutral__seed_0
+  category: neutral
+  task: blocks_ranking_size_neutral
+  seed: 0
+  config_overrides:
+    renderer: rasterizer
+    show_viewer: false
+    skip_reset_obs: true
+    side_video: false
+    vla_head_camera: true
+    camera_config:
+      default:
+        w: 640
+        h: 480
+        fovy: 60
+    eval_mode: true
+    randomize_avatar: false
+    randomize_table: false
+    track_avatar_collision: true
+    use_avatar_collider: true
+    neutral_avatar_strict_layout: true
+    neutral_avatar_region_mode: aggressive
+    neutral_avatar_region_candidates: 1024
+    neutral_avatar_motion_slow: 1.0
+    save_video: false
+    vla_recording:
+      enabled: false
+    neutral_avatar_motion: putting_cans_into_plate

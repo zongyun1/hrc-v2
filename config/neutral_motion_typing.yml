@@ -1,0 +1,10 @@
+# Force the seated "typing on a laptop" neutral motion (chair + laptop + mouse).
+# The clip + meta are loaded from dedicated files (not the shared
+# raw_blender_interaction_clips.{pkl,json}) so this doesn't touch shared assets.
+# Usage:
+#   scripts/collect.py --task <task>_neutral --config config/neutral_motion_typing.yml
+
+neutral_avatar_motion: Typing
+neutral_avatar_motion_pkl: retarget/output_motion_typing/motion.pkl
+neutral_avatar_motion_meta: assets/neutral_motions/typing_clip.json
+neutral_avatar_debug_layout: true

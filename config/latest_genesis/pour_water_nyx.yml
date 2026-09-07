@@ -1,0 +1,24 @@
+# Latest Genesis NYX render config for pour_water.
+renderer: nyx
+robot_type: franka
+no_avatar: false
+strict_avatar_init: true
+kinematic_mug_grasp: false
+kinematic_mug_transport: false
+settle_steps: 5
+side_video: false
+video_stride: 80
+recording_resolution: [640, 480]
+camera_config:
+  default:
+    w: 640
+    h: 480
+    fovy: 60
+nyx:
+  spp: 1
+  denoise: false
+  open_window: false
+  lights:
+    - type: directional
+      dir: [-0.4, 0.3, -1.0]
+      intensity: 5.0

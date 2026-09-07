@@ -1,0 +1,11 @@
+renderer: raytracer
+
+raytracer:
+  spp: 32
+  tracing_depth: 16
+  env_radius: 30.0
+  env_pos: [-15.0, 0.0, 0.0]
+  env_euler: [0.0, 0.0, 240.0]
+  env_texture: "assets/exr/brown_photostudio_02_4k.exr"
+  lights:
+    - {pos: [-5, 0, 10], color: [1, 1, 1], intensity: 6, radius: 4}

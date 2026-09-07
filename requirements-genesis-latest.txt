@@ -1,0 +1,32 @@
+# Genesis HR Bench — latest-Genesis runtime (Python 3.10).
+# Pins match the validated MAWM_nyx_clean env (genesis 1.2.0 + NYX renderer),
+# verified end-to-end: task eval + VLA data collection with the NYX renderer.
+# Build:  python3.10 -m venv .venv-genesis-latest
+#         .venv-genesis-latest/bin/python -m pip install -U pip wheel
+#         .venv-genesis-latest/bin/python -m pip install -r requirements-genesis-latest.txt
+
+--extra-index-url https://download.pytorch.org/whl/cu121
+
+torch==2.4.1+cu121
+torchvision==0.19.1+cu121
+
+# Genesis 1.2.0 + NYX GPU sensor renderer (all on PyPI)
+genesis-world==1.2.0
+gs-nyx==0.1.3
+gs-nyx-plugin==0.1.4
+coacd==1.0.11
+
+# Core benchmark deps
+numpy==1.26.4
+mplib==0.2.1
+transforms3d==0.4.2
+toppra==0.6.8
+opencv-python==4.11.0.86
+trimesh==4.12.2
+pygltflib==1.16.0
+h5py==3.16.0          # VLA data collection: envs/vla_recorder.py writes steps.h5
+
+# VLA client / baseline-serving helpers (HTTP eval, RL envs)
+requests
+flask
+gymnasium

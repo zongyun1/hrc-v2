@@ -1,0 +1,3 @@
+eval_trigger_step_min: 5
+eval_trigger_step_max: 15
+action_substeps: 10

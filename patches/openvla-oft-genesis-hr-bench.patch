@@ -1,0 +1,145 @@
+diff --git a/experiments/robot/openvla_utils.py b/experiments/robot/openvla_utils.py
+index c14c9dc..a417867 100644
+--- a/experiments/robot/openvla_utils.py
++++ b/experiments/robot/openvla_utils.py
+@@ -377,6 +377,26 @@ def _load_dataset_stats(vla: torch.nn.Module, checkpoint_path: str) -> None:
+         )
+ 
+ 
++def _hf_component_filename(repo_id: str, component_name: str, known_filenames: Dict[str, str]) -> str:
++    if repo_id in known_filenames:
++        return known_filenames[repo_id]
++
++    files = HfApi().list_repo_files(repo_id=repo_id)
++    prefix = f"{component_name}--"
++    candidates = [f for f in files if os.path.basename(f).startswith(prefix) and f.endswith("_checkpoint.pt")]
++    if not candidates:
++        raise ValueError(f"No {component_name} checkpoint found in HF repo {repo_id}")
++
++    def _step(filename: str) -> int:
++        stem = os.path.basename(filename)
++        try:
++            return int(stem.split("--", 1)[1].split("_checkpoint.pt", 1)[0])
++        except Exception:
++            return -1
++
++    return max(candidates, key=_step)
++
++
+ def get_processor(cfg: Any) -> AutoProcessor:
+     """
+     Get the VLA model's Hugging Face processor.
+@@ -419,12 +439,10 @@ def get_proprio_projector(cfg: Any, llm_dim: int, proprio_dim: int) -> ProprioPr
+             "moojink/openvla-7b-oft-finetuned-libero-10": "proprio_projector--150000_checkpoint.pt",
+             "moojink/openvla-7b-oft-finetuned-libero-spatial-object-goal-10": "proprio_projector--300000_checkpoint.pt",
+         }
+-        if cfg.pretrained_checkpoint not in model_path_to_proprio_projector_name.keys():
+-            raise ValueError("Unsupported HF Hub pretrained checkpoint found!")
+-        # Download proprio projector directly from HF Hub
+-        proprio_projector_path = hf_hub_download(
+-            repo_id=cfg.pretrained_checkpoint, filename=model_path_to_proprio_projector_name[cfg.pretrained_checkpoint]
++        filename = _hf_component_filename(
++            cfg.pretrained_checkpoint, "proprio_projector", model_path_to_proprio_projector_name
+         )
++        proprio_projector_path = hf_hub_download(repo_id=cfg.pretrained_checkpoint, filename=filename)
+         state_dict = load_component_state_dict(proprio_projector_path)
+         proprio_projector.load_state_dict(state_dict)
+     else:
+@@ -501,12 +519,8 @@ def get_action_head(cfg: Any, llm_dim: int) -> Union[L1RegressionActionHead, Dif
+             "moojink/openvla-7b-oft-finetuned-libero-10": "action_head--150000_checkpoint.pt",
+             "moojink/openvla-7b-oft-finetuned-libero-spatial-object-goal-10": "action_head--300000_checkpoint.pt",
+         }
+-        if cfg.pretrained_checkpoint not in model_path_to_action_head_name.keys():
+-            raise ValueError("Unsupported HF Hub pretrained checkpoint found!")
+-        # Download proprio projector directly from HF Hub
+-        action_head_path = hf_hub_download(
+-            repo_id=cfg.pretrained_checkpoint, filename=model_path_to_action_head_name[cfg.pretrained_checkpoint]
+-        )
++        filename = _hf_component_filename(cfg.pretrained_checkpoint, "action_head", model_path_to_action_head_name)
++        action_head_path = hf_hub_download(repo_id=cfg.pretrained_checkpoint, filename=filename)
+         state_dict = load_component_state_dict(action_head_path)
+         action_head.load_state_dict(state_dict)
+     else:
+diff --git a/prismatic/vla/constants.py b/prismatic/vla/constants.py
+index 229ae94..b65eeb8 100644
+--- a/prismatic/vla/constants.py
++++ b/prismatic/vla/constants.py
+@@ -44,12 +44,21 @@ BRIDGE_CONSTANTS = {
+     "ACTION_PROPRIO_NORMALIZATION_TYPE": NormalizationType.BOUNDS_Q99,
+ }
+ 
++GENESIS_CONSTANTS = {
++    "NUM_ACTIONS_CHUNK": 8,
++    "ACTION_DIM": 7,
++    "PROPRIO_DIM": 7,
++    "ACTION_PROPRIO_NORMALIZATION_TYPE": NormalizationType.BOUNDS_Q99,
++}
++
+ 
+ # Function to detect robot platform from command line arguments
+ def detect_robot_platform():
+     cmd_args = " ".join(sys.argv).lower()
+ 
+-    if "libero" in cmd_args:
++    if "genesis" in cmd_args:
++        return "GENESIS"
++    elif "libero" in cmd_args:
+         return "LIBERO"
+     elif "aloha" in cmd_args:
+         return "ALOHA"
+@@ -70,6 +79,8 @@ elif ROBOT_PLATFORM == "ALOHA":
+     constants = ALOHA_CONSTANTS
+ elif ROBOT_PLATFORM == "BRIDGE":
+     constants = BRIDGE_CONSTANTS
++elif ROBOT_PLATFORM == "GENESIS":
++    constants = GENESIS_CONSTANTS
+ 
+ # Assign constants to global variables
+ NUM_ACTIONS_CHUNK = constants["NUM_ACTIONS_CHUNK"]
+diff --git a/prismatic/vla/datasets/rlds/oxe/configs.py b/prismatic/vla/datasets/rlds/oxe/configs.py
+index 3222e02..509f328 100644
+--- a/prismatic/vla/datasets/rlds/oxe/configs.py
++++ b/prismatic/vla/datasets/rlds/oxe/configs.py
+@@ -677,6 +677,13 @@ OXE_DATASET_CONFIGS = {
+         "state_encoding": StateEncoding.POS_EULER,
+         "action_encoding": ActionEncoding.EEF_POS,
+     },
++    "genesis_hr_bench": {
++        "image_obs_keys": {"primary": "image", "secondary": None, "wrist": "wrist_image"},
++        "depth_obs_keys": {"primary": None, "secondary": None, "wrist": None},
++        "state_obs_keys": ["EEF_state", "gripper_state"],
++        "state_encoding": StateEncoding.POS_EULER,
++        "action_encoding": ActionEncoding.EEF_POS,
++    },
+     ### ALOHA fine-tuning datasets
+     "aloha1_fold_shorts_20_demos": {
+         "image_obs_keys": {"primary": "image", "secondary": None, "left_wrist": "left_wrist_image", "right_wrist": "right_wrist_image"},
+diff --git a/prismatic/vla/datasets/rlds/oxe/transforms.py b/prismatic/vla/datasets/rlds/oxe/transforms.py
+index bf848e9..84dc5f8 100644
+--- a/prismatic/vla/datasets/rlds/oxe/transforms.py
++++ b/prismatic/vla/datasets/rlds/oxe/transforms.py
+@@ -824,6 +824,16 @@ def tdroid_dataset_transform(trajectory: Dict[str, Any]) -> Dict[str, Any]:
+     return trajectory
+ 
+ 
++def genesis_hr_bench_dataset_transform(trajectory: Dict[str, Any]) -> Dict[str, Any]:
++    # Built by scripts/build_genesis_hr_bench_rlds.py:
++    #   action[:, :6] = [delta xyz, delta rpy_sxyz]
++    #   action[:, -1] = gripper in [0, 1] with 1=closed
++    #   state[:, :6] = [xyz, rpy_sxyz]
++    #   state[:, -1] = gripper in [0, 1] with 1=closed
++    trajectory["observation"]["EEF_state"] = trajectory["observation"]["state"][:, :6]
++    trajectory["observation"]["gripper_state"] = trajectory["observation"]["state"][:, -1:]
++    return trajectory
++
+ def libero_dataset_transform(trajectory: Dict[str, Any]) -> Dict[str, Any]:
+     # gripper action is in -1 (open)...1 (close) --> clip to 0...1, flip --> +1 = open, 0 = close
+     gripper_action = trajectory["action"][:, -1:]
+@@ -925,6 +935,7 @@ OXE_STANDARDIZATION_TRANSFORMS = {
+     "libero_goal_no_noops": libero_dataset_transform,
+     "libero_10_no_noops": libero_dataset_transform,
+     "libero_4_task_suites_no_noops": libero_dataset_transform,
++    "genesis_hr_bench": genesis_hr_bench_dataset_transform,
+     ### ALOHA fine-tuning datasets
+     "aloha1_fold_shorts_20_demos": aloha_dataset_transform,
+     "aloha1_fold_shirt_30_demos": aloha_dataset_transform,

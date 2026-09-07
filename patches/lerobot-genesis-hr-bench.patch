@@ -1,0 +1,188 @@
+diff --git a/src/lerobot/scripts/lerobot_train.py b/src/lerobot/scripts/lerobot_train.py
+index 55a8cc93..f48081db 100644
+--- a/src/lerobot/scripts/lerobot_train.py
++++ b/src/lerobot/scripts/lerobot_train.py
+@@ -21,7 +21,11 @@ Requires: pip install 'lerobot[training]'  (includes dataset + accelerate + wand
+ import dataclasses
+ import logging
+ import time
++
++import numpy as np
++import pandas as pd
+ from contextlib import nullcontext
++from pathlib import Path
+ from pprint import pformat
+ from typing import TYPE_CHECKING, Any
+ 
+@@ -44,6 +48,7 @@ from lerobot.common.wandb_utils import WandBLogger
+ from lerobot.configs import parser
+ from lerobot.configs.train import TrainPipelineConfig
+ from lerobot.datasets import EpisodeAwareSampler, make_dataset
++from lerobot.datasets.compute_stats import aggregate_stats
+ from lerobot.envs import close_envs, make_env, make_env_pre_post_processors
+ from lerobot.optim.factory import make_optimizer_and_scheduler
+ from lerobot.policies import PreTrainedPolicy, make_policy, make_pre_post_processors
+@@ -62,6 +67,62 @@ from lerobot.utils.utils import (
+ from .lerobot_eval import eval_policy_all
+ 
+ 
++def _episode_stats_from_row(row: dict, features: dict) -> dict:
++    episode_stats = {}
++    for key, value in row.items():
++        if not str(key).startswith("stats/"):
++            continue
++        stat_key = str(key).replace("stats/", "", 1)
++        parts = stat_key.split("/")
++        if len(parts) != 2:
++            continue
++        feature_name, stat_name = parts
++        if feature_name not in episode_stats:
++            episode_stats[feature_name] = {}
++
++        if feature_name in features:
++            feature_dtype = features[feature_name].get("dtype")
++            if feature_dtype in {"image", "video"} and stat_name != "count":
++                value = np.asarray(value)
++                if value.dtype == object:
++                    flat_values = []
++                    for item in value:
++                        while isinstance(item, np.ndarray):
++                            item = item.flatten()[0]
++                        flat_values.append(item)
++                    value = np.array(flat_values, dtype=np.float64).reshape(3, 1, 1)
++                elif value.shape == (3,):
++                    value = value.reshape(3, 1, 1)
++
++        episode_stats[feature_name][stat_name] = value
++    return episode_stats
++
++
++def _selected_episode_stats(dataset):
++    if getattr(dataset, "episodes", None) is None:
++        return dataset.meta.stats
++
++    stats = []
++    for episode_idx in dataset.episodes:
++        row_stats = _episode_stats_from_row(dataset.meta.episodes[episode_idx], dataset.meta.features)
++        if row_stats:
++            stats.append(row_stats)
++
++    if not stats:
++        episode_files = sorted((Path(dataset.meta.root) / "meta" / "episodes").glob("chunk-*/file-*.parquet"))
++        if not episode_files:
++            return dataset.meta.stats
++        episodes = pd.concat((pd.read_parquet(path) for path in episode_files), ignore_index=True)
++        selected = set(int(idx) for idx in dataset.episodes)
++        for _, row in episodes[episodes["episode_index"].isin(selected)].iterrows():
++            row_stats = _episode_stats_from_row(row.to_dict(), dataset.meta.features)
++            if row_stats:
++                stats.append(row_stats)
++
++    return aggregate_stats(stats) if stats else dataset.meta.stats
++
++
++
+ def update_policy(
+     train_metrics: MetricsTracker,
+     policy: PreTrainedPolicy,
+@@ -189,15 +250,21 @@ def train(cfg: TrainPipelineConfig, accelerator: "Accelerator | None" = None):
+     # We set step_scheduler_with_optimizer=False to prevent accelerate from adjusting the lr_scheduler steps based on the num_processes
+     # We set find_unused_parameters=True to handle models with conditional computation
+     if accelerator is None:
+-        from accelerate.utils import DistributedDataParallelKwargs
++        from datetime import timedelta
++
++        from accelerate.utils import DistributedDataParallelKwargs, InitProcessGroupKwargs
+ 
+         ddp_kwargs = DistributedDataParallelKwargs(find_unused_parameters=True)
++        # Dataset construction scans many parquet shards on cold cache. Keep the
++        # distributed init store alive long enough for all workers to reach the
++        # first barrier.
++        pg_kwargs = InitProcessGroupKwargs(timeout=timedelta(seconds=3600))
+         # Accelerate auto-detects the device based on the available hardware and ignores the policy.device setting.
+         # Force the device to be CPU when the active config's device is set to CPU (works for both policy and reward model training).
+         force_cpu = cfg.trainable_config.device == "cpu"
+         accelerator = Accelerator(
+             step_scheduler_with_optimizer=False,
+-            kwargs_handlers=[ddp_kwargs],
++            kwargs_handlers=[ddp_kwargs, pg_kwargs],
+             cpu=force_cpu,
+         )
+ 
+@@ -242,6 +309,10 @@ def train(cfg: TrainPipelineConfig, accelerator: "Accelerator | None" = None):
+     if not is_main_process:
+         dataset = make_dataset(cfg)
+ 
++    dataset_stats = _selected_episode_stats(dataset)
++    if is_main_process and getattr(dataset, "episodes", None) is not None:
++        logging.info("Using selected-episode normalization stats for %d episodes", len(dataset.episodes))
++
+     # Create environment used for evaluating checkpoints during training on simulation data.
+     # On real-world data, no need to create an environment as evaluations are done outside train.py,
+     # using the eval.py instead, with gym_dora environment and dora-rs.
+@@ -257,7 +328,7 @@ def train(cfg: TrainPipelineConfig, accelerator: "Accelerator | None" = None):
+ 
+         policy = make_reward_model(
+             cfg=cfg.reward_model,
+-            dataset_stats=dataset.meta.stats,
++            dataset_stats=dataset_stats,
+             dataset_meta=dataset.meta,
+         )
+         if not policy.is_trainable:
+@@ -305,7 +376,7 @@ def train(cfg: TrainPipelineConfig, accelerator: "Accelerator | None" = None):
+     processor_kwargs = {}
+     postprocessor_kwargs = {}
+     if (processor_pretrained_path and not cfg.resume) or not processor_pretrained_path:
+-        processor_kwargs["dataset_stats"] = dataset.meta.stats
++        processor_kwargs["dataset_stats"] = dataset_stats
+ 
+     if cfg.is_reward_model_training:
+         processor_kwargs["dataset_meta"] = dataset.meta
+@@ -314,7 +385,7 @@ def train(cfg: TrainPipelineConfig, accelerator: "Accelerator | None" = None):
+         processor_kwargs["preprocessor_overrides"] = {
+             "device_processor": {"device": device.type},
+             "normalizer_processor": {
+-                "stats": dataset.meta.stats,
++                "stats": dataset_stats,
+                 "features": {**policy.config.input_features, **policy.config.output_features},
+                 "norm_map": policy.config.normalization_mapping,
+             },
+@@ -324,7 +395,7 @@ def train(cfg: TrainPipelineConfig, accelerator: "Accelerator | None" = None):
+         }
+         postprocessor_kwargs["postprocessor_overrides"] = {
+             "unnormalizer_processor": {
+-                "stats": dataset.meta.stats,
++                "stats": dataset_stats,
+                 "features": policy.config.output_features,
+                 "norm_map": policy.config.normalization_mapping,
+             },
+@@ -390,10 +461,26 @@ def train(cfg: TrainPipelineConfig, accelerator: "Accelerator | None" = None):
+     # create dataloader for offline training
+     if hasattr(active_cfg, "drop_n_last_frames"):
+         shuffle = False
++        if dataset.episodes is None:
++            sampler_from_indices = dataset.meta.episodes["dataset_from_index"]
++            sampler_to_indices = dataset.meta.episodes["dataset_to_index"]
++            sampler_episode_indices = None
++        else:
++            # LeRobotDataset.__getitem__ expects indices relative to the episode-filtered
++            # HF dataset. Build local episode boundaries for selected-episode training.
++            sampler_from_indices = []
++            sampler_to_indices = []
++            next_index = 0
++            for episode_idx in dataset.episodes:
++                episode = dataset.meta.episodes[episode_idx]
++                sampler_from_indices.append(next_index)
++                next_index += int(episode["dataset_to_index"] - episode["dataset_from_index"])
++                sampler_to_indices.append(next_index)
++            sampler_episode_indices = None
+         sampler = EpisodeAwareSampler(
+-            dataset.meta.episodes["dataset_from_index"],
+-            dataset.meta.episodes["dataset_to_index"],
+-            episode_indices_to_use=dataset.episodes,
++            sampler_from_indices,
++            sampler_to_indices,
++            episode_indices_to_use=sampler_episode_indices,
+             drop_n_last_frames=active_cfg.drop_n_last_frames,
+             shuffle=True,
+         )

@@ -1,0 +1,15 @@
+env:
+  arm_tag: "right"
+  max_joint_delta: 0.1
+  action_substeps: 25
+  max_episode_steps: 100        # shorter than pick_and_place — bottle starts grasped
+  settle_steps: 20
+  vis: false
+  reward_mode: "dense"
+  # Progress-dominated reward (per-step distance decrease).
+  # No grasp/lift terms — bottle is kinematically attached at reset.
+  reward_weights:
+    progress: 50.0
+    reach: 1.0
+    success: 10.0
+    action_penalty: 0.0

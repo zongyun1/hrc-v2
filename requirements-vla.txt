@@ -1,0 +1,18 @@
+# Core (no extra deps needed for base interface or template)
+
+# OpenVLA
+torch>=2.0
+transformers>=4.40
+timm
+tokenizers
+accelerate
+Pillow
+scipy
+
+# Octo (install into a separate env from OpenVLA — JAX/torch can coexist but
+# Octo pins older jax/flax that fight with recent transformers wheels).
+# jax[cuda12]==0.4.20
+# flax==0.7.5
+# distrax
+# dlimp @ git+https://github.com/kvablack/dlimp.git
+# octo @ git+https://github.com/octo-models/octo.git

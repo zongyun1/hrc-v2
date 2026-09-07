@@ -1,0 +1,17 @@
+# NOTE: renderer intentionally NOT set here — inherit the default (nyx)
+# from config/default.yml. Re-declaring `renderer: rasterizer` here used to
+# silently disable NYX + the HDRI background. Pass --renderer to override.
+# Latest Genesis HD rasterizer collection with a fixed nearby human avatar.
+robot_type: franka
+no_avatar: false
+strict_avatar_init: true
+randomize_avatar: false
+track_avatar_collision: false
+side_video: false
+video_stride: 40
+recording_resolution: [640, 480]
+camera_config:
+  default:
+    w: 640
+    h: 480
+    fovy: 60

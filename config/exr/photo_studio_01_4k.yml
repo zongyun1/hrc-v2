@@ -1,0 +1,16 @@
+# Raytracer config: photo_studio_01_4k EXR scene
+#
+# Usage:
+#   python scripts/collect.py --task pour_water --config config/exr/photo_studio_01_4k.yml --episodes 1
+
+renderer: raytracer
+
+raytracer:
+  spp: 128
+  tracing_depth: 32
+  env_radius: 40.0
+  env_pos: [-2.0, -2.0, 1.0]
+  env_euler: [0.0, 0.0, 280.0]
+  env_texture: "assets/exr/photo_studio_01_4k.exr"
+  lights:
+    - {pos: [-5, 0, 10], color: [1, 1, 1], intensity: 6, radius: 4}

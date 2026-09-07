@@ -1,0 +1,52 @@
+vla:
+  model_name: "openvla_oft"
+  checkpoint_path: null
+
+  task_instruction: null
+
+  image_size: [224, 224]
+  cameras:
+    - head_camera
+  include_wrist_cameras: false
+
+  include_proprio: true
+  proprio_source: "joint_state"
+
+  action_type: "ee"
+  dual_arm: false
+  action_chunk_size: 1
+  action_norm_stats: null
+
+  device: "cuda"
+  dtype: "bfloat16"
+
+  primary_camera: "head_camera"
+  dual_arm_strategy: "unsupported"
+
+  # Bridge-style unnorm key (openvla_oft). Override per model via --vla-config.
+  unnorm_key: null
+
+  # Second image stream (OFT/pi0/pi05/pi0_fast/RDT/ACT/LeRobot-Diffusion/SmolVLA
+  # all train with a wrist camera). The client only ships this image if its
+  # policy class declares a non-None `IMG_WRIST`; primary-only baselines
+  # (Chi-DP / VQ-BeT) declare IMG_WRIST=None and the wrist image is dropped
+  # client-side. So a real camera name here is the correct default for every
+  # baseline whose client opts in; primary-only baselines stay primary-only.
+  wrist_camera: right_wrist
+
+  # OpenVLA dual-arm two_pass: the left arm is run against this camera's image.
+  secondary_camera: null
+
+  # HTTP bridge to the model server. scripts/run_vla_eval.sh spawns the
+  # matching baseline/servers/<model>_server.py and passes --server-url to
+  # eval_vla.py, so you rarely set this by hand. Ignored by `template`.
+  # Ports: pi0=8767 pi05=8768 openvla_oft=8769 rdt=8772 act=8775 vqbet=8776
+  # lerobot_diffusion=8777 smolvla=8778 pi0_fast=8779.
+  server_url: "http://127.0.0.1:8769"
+  server_timeout: 60
+
+  # pi0 / pi0.5 / pi0-FAST are finetuned + served via lerobot v0.5.2 (policy
+  # types pi0 / pi05 / pi0_fast through baseline/servers/lerobot_server.py).
+  # The current qpos_target_abs checkpoints emit 8-D absolute qpos actions, so
+  # run_vla_eval.sh defaults pi0/pi05 to --action-type qpos_abs. If you train
+  # an EE-delta checkpoint, override with --action-type ee.

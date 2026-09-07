@@ -1,0 +1,14 @@
+# Force the 'take objects from bowl' neutral motion.
+# Only motion-specific keys — everything else (renderer, cameras, nyx/EXR)
+# is inherited from config/default.yml. Do NOT re-declare renderer here:
+# this file used to be a stale copy of an old default.yml and its
+# `renderer: rasterizer` silently disabled NYX + the HDRI background.
+# Usage:
+#   scripts/collect.py --task <task>_neutral --config config/neutral_motion_take_objects_from_bowl.yml
+neutral_avatar_motion: take_objects_from_bowl
+neutral_avatar_loop_motion: false
+neutral_avatar_motion_slow: 6
+neutral_recording_camera_pos: [0.3, -1.3, 1.7]
+neutral_recording_camera_lookat: [0.3, 0.3, 0.8]
+neutral_side_camera_pos: [1.55, -1.05, 1.6]
+neutral_side_camera_lookat: [0.28, 0.28, 0.8]

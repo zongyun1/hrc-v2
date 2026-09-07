@@ -1,0 +1,9 @@
+# Force the 'open a bottle' neutral motion.
+# Only motion-specific keys — everything else (renderer, cameras, nyx/EXR)
+# is inherited from config/default.yml. Do NOT re-declare renderer here:
+# this file used to be a stale copy of an old default.yml and its
+# `renderer: rasterizer` silently disabled NYX + the HDRI background.
+# Usage:
+#   scripts/collect.py --task <task>_neutral --config config/neutral_motion_open_bottle.yml
+
+neutral_avatar_motion: open_bottle

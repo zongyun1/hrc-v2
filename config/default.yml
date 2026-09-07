@@ -1,0 +1,135 @@
+# Genesis HR Bench - Default Configuration
+
+# Show Genesis viewer during simulation
+show_viewer: false
+
+# Robot configuration (path to robot config.yml, null = default piper)
+robot_config: null
+
+# Camera configuration
+camera_config:
+  default:
+    w: 640
+    h: 480
+    fovy: 60
+  D435:
+    w: 640
+    h: 480
+    fovy: 60
+
+# Avatar configuration
+avatar:
+  motion_data: "avatars/motions/motion.pkl"
+  skin_options:
+    glb_path: "avatars/models/custom_Adrian_Keller.glb"   # fallback if not randomized
+    euler: [-90, 0, 90]
+    pos: [0.0, 0.0, -0.959008030]
+  frame_ratio: 1.0
+
+# Per-episode avatar randomization (domain randomization on the human, parallel
+# to nyx.env_texture: random above). When true, each reset() samples a fresh glb
+# from the task's AVATAR_POOL (else BaseTask.DEFAULT_AVATAR_POOL, 43 human
+# models; the 3 out-of-range-texture avatars are already excluded). Set false to
+# pin the single glb_path above. NOTE: the eval sets force randomize_avatar:false
+# in their per-episode config_overrides, so scored eval stays deterministic.
+randomize_avatar: true
+
+# Data collection
+collect:
+  episodes: 50
+  save_dir: "data"
+  save_video: false
+
+# Renderer: "nyx" (default) | "rasterizer" | "raytracer" | "batch"
+# nyx is a SMART default: it needs a CUDA GPU + a working gs_nyx_plugin
+# (env yz/env/MAWM_nyx_clean). When nyx can't run — CPU/debug runs,
+# GENESIS_BACKEND=cpu, no GPU, or an env with an incompatible gs_nyx_plugin —
+# BaseTask._resolve_renderer transparently falls back to "rasterizer" (with a
+# warning), so CPU debug runs and the shared env keep working unchanged.
+renderer: nyx
+
+# nyx (gs-nyx sensor renderer) settings — only used when renderer resolves to nyx
+#
+# spp/denoise: nyx is a SINGLE-BOUNCE ray tracer, so spp:1 + denoise:false is
+# heavily grainy. denoise is what removes the noise (spp 4/8/16 are visually
+# indistinguishable once it is on); spp 16 + denoise is clean and costs little,
+# because wall-time is dominated by physics, not rendering (measured on
+# pour_water: spp1/480p 219 s -> spp16/1080p 272 s, i.e. +24%).
+#
+# env_texture: equirectangular HDRI used as background + image-based lighting
+# (same assets/exr files as raytracer.env_texture). It replaces the plain grey
+# void with a real environment and lights the scene, at ~no cost (+1%).
+#   "random"  -> sample a fresh HDRI every reset from env_texture_pool
+#                (default pool = BaseTask.DEFAULT_ENV_TEXTURE_POOL, i.e. every
+#                *.exr in assets/exr). Gives per-episode background variety /
+#                domain randomization.
+#   "<path>"  -> always use that one HDRI.
+#   omitted   -> no background (plain grey void); add a nyx.lights entry or the
+#                scene renders dark.
+# env_rotation spins the HDRI about the up axis (degrees); env_multiplier scales
+# its radiance. env_offset is an image-space panorama displacement in degrees:
+# [horizontal, vertical], where positive moves the photographed background
+# image-right / image-up. Per-file env_offsets are added after random EXR
+# selection. NYX environment maps are infinite-distance, so this is the useful
+# visual equivalent of displacement; literal XYZ translation is not defined.
+nyx:
+  spp: 16
+  denoise: true
+  open_window: false
+  env_texture: random
+  env_rotation: 0.0
+  env_multiplier: 1.0
+  env_offset: [0.0, 0.0]
+  env_offsets:
+    abandoned_garage_4k.exr: [0.0, 0.0]
+    brown_photostudio_02_4k.exr: [0.0, 0.0]
+    church_meeting_room_4k.exr: [0.0, 0.0]
+    ferndale_studio_11_4k.exr: [0.0, 0.0]
+    glasshouse_interior_4k.exr: [0.0, 0.0]
+    marry_hall_4k.exr: [0.0, 0.0]
+    pav_studio_03_4k.exr: [0.0, 0.0]
+    photo_studio_01_4k.exr: [0.0, 0.0]
+    university_workshop_4k.exr: [0.0, 0.0]
+  # env_texture_pool: ["assets/exr/university_workshop_4k.exr", ...]
+
+# Recording / side camera resolution. NOTE: these are the knobs for the
+# `recording` and `side` cameras — camera_config above only covers the
+# head/wrist camera *types* ("default" / "D435"). Leaving these unset pins the
+# side + recording views to a hardcoded 640x480 no matter what camera_config says.
+recording_resolution: [1920, 1080]
+side_resolution: [1920, 1080]
+
+# Non-VLA demonstration videos use the two camera poses selected in the EXR
+# review: three-quarter left followed by three-quarter right.  The straight-on
+# camera behind the robot is intentionally excluded.  BaseTask automatically
+# leaves these overrides off for record_stride/VLARecorder collection, so VLA
+# head/wrist/side observations retain their existing camera contract.
+demo_video_cameras:
+  enabled: true
+  left:
+    position: [-1.2727922061, -1.2727922061, 1.1]
+    lookat: [0.0, 0.0, 1.1]
+    fov: 40.0
+  right:
+    position: [1.2727922061, -1.2727922061, 1.1]
+    lookat: [0.0, 0.0, 1.1]
+    fov: 40.0
+
+# Random background table objects are disabled by default. Enable this to add
+# decorative/task-irrelevant tabletop objects in tasks that define regions.
+table_random_objects: false
+task_irrelevant_objects: false
+
+# Ray tracer settings (only used when renderer: raytracer)
+raytracer:
+  spp: 256              # samples per pixel (higher = less noise, slower)
+  tracing_depth: 32     # max ray bounce depth
+  env_radius: 1000.0    # environment sphere radius
+  env_texture: "assets/exr/brown_photostudio_02_4k.exr"
+  lights:
+    - {pos: [0, 0, 10], color: [1, 1, 1], intensity: 10, radius: 4}
+
+# Evaluation
+eval:
+  episodes: 10
+  max_steps: 300

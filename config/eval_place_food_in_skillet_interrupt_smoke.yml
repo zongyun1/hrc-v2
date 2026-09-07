@@ -1,0 +1,5 @@
+action_substeps: 10
+eval_trigger_step_min: 5
+eval_trigger_step_max: 10
+eval_glide_policy_steps: 8
+video_stride: 12

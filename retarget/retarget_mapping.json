@@ -1,0 +1,111 @@
+{
+    "rokoko_custom_names": true,
+    "version": 1,
+    "bones": {
+        "custom_bone_left_foot": [
+            "left_foot",
+            "mixamorig1:leftfoot"
+        ],
+        "custom_bone_right_foot": [
+            "right_foot",
+            "mixamorig1:rightfoot"
+        ],
+        "custom_bone_left_shoulder": [
+            "left_shoulder",
+            "mixamorig1:leftarm"
+        ],
+        "custom_bone_right_shoulder": [
+            "right_shoulder",
+            "mixamorig1:rightarm"
+        ],
+        "leftIndexMedial": [
+            "mixamorig1:lefthandindex1"
+        ],
+        "leftIndexDistal": [
+            "mixamorig1:lefthandindex2"
+        ],
+        "custom_bone_left_index3": [
+            "left_index3",
+            "mixamorig1:lefthandindex3"
+        ],
+        "custom_bone_left_middle3": [
+            "left_middle3",
+            "mixamorig1:lefthandmiddle3"
+        ],
+        "leftLittleMedial": [
+            "mixamorig1:lefthandpinky1"
+        ],
+        "leftLittleDistal": [
+            "mixamorig1:lefthandpinky2"
+        ],
+        "custom_bone_left_pinky3": [
+            "left_pinky3",
+            "mixamorig1:lefthandpinky3"
+        ],
+        "leftRingMedial": [
+            "mixamorig1:lefthandring1"
+        ],
+        "leftRingDistal": [
+            "mixamorig1:lefthandring2"
+        ],
+        "custom_bone_left_ring3": [
+            "left_ring3",
+            "mixamorig1:lefthandring3"
+        ],
+        "leftThumbMedial": [
+            "mixamorig1:lefthandthumb1"
+        ],
+        "leftThumbDistal": [
+            "mixamorig1:lefthandthumb2"
+        ],
+        "custom_bone_left_thumb3": [
+            "left_thumb3",
+            "mixamorig1:lefthandthumb3"
+        ],
+        "rightIndexMedial": [
+            "mixamorig1:righthandindex1"
+        ],
+        "rightIndexDistal": [
+            "mixamorig1:righthandindex2"
+        ],
+        "custom_bone_right_index3": [
+            "right_index3",
+            "mixamorig1:righthandindex3"
+        ],
+        "custom_bone_right_middle3": [
+            "right_middle3",
+            "mixamorig1:righthandmiddle3"
+        ],
+        "rightRingMedial": [
+            "mixamorig1:righthandring1"
+        ],
+        "rightRingDistal": [
+            "mixamorig1:righthandring2"
+        ],
+        "custom_bone_right_ring3": [
+            "right_ring3",
+            "mixamorig1:righthandring3"
+        ],
+        "rightThumbMedial": [
+            "mixamorig1:righthandthumb1"
+        ],
+        "rightThumbDistal": [
+            "mixamorig1:righthandthumb2"
+        ],
+        "custom_bone_right_thumb3": [
+            "right_thumb3",
+            "mixamorig1:righthandthumb3"
+        ],
+        "rightLittleMedial": [
+            "mixamorig1:righthandpinky1"
+        ],
+        "rightLittleDistal": [
+            "mixamorig1:righthandpinky2"
+        ],
+        "custom_bone_right_pinky3": [
+            "right_pinky3",
+            "mixamorig1:righthandpinky3"
+        ]
+    },
+    "shapes": {}
+}

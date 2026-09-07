@@ -1,0 +1,10 @@
+# Force the standing "talking on the phone" neutral motion (phone in left hand).
+# The clip + meta are loaded from dedicated files (not the shared
+# raw_blender_interaction_clips.{pkl,json}) so this doesn't touch shared assets.
+# Usage:
+#   scripts/collect.py --task <task>_neutral --config config/neutral_motion_talking.yml
+
+neutral_avatar_motion: talking
+neutral_avatar_motion_pkl: retarget/output_motion_talking/motion.pkl
+neutral_avatar_motion_meta: assets/neutral_motions/talking_clip.json
+neutral_avatar_debug_layout: true

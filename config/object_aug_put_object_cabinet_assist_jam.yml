@@ -1,0 +1,4 @@
+object_name: 031_jam-jar
+video_stride: 12
+object_spawn_x_range: [-0.18, -0.08]
+object_spawn_y_range: [-0.34, -0.24]

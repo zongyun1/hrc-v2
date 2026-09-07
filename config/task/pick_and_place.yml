@@ -1,0 +1,15 @@
+env:
+  arm_tag: "right"
+  max_joint_delta: 0.1          # radians per step, per joint
+  action_substeps: 25           # Genesis physics sub-steps per env.step
+  max_episode_steps: 200        # truncation horizon
+  settle_steps: 20              # physics settle at reset
+  vis: false
+  reward_mode: "dense"          # dense | sparse | staged
+  reward_weights:
+    reach: 1.0
+    grasp: 0.5
+    lift: 1.0
+    place: 2.0
+    success: 10.0
+    action_penalty: 0.001

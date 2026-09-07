@@ -1,0 +1,22 @@
+# Genesis HR Bench - Dependencies
+
+# Physics simulation
+genesis-world  # Genesis simulator
+
+# Motion planning
+mplib==0.2.1
+toppra
+
+# Math / transforms
+numpy
+scipy
+transforms3d
+
+# Data
+pyyaml
+imageio
+imageio-ffmpeg
+
+# Optional: GPU support
+# torch
+# torchvision

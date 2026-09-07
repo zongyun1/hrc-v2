@@ -1,0 +1,6 @@
+eval_mode: true
+track_avatar_collision: true
+eval_trigger_step_min: 20
+eval_trigger_step_max: 40
+action_substeps: 12
+video_stride: 12

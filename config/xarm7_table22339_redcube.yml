@@ -1,0 +1,6 @@
+robot_type: xarm7
+planner_override: mplib
+randomize_table: true
+debug_table_randomization: true
+table_variant_name: sapien-table-22339
+dump_cube_color: [1.0, 0.0, 0.0]

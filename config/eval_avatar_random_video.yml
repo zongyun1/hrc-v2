@@ -1,0 +1,14 @@
+eval_mode: true
+eval_avatar_pre_policy: true
+eval_trigger_step_min: 5
+eval_trigger_step_max: 20
+neutral_eval_trigger_step_min: 5
+neutral_eval_trigger_step_max: 20
+eval_interrupt_force_at_trigger: true
+eval_stop_on_success: false
+action_substeps: 10
+video_stride: 8
+show_viewer: false
+randomize_avatar: false
+track_avatar_collision: false
+neutral_avatar_strict_layout: false
