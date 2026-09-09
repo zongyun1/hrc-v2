@@ -1,0 +1,2804 @@
+diff --git a/lw_benchhub/autosim/action_adapters/x7s_action_adapter.py b/lw_benchhub/autosim/action_adapters/x7s_action_adapter.py
+index 12919d6..059542a 100644
+--- a/lw_benchhub/autosim/action_adapters/x7s_action_adapter.py
++++ b/lw_benchhub/autosim/action_adapters/x7s_action_adapter.py
+@@ -29,7 +29,7 @@ class X7SActionAdapter(ActionAdapterBase):
+         vx, vy, vyaw = skill_output.action  # [vx, vy, vyaw] in the world frame
+ 
+         robot = env.scene["robot"]
+-        world_pose = robot.data.root_pose_w[0]  # [x, y, z, qw, qx, qy, qz]
++        world_pose = robot.data.root_pose_w.torch[0]  # [x, y, z, qw, qx, qy, qz]
+         w, x, y, z = world_pose[3:7]
+         sin_yaw = 2 * (w * z + x * y)
+         cos_yaw = 1 - 2 * (y**2 + z**2)
+@@ -59,7 +59,7 @@ class X7SActionAdapter(ActionAdapterBase):
+         target_joint_pos = skill_output.action
+ 
+         robot = env.scene["robot"]
+-        current_joint_pos = robot.data.joint_pos[0]
++        current_joint_pos = robot.data.joint_pos.torch[0]
+ 
+         last_action = env.action_manager.action
+         action = last_action[0, :].clone()
+diff --git a/lw_benchhub/core/checks/action_state_inconsistency_checker.py b/lw_benchhub/core/checks/action_state_inconsistency_checker.py
+index aa131a8..c5d5f32 100644
+--- a/lw_benchhub/core/checks/action_state_inconsistency_checker.py
++++ b/lw_benchhub/core/checks/action_state_inconsistency_checker.py
+@@ -116,7 +116,7 @@ class ActionStateInconsistencyChecker(BaseChecker):
+             return self._last_result
+ 
+         actions = env.latest_action
+-        joint_pos = robot.data.joint_pos
++        joint_pos = robot.data.joint_pos.torch
+         num_envs, num_joints = joint_pos.shape
+         joint_names = robot.joint_names
+ 
+diff --git a/lw_benchhub/core/checks/actuator_velocity_jump_checker.py b/lw_benchhub/core/checks/actuator_velocity_jump_checker.py
+index da6d48a..b286f83 100644
+--- a/lw_benchhub/core/checks/actuator_velocity_jump_checker.py
++++ b/lw_benchhub/core/checks/actuator_velocity_jump_checker.py
+@@ -56,7 +56,7 @@ class VelocityJumpChecker(BaseChecker):
+         self._jump_violations = {}
+ 
+         robot = env.scene.articulations['robot']
+-        current_body_poses = robot.data.body_com_pose_w[0]
++        current_body_poses = robot.data.body_com_pose_w.torch[0]
+         body_names = robot.data.body_names
+ 
+         if not hasattr(self, "_arm_indices") or not self._arm_indices:
+diff --git a/lw_benchhub/core/checks/arm_joint_pos_checker.py b/lw_benchhub/core/checks/arm_joint_pos_checker.py
+index 18428e3..c553d46 100644
+--- a/lw_benchhub/core/checks/arm_joint_pos_checker.py
++++ b/lw_benchhub/core/checks/arm_joint_pos_checker.py
+@@ -53,7 +53,7 @@ class ArmJointAngleChecker(BaseChecker):
+ 
+         for j_name in self.joint_names:
+             joint_idx = scene.articulations[self.name].data.joint_names.index(j_name)
+-            joint_qpos = scene.articulations[self.name].data.joint_pos[:, joint_idx]
++            joint_qpos = scene.articulations[self.name].data.joint_pos.torch[:, joint_idx]
+ 
+             out_of_bounds = (joint_qpos < self.lower_bound) | (joint_qpos > self.upper_bound)
+ 
+diff --git a/lw_benchhub/core/checks/motion_checker.py b/lw_benchhub/core/checks/motion_checker.py
+index 3850b71..54e35c8 100644
+--- a/lw_benchhub/core/checks/motion_checker.py
++++ b/lw_benchhub/core/checks/motion_checker.py
+@@ -49,7 +49,7 @@ class MotionChecker(BaseChecker):
+         motion_violations = {}
+ 
+         # Get current frame robot body poses and names
+-        current_body_poses = self.env.scene.articulations['robot'].data.body_com_pose_w[0]
++        current_body_poses = self.env.scene.articulations['robot'].data.body_com_pose_w.torch[0]
+         body_names = self.env.scene.articulations['robot'].data.body_names
+ 
+         # Check if we have previous frame data
+diff --git a/lw_benchhub/core/checks/obj_drop_checker.py b/lw_benchhub/core/checks/obj_drop_checker.py
+index a19e3e8..fed48f4 100644
+--- a/lw_benchhub/core/checks/obj_drop_checker.py
++++ b/lw_benchhub/core/checks/obj_drop_checker.py
+@@ -45,7 +45,7 @@ class ObjDropChecker(BaseChecker):
+ 
+         for name, obj in scene.rigid_objects.items():
+             obj_map[name] = "rigid"
+-            obj_getters[name] = lambda o=obj: o.data.body_com_pos_w[:, 0:1, 2]
++            obj_getters[name] = lambda o=obj: o.data.body_com_pos_w.torch[:, 0:1, 2]
+ 
+         for name, obj in scene.deformable_objects.items():
+             obj_map[name] = "deformable"
+@@ -68,7 +68,7 @@ class ObjDropChecker(BaseChecker):
+ 
+         for name in env.scene.rigid_objects:
+             if name in scene.rigid_objects:
+-                obj_getters[name] = lambda o=scene.rigid_objects[name]: o.data.body_com_pos_w[:, 0:1, 2]
++                obj_getters[name] = lambda o=scene.rigid_objects[name]: o.data.body_com_pos_w.torch[:, 0:1, 2]
+             elif name in scene.deformable_objects:
+                 obj_getters[name] = lambda o=scene.deformable_objects[name]: o.data.nodal_pos_w[:, 0:1, 2]
+             obj_map[name] = "cfg_object"
+diff --git a/lw_benchhub/core/checks/start_object_move_checker.py b/lw_benchhub/core/checks/start_object_move_checker.py
+index ff04894..18d8bd6 100644
+--- a/lw_benchhub/core/checks/start_object_move_checker.py
++++ b/lw_benchhub/core/checks/start_object_move_checker.py
+@@ -51,10 +51,10 @@ class StartObjectMoveChecker(BaseChecker):
+         if not self._pos_start:
+             for obj in self.env.scene.articulations.keys():
+                 if hasattr(self.env.scene.articulations[obj], 'data') and obj != 'robot':
+-                    self._pos_start[obj] = self.env.scene.articulations[obj].data.body_com_pos_w[0].clone()
++                    self._pos_start[obj] = self.env.scene.articulations[obj].data.body_com_pos_w.torch[0].clone()
+             for obj in self.env.scene.rigid_objects.keys():
+                 if hasattr(self.env.scene.rigid_objects[obj], 'data'):
+-                    self._pos_start[obj] = self.env.scene.rigid_objects[obj].data.body_com_pos_w[0].clone()
++                    self._pos_start[obj] = self.env.scene.rigid_objects[obj].data.body_com_pos_w.torch[0].clone()
+             return {"success": True, "warning_text": "", "metrics": {"success": True, "move_info": {}}}
+ 
+         # Check for object movement within the defined step range
+@@ -62,7 +62,7 @@ class StartObjectMoveChecker(BaseChecker):
+             for obj in self.env.scene.articulations.keys():
+                 if hasattr(self.env.scene.articulations[obj], 'data') and obj != 'robot':
+                     body_names = self.env.scene.articulations[obj].data.body_names
+-                    obj_pos = self.env.scene.articulations[obj].data.body_com_pos_w[0]
++                    obj_pos = self.env.scene.articulations[obj].data.body_com_pos_w.torch[0]
+                     for i, body_name in enumerate(body_names):
+                         if i < len(obj_pos) and i < len(self._pos_start[obj]):
+                             start_pos = self._pos_start[obj][i]
+@@ -87,7 +87,7 @@ class StartObjectMoveChecker(BaseChecker):
+ 
+             for obj in self.env.scene.rigid_objects.keys():
+                 if hasattr(self.env.scene.rigid_objects[obj], 'data'):
+-                    obj_pos = self.env.scene.rigid_objects[obj].data.body_com_pos_w[0]
++                    obj_pos = self.env.scene.rigid_objects[obj].data.body_com_pos_w.torch[0]
+                     for i in range(len(obj_pos)):
+                         if i < len(self._pos_start[obj]):
+                             start_pos = self._pos_start[obj][i]
+diff --git a/lw_benchhub/core/context.py b/lw_benchhub/core/context.py
+index ec380ee..5277666 100644
+--- a/lw_benchhub/core/context.py
++++ b/lw_benchhub/core/context.py
+@@ -14,7 +14,7 @@
+ 
+ from dataclasses import field
+ 
+-from isaaclab.utils import dataclass
++from dataclasses import dataclass
+ 
+ from lw_benchhub.utils.env import ExecuteMode
+ 
+diff --git a/lw_benchhub/core/devices/openxr/lw_openxr_device.py b/lw_benchhub/core/devices/openxr/lw_openxr_device.py
+index bafe694..6f3ec7b 100644
+--- a/lw_benchhub/core/devices/openxr/lw_openxr_device.py
++++ b/lw_benchhub/core/devices/openxr/lw_openxr_device.py
+@@ -73,9 +73,9 @@ class LwOpenXRDevice(OpenXRDevice):
+         self._xr_cfg = xr_cfg or XrCfg()
+         self.env = env
+         self.robot = env.scene.articulations['robot']
+-        self._xr_cfg.anchor_pos = self.robot.data.root_com_pos_w[0]
++        self._xr_cfg.anchor_pos = self.robot.data.root_com_pos_w.torch[0]
+         self._xr_cfg.anchor_pos[2] = -0.2
+-        self._xr_cfg.anchor_rot = self.robot.data.root_com_quat_w[0]
++        self._xr_cfg.anchor_rot = self.robot.data.root_com_quat_w.torch[0]
+         rotation = PoseUtils.matrix_from_quat(torch.tensor([0.707, 0.0, 0.0, -0.707], dtype=torch.float32))
+         anchor_rot = torch.matmul(PoseUtils.matrix_from_quat(self._xr_cfg.anchor_rot), rotation)
+         self._xr_cfg.anchor_rot = PoseUtils.quat_from_matrix(anchor_rot)
+@@ -138,8 +138,8 @@ class LwOpenXRDevice(OpenXRDevice):
+         )
+         usd_right_roll_link_in_world_quat = PoseUtils.quat_from_matrix(usd_right_roll_link_in_world_mat)
+ 
+-        arm_pos, arm_quat = math_utils.subtract_frame_transforms(self.robot.data.root_com_pos_w[0],
+-                                                                 self.robot.data.root_com_quat_w[0],
++        arm_pos, arm_quat = math_utils.subtract_frame_transforms(self.robot.data.root_com_pos_w.torch[0],
++                                                                 self.robot.data.root_com_quat_w.torch[0],
+                                                                  usd_right_roll_link_in_world_pos,
+                                                                  usd_right_roll_link_in_world_quat)
+         return torch.cat([arm_pos, arm_quat])
+diff --git a/lw_benchhub/core/devices/vr/vr.py b/lw_benchhub/core/devices/vr/vr.py
+index 07a12cb..310c9a9 100644
+--- a/lw_benchhub/core/devices/vr/vr.py
++++ b/lw_benchhub/core/devices/vr/vr.py
+@@ -837,7 +837,7 @@ class VRController(VRDevice):
+             if not self.relative_control:
+                 if self.is_body_moving_last_frame:
+                     self.is_body_moving = False
+-                    joint_vel = self.env.scene.articulations["robot"].data.joint_vel
++                    joint_vel = self.env.scene.articulations["robot"].data.joint_vel.torch
+                     for i in range(joint_vel.shape[1]):
+                         get_vr_logger().info("joint %s vel: %s", self.env.scene.articulations["robot"].joint_names[i], joint_vel[0, i])
+                         if abs(joint_vel[0, i]) > 0.01:  # Check joint velocity threshold
+@@ -968,7 +968,7 @@ class VRController(VRDevice):
+         if left_controller_state["b_button"]:
+             if self.is_body_moving_last_frame:
+                 self.is_body_moving = False
+-                joint_vel = self.env.scene.articulations["robot"].data.joint_vel
++                joint_vel = self.env.scene.articulations["robot"].data.joint_vel.torch
+                 for i in range(joint_vel.shape[1]):
+                     get_vr_logger().info("joint %s vel: %s", self.env.scene.articulations["robot"].joint_names[i], joint_vel[0, i])
+                     if abs(joint_vel[0, i]) > 0.01:  # Check joint velocity threshold
+@@ -1010,7 +1010,7 @@ class VRController(VRDevice):
+         if right_controller_state["a_button"]:
+             if self.is_body_moving_last_frame:
+                 self.is_body_moving = False
+-                body_lin_vel_w = self.env.scene.articulations["robot"].data.body_lin_vel_w
++                body_lin_vel_w = self.env.scene.articulations["robot"].data.body_lin_vel_w.torch
+                 for i in range(body_lin_vel_w.shape[1]):
+                     if abs(np.linalg.norm(body_lin_vel_w[0, i, :])) > 0.00001:  # TODO: 0.00001 is a magic number, need to be tuned, 0.0001 is tested to be unsuitable
+                         self.is_body_moving = True
+diff --git a/lw_benchhub/core/mdp/__init__.py b/lw_benchhub/core/mdp/__init__.py
+index fb2c9ad..e9ec61e 100644
+--- a/lw_benchhub/core/mdp/__init__.py
++++ b/lw_benchhub/core/mdp/__init__.py
+@@ -13,6 +13,8 @@
+ # limitations under the License.
+ 
+ from isaaclab.envs.mdp import *  # noqa: F401, F403
++from isaaclab.managers import ActionTerm, ActionTermCfg
++from isaaclab.controllers import DifferentialIKControllerCfg
+ 
+ from .observations import *  # noqa: F401, F403
+ from .actions import *  # noqa: F401, F403
+diff --git a/lw_benchhub/core/mdp/actions/leg_position_action.py b/lw_benchhub/core/mdp/actions/leg_position_action.py
+index e175784..8332c86 100644
+--- a/lw_benchhub/core/mdp/actions/leg_position_action.py
++++ b/lw_benchhub/core/mdp/actions/leg_position_action.py
+@@ -123,19 +123,19 @@ class LegPositionAction(ActionTerm):
+         self.target_dof_pos = self.loco_config.default_angles.copy()
+ 
+     def refresh_prop(self):
+-        joint_pos = self._asset.data.joint_pos[:, self.loco_joint_ids]
+-        joint_vel = self._asset.data.joint_vel[:, self.loco_joint_ids]
++        joint_pos = self._asset.data.joint_pos.torch[:, self.loco_joint_ids]
++        joint_vel = self._asset.data.joint_vel.torch[:, self.loco_joint_ids]
+ 
+         self.loco_qj = joint_pos.cpu().numpy()[0]
+         self.loco_dqj = joint_vel.cpu().numpy()[0]
+-        squat_joint_pos = self._asset.data.joint_pos[:, self.squat_joint_ids]
+-        squat_joint_vel = self._asset.data.joint_vel[:, self.squat_joint_ids]
++        squat_joint_pos = self._asset.data.joint_pos.torch[:, self.squat_joint_ids]
++        squat_joint_vel = self._asset.data.joint_vel.torch[:, self.squat_joint_ids]
+         self.squat_qj = squat_joint_pos.cpu().numpy()[0]
+         self.squat_dqj = squat_joint_vel.cpu().numpy()[0]
+ 
+         body_idx = self._asset.find_bodies("pelvis")[0]
+-        quat = self._asset.data.body_link_quat_w[:, body_idx]
+-        ang_vel = self._asset.data.body_link_ang_vel_w[:, body_idx]
++        quat = self._asset.data.body_link_quat_w.torch[:, body_idx]
++        ang_vel = self._asset.data.body_link_ang_vel_w.torch[:, body_idx]
+ 
+         quat_np = quat.cpu().numpy()[0][0]  # [w, x, y, z]
+         ang_vel_np = ang_vel.cpu().numpy()[0].flatten()  # [wx, wy, wz]
+diff --git a/lw_benchhub/core/mdp/observations.py b/lw_benchhub/core/mdp/observations.py
+index 03131fa..4598a84 100644
+--- a/lw_benchhub/core/mdp/observations.py
++++ b/lw_benchhub/core/mdp/observations.py
+@@ -32,13 +32,13 @@ def rel_ee_object_distance(env: ManagerBasedRLEnv) -> torch.Tensor:
+     ee_tf_data: FrameTransformerData = env.scene["ee_frame"].data
+     object_data: ArticulationData = env.scene["object"].data
+ 
+-    return object_data.root_pos_w - ee_tf_data.target_pos_w[..., 0, :]
++    return object_data.root_pos_w - ee_tf_data.target_pos_w.torch[..., 0, :]
+ 
+ 
+ def fingertips_pos(env: ManagerBasedRLEnv) -> torch.Tensor:
+     """The position of the fingertips relative to the environment origins."""
+     ee_tf_data: FrameTransformerData = env.scene["ee_frame"].data
+-    fingertips_pos = ee_tf_data.target_pos_w[..., 1:, :] - env.scene.env_origins.unsqueeze(1)
++    fingertips_pos = ee_tf_data.target_pos_w.torch[..., 1:, :] - env.scene.env_origins.unsqueeze(1)
+ 
+     return fingertips_pos.view(env.num_envs, -1)
+ 
+@@ -46,7 +46,7 @@ def fingertips_pos(env: ManagerBasedRLEnv) -> torch.Tensor:
+ def ee_pos(env: ManagerBasedRLEnv) -> torch.Tensor:
+     """The position of the end-effector relative to the environment origins."""
+     ee_tf_data: FrameTransformerData = env.scene["ee_frame"].data
+-    ee_pos = ee_tf_data.target_pos_w - env.scene.env_origins.unsqueeze(1)
++    ee_pos = ee_tf_data.target_pos_w.torch - env.scene.env_origins.unsqueeze(1)
+ 
+     return ee_pos
+ 
+@@ -57,7 +57,7 @@ def ee_quat(env: ManagerBasedRLEnv, make_quat_unique: bool = True) -> torch.Tens
+     If :attr:`make_quat_unique` is True, the quaternion is made unique by ensuring the real part is positive.
+     """
+     ee_tf_data: FrameTransformerData = env.scene["ee_frame"].data
+-    ee_quat = ee_tf_data.target_quat_w
++    ee_quat = ee_tf_data.target_quat_w.torch
+     # make first element of quaternion positive
+     return math_utils.quat_unique(ee_quat) if make_quat_unique else ee_quat
+ 
+@@ -91,22 +91,22 @@ def get_target_qpos(
+ 
+ def ee_frame_pos(env: ManagerBasedRLEnv, ee_frame_cfg: SceneEntityCfg = SceneEntityCfg("ee_frame")) -> torch.Tensor:
+     ee_frame: FrameTransformer = env.scene[ee_frame_cfg.name]
+-    ee_frame_pos = ee_frame.data.target_pos_w[:, 0, :] - env.scene.env_origins[:, 0:3]
++    ee_frame_pos = ee_frame.data.target_pos_w.torch[:, 0, :] - env.scene.env_origins[:, 0:3]
+ 
+     return ee_frame_pos
+ 
+ 
+ def ee_frame_quat(env: ManagerBasedRLEnv, ee_frame_cfg: SceneEntityCfg = SceneEntityCfg("ee_frame")) -> torch.Tensor:
+     ee_frame: FrameTransformer = env.scene[ee_frame_cfg.name]
+-    ee_frame_quat = ee_frame.data.target_quat_w[:, 0, :]
++    ee_frame_quat = ee_frame.data.target_quat_w.torch[:, 0, :]
+ 
+     return ee_frame_quat
+ 
+ 
+ def gripper_pos(env: ManagerBasedRLEnv, robot_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+     robot: Articulation = env.scene[robot_cfg.name]
+-    finger_joint_1 = robot.data.joint_pos[:, -1].clone().unsqueeze(1)
+-    finger_joint_2 = -1 * robot.data.joint_pos[:, -2].clone().unsqueeze(1)
++    finger_joint_1 = robot.data.joint_pos.torch[:, -1].clone().unsqueeze(1)
++    finger_joint_2 = -1 * robot.data.joint_pos.torch[:, -2].clone().unsqueeze(1)
+ 
+     return torch.cat((finger_joint_1, finger_joint_2), dim=1)
+ 
+@@ -117,8 +117,8 @@ def get_eef_base(env: ManagerBasedRLEnv, base_link_name: str = 'dummy_link', eef
+     base_link_ids, _ = robot.find_bodies(base_link_name)
+     hand_idx = hand_ids[0]
+     base_link_idx = base_link_ids[0]
+-    hand_pose_w = robot.data.body_link_pose_w[0, hand_idx, :]
+-    base_link_pose_w = robot.data.body_link_pose_w[0, base_link_idx, :]
++    hand_pose_w = robot.data.body_link_pose_w.torch[0, hand_idx, :]
++    base_link_pose_w = robot.data.body_link_pose_w.torch[0, base_link_idx, :]
+     hand_pos_base, hand_quat_base = subtract_frame_transforms(
+         base_link_pose_w[:3].unsqueeze(0),   # base position in world
+         base_link_pose_w[3:].unsqueeze(0),   # base quaternion [w,x,y,z] in world
+@@ -141,7 +141,7 @@ def get_eef_pos(env: ManagerBasedRLEnv, link_name: str) -> torch.Tensor:
+     This is a generic version of :func:`get_left_eef_pos` / :func:`get_right_eef_pos`
+     that selects the link by name. It is used by Arena configs such as GR1T2.
+     """
+-    body_pos_w = env.scene["robot"].data.body_pos_w
++    body_pos_w = env.scene["robot"].data.body_pos_w.torch
+     body_names: List[str] = env.scene["robot"].data.body_names
+     try:
+         link_idx = body_names.index(link_name)
+@@ -155,7 +155,7 @@ def get_eef_pos(env: ManagerBasedRLEnv, link_name: str) -> torch.Tensor:
+ 
+ def get_eef_quat(env: ManagerBasedRLEnv, link_name: str) -> torch.Tensor:
+     """Return the orientation (quaternion) of an end-effector link in world frame."""
+-    body_quat_w = env.scene["robot"].data.body_quat_w
++    body_quat_w = env.scene["robot"].data.body_quat_w.torch
+     body_names: List[str] = env.scene["robot"].data.body_names
+     try:
+         link_idx = body_names.index(link_name)
+@@ -204,7 +204,7 @@ def get_robot_joint_state(env: ManagerBasedRLEnv, joint_names: Iterable[str]) ->
+         Tensor of shape ``(num_envs, num_selected_joints)`` with joint positions.
+     """
+     robot_joint_names = env.scene["robot"].data.joint_names
+-    device = env.scene["robot"].data.joint_pos.device
++    device = env.scene["robot"].data.joint_pos.torch.device
+     indices = _match_joint_indices(robot_joint_names, joint_names, device)
+-    joint_pos = env.scene["robot"].data.joint_pos[:, indices]
++    joint_pos = env.scene["robot"].data.joint_pos.torch[:, indices]
+     return joint_pos
+diff --git a/lw_benchhub/core/mdp/rewards.py b/lw_benchhub/core/mdp/rewards.py
+index 33a40f8..e377331 100644
+--- a/lw_benchhub/core/mdp/rewards.py
++++ b/lw_benchhub/core/mdp/rewards.py
+@@ -29,8 +29,8 @@ def approach_ee_handle(env: ManagerBasedRLEnv, threshold: float) -> torch.Tensor
+         \end{cases}
+ 
+     """
+-    ee_tcp_pos = env.scene["ee_frame"].data.target_pos_w[..., 0, :]
+-    handle_pos = env.scene["cabinet_frame"].data.target_pos_w[..., 0, :]
++    ee_tcp_pos = env.scene["ee_frame"].data.target_pos_w.torch[..., 0, :]
++    handle_pos = env.scene["cabinet_frame"].data.target_pos_w.torch[..., 0, :]
+ 
+     # Compute the distance of the end-effector to the handle
+     distance = torch.norm(handle_pos - ee_tcp_pos, dim=-1, p=2)
+@@ -53,8 +53,8 @@ def align_ee_handle(env: ManagerBasedRLEnv) -> torch.Tensor:
+     where :math:`align_z` is the dot product of the z direction of the gripper and the -x direction of the handle
+     and :math:`align_x` is the dot product of the x direction of the gripper and the -y direction of the handle.
+     """
+-    ee_tcp_quat = env.scene["ee_frame"].data.target_quat_w[..., 0, :]
+-    handle_quat = env.scene["cabinet_frame"].data.target_quat_w[..., 0, :]
++    ee_tcp_quat = env.scene["ee_frame"].data.target_quat_w.torch[..., 0, :]
++    handle_quat = env.scene["cabinet_frame"].data.target_quat_w.torch[..., 0, :]
+ 
+     ee_tcp_rot_mat = matrix_from_quat(ee_tcp_quat)
+     handle_mat = matrix_from_quat(handle_quat)
+@@ -79,9 +79,9 @@ def align_grasp_around_handle(env: ManagerBasedRLEnv) -> torch.Tensor:
+     The correct hand orientation is when the left finger is above the handle and the right finger is below the handle.
+     """
+     # Target object position: (num_envs, 3)
+-    handle_pos = env.scene["cabinet_frame"].data.target_pos_w[..., 0, :]
++    handle_pos = env.scene["cabinet_frame"].data.target_pos_w.torch[..., 0, :]
+     # Fingertips position: (num_envs, n_fingertips, 3)
+-    ee_fingertips_w = env.scene["ee_frame"].data.target_pos_w[..., 1:, :]
++    ee_fingertips_w = env.scene["ee_frame"].data.target_pos_w.torch[..., 1:, :]
+     lfinger_pos = ee_fingertips_w[..., 0, :]
+     rfinger_pos = ee_fingertips_w[..., 1, :]
+ 
+@@ -99,9 +99,9 @@ def approach_gripper_handle(env: ManagerBasedRLEnv, offset: float = 0.04) -> tor
+     (i.e., the left finger is above the handle and the right finger is below the handle). Otherwise, it returns zero.
+     """
+     # Target object position: (num_envs, 3)
+-    handle_pos = env.scene["cabinet_frame"].data.target_pos_w[..., 0, :]
++    handle_pos = env.scene["cabinet_frame"].data.target_pos_w.torch[..., 0, :]
+     # Fingertips position: (num_envs, n_fingertips, 3)
+-    ee_fingertips_w = env.scene["ee_frame"].data.target_pos_w[..., 1:, :]
++    ee_fingertips_w = env.scene["ee_frame"].data.target_pos_w.torch[..., 1:, :]
+     lfinger_pos = ee_fingertips_w[..., 0, :]
+     rfinger_pos = ee_fingertips_w[..., 1, :]
+ 
+@@ -126,9 +126,9 @@ def grasp_handle(
+     Note:
+         It is assumed that zero joint position corresponds to the fingers being closed.
+     """
+-    ee_tcp_pos = env.scene["ee_frame"].data.target_pos_w[..., 0, :]
+-    handle_pos = env.scene["cabinet_frame"].data.target_pos_w[..., 0, :]
+-    gripper_joint_pos = env.scene[asset_cfg.name].data.joint_pos[:, asset_cfg.joint_ids]
++    ee_tcp_pos = env.scene["ee_frame"].data.target_pos_w.torch[..., 0, :]
++    handle_pos = env.scene["cabinet_frame"].data.target_pos_w.torch[..., 0, :]
++    gripper_joint_pos = env.scene[asset_cfg.name].data.joint_pos.torch[:, asset_cfg.joint_ids]
+ 
+     distance = torch.norm(handle_pos - ee_tcp_pos, dim=-1, p=2)
+     is_close = distance <= threshold
+@@ -142,7 +142,7 @@ def open_drawer_bonus(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg) -> torc
+     The bonus is given when the drawer is open. If the grasp is around the handle, the bonus is doubled.
+     """
+     joint_index = asset_cfg.joint_ids[0] if not isinstance(asset_cfg.joint_ids, slice) else 0
+-    drawer_pos = env.scene[asset_cfg.name].data.joint_pos[:, joint_index]
++    drawer_pos = env.scene[asset_cfg.name].data.joint_pos.torch[:, joint_index]
+     is_graspable = align_grasp_around_handle(env).float()
+ 
+     return (is_graspable + 1.0) * drawer_pos
+@@ -155,7 +155,7 @@ def multi_stage_open_drawer(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg) -
+     This helps the agent to learn to open the drawer in a controlled manner.
+     """
+     joint_index = asset_cfg.joint_ids[0] if not isinstance(asset_cfg.joint_ids, slice) else 0
+-    drawer_pos = env.scene[asset_cfg.name].data.joint_pos[:, joint_index]
++    drawer_pos = env.scene[asset_cfg.name].data.joint_pos.torch[:, joint_index]
+     is_graspable = align_grasp_around_handle(env).float()
+ 
+     open_easy = (drawer_pos > 0.01) * 0.5
+diff --git a/lw_benchhub/core/models/fixtures/blender.py b/lw_benchhub/core/models/fixtures/blender.py
+index 615c7f2..0c2bf7f 100644
+--- a/lw_benchhub/core/models/fixtures/blender.py
++++ b/lw_benchhub/core/models/fixtures/blender.py
+@@ -72,7 +72,7 @@ class Blender(Fixture):
+     def get_lid_closed_pos(self, env):
+         prims = usd.get_all_prims(env.scene.stage)
+         anchor_prim = next((p for p in prims if "reg_anchor" in p.GetPath().pathString), None)
+-        pos_blender = env.scene.articulations[self.name].data.root_pos_w
++        pos_blender = env.scene.articulations[self.name].data.root_pos_w.torch
+         trans_attr = anchor_prim.GetAttribute("xformOp:translate").Get()
+         anchor_offset = torch.tensor([trans_attr[0], trans_attr[1], trans_attr[2]], dtype=torch.float32, device=env.device)
+         pos_anchor = pos_blender + anchor_offset
+@@ -82,7 +82,7 @@ class Blender(Fixture):
+         self.blender_lid = next((k for k in env.scene.rigid_objects if k.startswith(self.name) and k.endswith("_lid")), None)
+         if self.blender_lid is None:
+             return None
+-        return env.scene.rigid_objects[self.blender_lid].data.root_pos_w
++        return env.scene.rigid_objects[self.blender_lid].data.root_pos_w.torch
+ 
+     def update_state(self, env):
+         curr_lid_pos = self.get_curr_lid_pos(env)
+@@ -101,7 +101,7 @@ class Blender(Fixture):
+             power_joint_name = self._joint_names["power"]
+             if power_joint_name in joint_names:
+                 power_joint_idx = joint_names.index(power_joint_name)
+-                joint_pos = blender_articulation.data.joint_pos[:, power_joint_idx]
++                joint_pos = blender_articulation.data.joint_pos.torch[:, power_joint_idx]
+                 # A small positive value indicates the button is pressed.
+                 press_threshold = 0.0001
+                 button_pressed = joint_pos >= press_threshold
+diff --git a/lw_benchhub/core/models/fixtures/cabinets.py b/lw_benchhub/core/models/fixtures/cabinets.py
+index b5c4ecb..4eadc19 100644
+--- a/lw_benchhub/core/models/fixtures/cabinets.py
++++ b/lw_benchhub/core/models/fixtures/cabinets.py
+@@ -71,7 +71,7 @@ class HingeCabinet(Cabinet):
+         state = dict()
+         joint_names = env.scene.articulations[self.name].joint_names
+         for i, joint_name in enumerate(joint_names):
+-            state[joint_name] = env.scene.articulations[self.name].data.joint_pos[:, i]
++            state[joint_name] = env.scene.articulations[self.name].data.joint_pos.torch[:, i]
+         return state
+ 
+     def set_door_state(self, min, max, env, env_ids=None):
+@@ -112,7 +112,7 @@ class HingeCabinet(Cabinet):
+         joint_names = env.scene.articulations[self.name].joint_names
+         state = dict()
+         for i, joint_name in enumerate(joint_names):
+-            joint_qpos = env.scene.articulations[self.name].data.joint_pos[:, i]
++            joint_qpos = env.scene.articulations[self.name].data.joint_pos.torch[:, i]
+             state[joint_name] = OU.normalize_joint_value(joint_qpos, joint_min=0, joint_max=np.pi / 2)
+         return state
+ 
+@@ -147,7 +147,7 @@ class Drawer(Cabinet):
+             env (ManagerBasedRLEnv): environment
+         """
+         door_joint_id = env.scene.articulations[self.name].joint_names.index(self.door_joint_names[0])
+-        door_qpos = env.scene.articulations[self.name].data.joint_pos[:, door_joint_id].cpu().numpy()
++        door_qpos = env.scene.articulations[self.name].data.joint_pos.torch[:, door_joint_id].cpu().numpy()
+         # suppose drawer joint direction(in its local frame) is along -y axis
+         door_qpos = np.stack([np.zeros_like(door_qpos), -door_qpos, np.zeros_like(door_qpos)], axis=-1)
+         self._regions["int"]["per_env_offset"] = door_qpos
+@@ -199,7 +199,7 @@ class Drawer(Cabinet):
+             dict: maps door name to a percentage of how open the door is
+         """
+         joint_idx = env.scene.articulations[self.name].joint_names.index("drawer_door_joint")
+-        hinge_qpos = env.scene.articulations[self.name].data.joint_pos[:, joint_idx]
++        hinge_qpos = env.scene.articulations[self.name].data.joint_pos.torch[:, joint_idx]
+ 
+         # convert to percentages
+         door = OU.normalize_joint_value(
+@@ -226,7 +226,7 @@ class PanelCabinet(Cabinet):
+         state = dict()
+         for i, joint_name in enumerate(list(self._joint_infos.keys())):
+             joint_idx = env.scene.articulations[self.name].joint_names.index(joint_name)
+-            state[joint_name] = env.scene.articulations[self.name].data.joint_pos[:, joint_idx]
++            state[joint_name] = env.scene.articulations[self.name].data.joint_pos.torch[:, joint_idx]
+         return state
+ 
+ 
+diff --git a/lw_benchhub/core/models/fixtures/coffee_machine.py b/lw_benchhub/core/models/fixtures/coffee_machine.py
+index c587270..f8695bb 100644
+--- a/lw_benchhub/core/models/fixtures/coffee_machine.py
++++ b/lw_benchhub/core/models/fixtures/coffee_machine.py
+@@ -132,7 +132,7 @@ class CoffeeMachine(Fixture):
+                 button_joint_name = joint_lookup[0]
+                 button_joint_index = joint_names.index(button_joint_name)
+ 
+-                joint_pos = articulation.data.joint_pos[:, button_joint_index]
++                joint_pos = articulation.data.joint_pos.torch[:, button_joint_index]
+                 threshold = torch.tensor([0.0001], device=self.device).repeat(self.num_envs)
+                 button_pressed = (joint_pos >= threshold)
+ 
+@@ -187,7 +187,7 @@ class CoffeeMachine(Fixture):
+         Returns:
+             bool: True if object is placed under coffee machine, False otherwise
+         """
+-        obj_poses = env.scene.rigid_objects[obj_name].data.body_com_pos_w[:, 0, :]
++        obj_poses = env.scene.rigid_objects[obj_name].data.body_com_pos_w.torch[:, 0, :]
+         pour_site_poses = T.euler2mat(torch.tensor([0, 0, self.rot], device=self.device, dtype=torch.float32)) @ \
+             torch.tensor(self.get_reset_regions()["bottom"]["offset"], device=self.device, dtype=torch.float32) + \
+             torch.tensor(self.pos, device=self.device, dtype=torch.float32) + \
+@@ -209,7 +209,7 @@ class CoffeeMachine(Fixture):
+             bool: True if gripper is far from the button, False otherwise
+         """
+         result = torch.tensor([True] * env.num_envs, dtype=torch.bool, device=env.device)
+-        gripper_site_pos = env.scene["ee_frame"].data.target_pos_w  # (env_num, ee_num, 3)
++        gripper_site_pos = env.scene["ee_frame"].data.target_pos_w.torch  # (env_num, ee_num, 3)
+         for name in self._start_button_names:
+             button_pos = torch.tensor([usd.get_prim_pos_rot_in_world(self.start_button_infos[name][0])[0]], device=env.device) + env.scene.env_origins  # (env_num, 3)
+             button_pos = button_pos.unsqueeze(1)  # (env_num, 1, 3)
+@@ -266,7 +266,7 @@ class CoffeeMachine(Fixture):
+             target_prim = target_prim.GetParent()
+ 
+         target_usd_pos, target_usd_quat, _ = usd.get_prim_pos_rot_in_world(target_prim)
+-        target_sim_pose = self._env.scene[target_prim.GetName()].data.root_com_pose_w
++        target_sim_pose = self._env.scene[target_prim.GetName()].data.root_com_pose_w.torch
+         target_sim_pos, target_sim_quat = target_sim_pose[env_index, :3], target_sim_pose[env_index, 3:7]
+         relative_pos, relative_quat = math_utils.subtract_frame_transforms(
+             torch.tensor(target_usd_pos, device=self._env.device).unsqueeze(0),
+diff --git a/lw_benchhub/core/models/fixtures/electric_kettle.py b/lw_benchhub/core/models/fixtures/electric_kettle.py
+index 76a04a2..077f6cd 100644
+--- a/lw_benchhub/core/models/fixtures/electric_kettle.py
++++ b/lw_benchhub/core/models/fixtures/electric_kettle.py
+@@ -53,7 +53,7 @@ class ElectricKettle(Fixture):
+ 
+         for j_name in joint_names:
+             joint_idx = env.scene.articulations[self.name].data.joint_names.index(j_name)
+-            joint_range = env.scene.articulations[self.name].data.joint_pos_limits[0, joint_idx, :]
++            joint_range = env.scene.articulations[self.name].data.joint_pos_limits.torch[0, joint_idx, :]
+             joint_min, joint_max = joint_range[0], joint_range[1]
+ 
+             # Compute desired qpos from normalized min/max
+diff --git a/lw_benchhub/core/models/fixtures/fixture.py b/lw_benchhub/core/models/fixtures/fixture.py
+index 33efb97..71ed95c 100644
+--- a/lw_benchhub/core/models/fixtures/fixture.py
++++ b/lw_benchhub/core/models/fixtures/fixture.py
+@@ -244,8 +244,8 @@ class Fixture:
+ 
+         for i, body_name in enumerate(articulation.data.body_names):
+             try:
+-                body_pos = articulation.data.body_com_pos_w[env_ids, i, :3]
+-                body_quat = articulation.data.body_com_quat_w[env_ids, i, :4]
++                body_pos = articulation.data.body_com_pos_w.torch[env_ids, i, :3]
++                body_quat = articulation.data.body_com_quat_w.torch[env_ids, i, :4]
+ 
+                 if body_name in self.body_bbox_map:
+                     body_size = self.body_bbox_map[body_name]
+@@ -341,7 +341,7 @@ class Fixture:
+         if self.name in env.scene.extras.keys():
+             self.prim_paths = env.scene.extras[self.name].prim_paths
+         elif self.name in env.scene.articulations.keys():
+-            self.prim_paths = env.scene.articulations[self.name]._root_physx_view.prim_paths
++            self.prim_paths = env.scene.articulations[self.name].root_physx_view.prim_paths
+         else:
+             self.prim_paths = None
+ 
+@@ -357,8 +357,8 @@ class Fixture:
+ 
+         for j_name in joint_names:
+             joint_idx = env.scene.articulations[self.name].data.joint_names.index(j_name)
+-            joint_qpos = env.scene.articulations[self.name].data.joint_pos[:, joint_idx]
+-            joint_range = env.scene.articulations[self.name].data.joint_pos_limits[0, joint_idx, :]
++            joint_qpos = env.scene.articulations[self.name].data.joint_pos.torch[:, joint_idx]
++            joint_range = env.scene.articulations[self.name].data.joint_pos_limits.torch[0, joint_idx, :]
+             joint_min, joint_max = joint_range[0], joint_range[1]
+             # convert to normalized joint value
+             norm_qpos = OU.normalize_joint_value(
+@@ -385,7 +385,7 @@ class Fixture:
+ 
+         for j_name in joint_names:
+             joint_idx = env.scene.articulations[self.name].data.joint_names.index(j_name)
+-            joint_range = env.scene.articulations[self.name].data.joint_pos_limits[0, joint_idx, :]
++            joint_range = env.scene.articulations[self.name].data.joint_pos_limits.torch[0, joint_idx, :]
+             joint_min, joint_max = joint_range[0], joint_range[1]
+             if joint_min >= 0:
+                 desired_min = joint_min + (joint_max - joint_min) * min
+@@ -393,10 +393,12 @@ class Fixture:
+             else:
+                 desired_min = joint_min + (joint_max - joint_min) * (1 - max)
+                 desired_max = joint_min + (joint_max - joint_min) * (1 - min)
+-            env.scene.articulations[self.name].write_joint_position_to_sim(
+-                torch.tensor([[self.rng.uniform(float(desired_min), float(desired_max))]]).to(env.device),
+-                torch.tensor([joint_idx]).to(env.device),
+-                torch.as_tensor(env_ids).to(env.device) if env_ids is not None else None
++            env.scene.articulations[self.name].write_joint_position_to_sim_index(
++                position=torch.full((env.num_envs if env_ids is None else len(env_ids), 1),
++                    self.rng.uniform(float(desired_min), float(desired_max)),
++                    dtype=torch.float32, device=env.device),
++                joint_ids=torch.tensor([joint_idx], dtype=torch.int32, device=env.device),
++                env_ids=torch.as_tensor(env_ids, dtype=torch.int32, device=env.device) if env_ids is not None else None
+             )
+ 
+     def is_open(self, env, joint_names=None, th=0.90):
+diff --git a/lw_benchhub/core/models/fixtures/fridge.py b/lw_benchhub/core/models/fixtures/fridge.py
+index 31a2d2a..dbf1f4b 100644
+--- a/lw_benchhub/core/models/fixtures/fridge.py
++++ b/lw_benchhub/core/models/fixtures/fridge.py
+@@ -67,7 +67,7 @@ class Fridge(Fixture):
+             joint_name = matching_joints[0]
+             try:
+                 joint_id = env.scene.articulations[self.name].joint_names.index(joint_name)
+-                qpos = env.scene.articulations[self.name].data.joint_pos[:, joint_id].cpu().numpy()
++                qpos = env.scene.articulations[self.name].data.joint_pos.torch[:, joint_id].cpu().numpy()
+                 offset = np.stack([np.zeros_like(qpos), -qpos, np.zeros_like(qpos)], axis=-1)
+                 if "per_env_offset" not in self._regions[reg_name]:
+                     self._regions[reg_name]["per_env_offset"] = np.zeros((self.num_envs, 3))
+@@ -132,7 +132,7 @@ class Fridge(Fixture):
+             for name in self.get_reset_regions(env, reg_type=reg_type, compartment=compartment, rack_index=rack_index)]
+         inside = torch.tensor([False], dtype=torch.bool, device=env.device).repeat(env.num_envs)
+         for i in range(env.num_envs):
+-            obj_pos = env.scene.rigid_objects[object_name].data.body_com_pos_w[i, 0, :]
++            obj_pos = env.scene.rigid_objects[object_name].data.body_com_pos_w.torch[i, 0, :]
+             obj_z = obj_pos[2]
+             filtered_region_names = []
+             for region_name in region_names:
+diff --git a/lw_benchhub/core/models/fixtures/microwave.py b/lw_benchhub/core/models/fixtures/microwave.py
+index 7670e9a..77ae38c 100644
+--- a/lw_benchhub/core/models/fixtures/microwave.py
++++ b/lw_benchhub/core/models/fixtures/microwave.py
+@@ -108,7 +108,7 @@ class Microwave(Fixture):
+                 button_joint_name = joint_lookup[0]
+                 button_joint_index = joint_names.index(button_joint_name)
+ 
+-                joint_pos = microwave_articulation.data.joint_pos[:, button_joint_index]
++                joint_pos = microwave_articulation.data.joint_pos.torch[:, button_joint_index]
+                 press_threshold = torch.tensor([0.0001], device=device).repeat(num_envs)
+                 button_pressed = (joint_pos >= press_threshold)
+ 
+@@ -134,14 +134,14 @@ class Microwave(Fixture):
+                 button_joint_name = joint_lookup[0]
+                 button_joint_index = joint_names.index(button_joint_name)
+ 
+-                joint_pos = microwave_articulation.data.joint_pos[:, button_joint_index]
++                joint_pos = microwave_articulation.data.joint_pos.torch[:, button_joint_index]
+                 press_threshold = torch.tensor([0.0001], device=device).repeat(num_envs)
+                 button_pressed = (joint_pos >= press_threshold)
+ 
+                 button_press_states["stop_button"] = button_pressed
+                 stop_button_pressed |= button_pressed
+         else:
+-            gripper_site_pos = env.scene["ee_frame"].data.target_pos_w  # (num_envs, num_ee, 3)
++            gripper_site_pos = env.scene["ee_frame"].data.target_pos_w.torch  # (num_envs, num_ee, 3)
+             start_button_pos_raw, _, _ = usd.get_prim_pos_rot_in_world(button_prims["start_button"][0])
+             stop_button_pos_raw, _, _ = usd.get_prim_pos_rot_in_world(button_prims["stop_button"][0])
+             start_button_pos = torch.tensor(start_button_pos_raw, dtype=torch.float32, device=device).unsqueeze(0).unsqueeze(0)
+@@ -170,7 +170,7 @@ class Microwave(Fixture):
+ 
+     def gripper_button_far(self, env: ManagerBasedRLEnv, button, th=0.3):
+         assert button in ["start_button", "stop_button"]
+-        ee_pos = env.scene["ee_frame"].data.target_pos_w  # (env_num, ee_num, 3)
++        ee_pos = env.scene["ee_frame"].data.target_pos_w.torch  # (env_num, ee_num, 3)
+         button_prims = self.button_infos[button]
+         button_pos_list = []
+         for prim in button_prims:
+diff --git a/lw_benchhub/core/models/fixtures/sink.py b/lw_benchhub/core/models/fixtures/sink.py
+index 2c3882b..3ebdfcc 100644
+--- a/lw_benchhub/core/models/fixtures/sink.py
++++ b/lw_benchhub/core/models/fixtures/sink.py
+@@ -92,7 +92,7 @@ class Sink(Fixture):
+             if temp is not None and len(handle_indices) >= 2:
+                 # Directional temperature around midpoint: one side hot, opposite side cold
+                 temp_joint_idx = handle_indices[1]
+-                temp_limits = env.scene.articulations[self.name].data.joint_pos_limits[0, temp_joint_idx, :]
++                temp_limits = env.scene.articulations[self.name].data.joint_pos_limits.torch[0, temp_joint_idx, :]
+                 jmin = float(temp_limits[0])
+                 jmax = float(temp_limits[1])
+                 mid = (jmin + jmax) * 0.5
+@@ -168,8 +168,8 @@ class Sink(Fixture):
+             return handle_state
+         # primary (flow) axis
+         handle_joint_idx = handle_indices[0]
+-        handle_joint_range = env.scene.articulations[self.name].data.joint_pos_limits[:, handle_joint_idx]
+-        handle_joint_qpos = env.scene.articulations[self.name].data.joint_pos[:, handle_joint_idx]
++        handle_joint_range = env.scene.articulations[self.name].data.joint_pos_limits.torch[:, handle_joint_idx]
++        handle_joint_qpos = env.scene.articulations[self.name].data.joint_pos.torch[:, handle_joint_idx]
+ 
+         handle_joint_qpos = handle_joint_qpos % (2 * torch.pi)
+         handle_joint_qpos[handle_joint_qpos < 0] += 2 * torch.pi
+@@ -181,8 +181,8 @@ class Sink(Fixture):
+         # secondary (temperature) axis if present
+         if len(handle_indices) >= 2:
+             temp_joint_idx = handle_indices[1]
+-            temp_joint_range = env.scene.articulations[self.name].data.joint_pos_limits[:, temp_joint_idx]
+-            temp_joint_qpos = env.scene.articulations[self.name].data.joint_pos[:, temp_joint_idx]
++            temp_joint_range = env.scene.articulations[self.name].data.joint_pos_limits.torch[:, temp_joint_idx]
++            temp_joint_qpos = env.scene.articulations[self.name].data.joint_pos.torch[:, temp_joint_idx]
+             temp_joint_qpos = temp_joint_qpos % (2 * torch.pi)
+             temp_joint_qpos[temp_joint_qpos < 0] += 2 * torch.pi
+             handle_state["temp_joint"] = temp_joint_qpos
+@@ -205,7 +205,7 @@ class Sink(Fixture):
+             handle_state["temp"] = temp_label
+ 
+         spout_joint_idx = next(i for i, name in enumerate(joint_names) if "spout_joint" in name.lower())
+-        spout_joint_qpos = env.scene.articulations[self.name].data.joint_pos[:, spout_joint_idx]
++        spout_joint_qpos = env.scene.articulations[self.name].data.joint_pos.torch[:, spout_joint_idx]
+         spout_joint_qpos = spout_joint_qpos % (2 * torch.pi)
+         spout_joint_qpos[spout_joint_qpos < 0] += 2 * torch.pi
+         handle_state["spout_joint"] = spout_joint_qpos
+diff --git a/lw_benchhub/core/models/fixtures/stand_mixer.py b/lw_benchhub/core/models/fixtures/stand_mixer.py
+index 5dc3b74..3501a1a 100644
+--- a/lw_benchhub/core/models/fixtures/stand_mixer.py
++++ b/lw_benchhub/core/models/fixtures/stand_mixer.py
+@@ -155,13 +155,13 @@ class StandMixer(Fixture):
+         all_in = np.array([True]).repeat(env.num_envs)
+         for env_id in range(env.num_envs):
+             if partial_check:
+-                pts = torch.mean(env.scene.rigid_objects[obj.task_name].data.body_com_pos_w, dim=1)[env_id].cpu().numpy()  # (3, )
++                pts = torch.mean(env.scene.rigid_objects[obj.task_name].data.body_com_pos_w.torch, dim=1)[env_id].cpu().numpy()  # (3, )
+                 pts = pts.reshape(1, 3)
+                 tol = 0.015
+             else:
+-                pos = env.scene.rigid_objects[obj.task_name].data.body_com_pos_w[env_id, 0, :]  # (3, )
++                pos = env.scene.rigid_objects[obj.task_name].data.body_com_pos_w.torch[env_id, 0, :]  # (3, )
+                 pos = (pos + env.scene.env_origins[env_id]).cpu().numpy()
+-                quat = env.scene.rigid_objects[obj.task_name].data.body_com_quat_w[env_id, 0, :]  # (4, )
++                quat = env.scene.rigid_objects[obj.task_name].data.body_com_quat_w.torch[env_id, 0, :]  # (4, )
+                 quat = T.convert_quat(quat, to="xyzw").cpu().numpy()
+                 pts = obj.get_bbox_points(trans=pos, rot=quat)
+                 pts = np.stack(pts, axis=0)
+diff --git a/lw_benchhub/core/models/fixtures/stove.py b/lw_benchhub/core/models/fixtures/stove.py
+index ad2e7f9..e5283ac 100644
+--- a/lw_benchhub/core/models/fixtures/stove.py
++++ b/lw_benchhub/core/models/fixtures/stove.py
+@@ -111,7 +111,7 @@ class Stove(Fixture):
+             env_ids = torch.arange(env.num_envs)
+         for env_id in env_ids:
+             knob_joint_id = env.scene.articulations[self.name].data.joint_names.index(f"knob_{knob}_joint")
+-            joint_pos_limits = env.scene.articulations[self.name].data.joint_pos_limits[:, knob_joint_id]
++            joint_pos_limits = env.scene.articulations[self.name].data.joint_pos_limits.torch[:, knob_joint_id]
+             joint_min, joint_max = joint_pos_limits[0, 0].item(), joint_pos_limits[0, 1].item()
+             if knob not in self._knob_joint_ranges:
+                 self._knob_joint_ranges[knob] = joint_pos_limits
+@@ -171,9 +171,9 @@ class Stove(Fixture):
+ 
+         knobs_state = self.get_knobs_state(env=env)
+         if obj_name in env.scene.articulations:
+-            obj_pos = env.scene.articulations[obj_name].data.body_link_pos_w[..., 0, :]
++            obj_pos = env.scene.articulations[obj_name].data.body_link_pos_w.torch[..., 0, :]
+         else:
+-            obj_pos = env.scene.rigid_objects[obj_name].data.body_link_pos_w[..., 0, :]
++            obj_pos = env.scene.rigid_objects[obj_name].data.body_link_pos_w.torch[..., 0, :]
+ 
+         obj_on_stove = OU.check_obj_fixture_contact(env, obj_name, self)
+         stove_pos = torch.tensor(self.pos, device=self.device)
+@@ -226,7 +226,7 @@ class Stove(Fixture):
+         if self._env is not None:
+             for location in self.valid_locations:
+                 joint_id = self._env.scene.articulations[self.name].data.joint_names.index(f"knob_{location}_joint")
+-                joint = self._env.scene.articulations[self.name].data.joint_pos[:, joint_id]
++                joint = self._env.scene.articulations[self.name].data.joint_pos.torch[:, joint_id]
+                 self._knob_joints[location] = joint
+             return self._knob_joints
+         else:
+diff --git a/lw_benchhub/core/models/fixtures/toaster_oven.py b/lw_benchhub/core/models/fixtures/toaster_oven.py
+index 6fd7b3f..bf841d3 100644
+--- a/lw_benchhub/core/models/fixtures/toaster_oven.py
++++ b/lw_benchhub/core/models/fixtures/toaster_oven.py
+@@ -222,9 +222,9 @@ class ToasterOven(Fixture):
+         joint_state = dict()
+         for j_name in joint_names:
+             joint_idx = env.scene.articulations[self.name].data.joint_names.index(j_name)
+-            joint_qpos = env.scene.articulations[self.name].data.joint_pos[:, joint_idx]
+-            init_joint_qpos = env.scene.articulations[self.name].data.default_joint_pos[:, joint_idx]
+-            joint_range = env.scene.articulations[self.name].data.joint_pos_limits[0, joint_idx, :]
++            joint_qpos = env.scene.articulations[self.name].data.joint_pos.torch[:, joint_idx]
++            init_joint_qpos = env.scene.articulations[self.name].data.default_joint_pos.torch[:, joint_idx]
++            joint_range = env.scene.articulations[self.name].data.joint_pos_limits.torch[0, joint_idx, :]
+             joint_min, joint_max = joint_range[0], joint_range[1]
+             norm_qpos = abs(joint_qpos - init_joint_qpos) / (joint_max - joint_min)
+             joint_state[j_name] = norm_qpos
+diff --git a/lw_benchhub/core/orchestrate/orchestrate.py b/lw_benchhub/core/orchestrate/orchestrate.py
+index e513482..949e818 100644
+--- a/lw_benchhub/core/orchestrate/orchestrate.py
++++ b/lw_benchhub/core/orchestrate/orchestrate.py
+@@ -126,7 +126,7 @@ class LwBaseOrchestrator(OrchestratorBase, NoDeepcopyMixin):
+         for obj_name in reset_objs:
+             obj_pos, obj_quat_xyzw, _ = object_placements[obj_name]
+             obj_pos_multienv = torch.tensor(obj_pos, device=self.context.device, dtype=torch.float32) + env.scene.env_origins[env_ids]
+-            obj_quat = Tt.convert_quat(torch.tensor(obj_quat_xyzw, device=self.context.device, dtype=torch.float32), to="wxyz")
++            obj_quat = torch.tensor(obj_quat_xyzw, device=self.context.device, dtype=torch.float32)
+             obj_quat = obj_quat.unsqueeze(0).repeat(obj_pos_multienv.shape[0], 1)
+             root_pos_multienv = torch.concatenate([obj_pos_multienv, obj_quat], dim=-1)
+             if obj_name in self.task._articulation_assets:
+diff --git a/lw_benchhub/core/rl/base.py b/lw_benchhub/core/rl/base.py
+index 4534ad3..f520c3c 100644
+--- a/lw_benchhub/core/rl/base.py
++++ b/lw_benchhub/core/rl/base.py
+@@ -74,15 +74,18 @@ class LwRL(NoDeepcopyMixin):
+         env_cfg.viewer.lookat = (0.8, 0.0, 0.5)
+         # simulation settings
+         env_cfg.sim.render_interval = env_cfg.decimation
+-        env_cfg.sim.physx.bounce_threshold_velocity = 0.2
+-        env_cfg.sim.physx.bounce_threshold_velocity = 0.01
+-        env_cfg.sim.physx.friction_correlation_distance = 0.00625
++        from isaaclab_physx.physics import PhysxCfg
++        if env_cfg.sim.physics is None:
++            env_cfg.sim.physics = PhysxCfg()
++        env_cfg.sim.physics.bounce_threshold_velocity = 0.2
++        env_cfg.sim.physics.bounce_threshold_velocity = 0.01
++        env_cfg.sim.physics.friction_correlation_distance = 0.00625
+         env_cfg.decimation = 5
+         env_cfg.episode_length_s = 3.2
+         env_cfg.sim.dt = 0.01  # 100Hz
+         env_cfg.sim.render_interval = env_cfg.decimation
+-        env_cfg.sim.physx.gpu_found_lost_aggregate_pairs_capacity = 1024 * 1024 * 4 * 4
+-        env_cfg.sim.physx.gpu_total_aggregate_pairs_capacity = 16 * 16 * 1024
++        env_cfg.sim.physics.gpu_found_lost_aggregate_pairs_capacity = 1024 * 1024 * 4 * 4
++        env_cfg.sim.physics.gpu_total_aggregate_pairs_capacity = 16 * 16 * 1024
+         return env_cfg
+ 
+     def get_policy_observation_cfg(self):
+diff --git a/lw_benchhub/core/robots/agilex/assets_cfg.py b/lw_benchhub/core/robots/agilex/assets_cfg.py
+index 03cccec..0204e46 100644
+--- a/lw_benchhub/core/robots/agilex/assets_cfg.py
++++ b/lw_benchhub/core/robots/agilex/assets_cfg.py
+@@ -58,7 +58,7 @@ PIPER_CFG = ArticulationCfg(
+     ),
+     init_state=ArticulationCfg.InitialStateCfg(
+         pos=(0, 0, 0),
+-        rot=(1, 0, 0, 0),
++        rot=(0, 0, 0, 1),
+         joint_pos={
+             "joint1": 0.0,
+             "joint2": 0.0,
+@@ -156,7 +156,7 @@ DOOUBLE_PIPER_CFG = ArticulationCfg(
+     ),
+     init_state=ArticulationCfg.InitialStateCfg(
+         pos=(0, 0, 0),
+-        rot=(1, 0, 0, 0),
++        rot=(0, 0, 0, 1),
+         joint_pos={
+             "joint1.*": 0.0,
+             "joint2.*": 0.0,
+@@ -325,3 +325,5 @@ DOUBLE_PIPER_VIS_HELPER_CFG = {
+         )
+     }
+ }
++
++# LW Lab 3: authored rot= quaternion literals use XYZW.
+diff --git a/lw_benchhub/core/robots/agilex/double_piper.py b/lw_benchhub/core/robots/agilex/double_piper.py
+index 66c92eb..6b4d8af 100644
+--- a/lw_benchhub/core/robots/agilex/double_piper.py
++++ b/lw_benchhub/core/robots/agilex/double_piper.py
+@@ -92,7 +92,7 @@ class DoublePiperEnvCfg(LwEmbodimentBase):
+             "left_hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/piper_L/hand_link_l/left_hand_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.2, 0.0, -0.02), rot=(-0.18301, -0.68301, 0.68301, 0.18301), convention="opengl"),
++                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.2, 0.0, -0.02), rot=(-0.68301, 0.68301, 0.18301, -0.18301), convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=19.3,
+@@ -112,7 +112,7 @@ class DoublePiperEnvCfg(LwEmbodimentBase):
+             "first_person_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/piper_R/dummy_link/first_person_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.02, 0.3, 0.52 + torch.rand(1).item() * 0.1 - 0.05), rot=(0.64597, 0.28761, -0.28761, -0.64597), convention="opengl"),  # rot: (0.0, -45, -90) with random z offset
++                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.02, 0.3, 0.52 + torch.rand(1).item() * 0.1 - 0.05), rot=(0.28761, -0.28761, -0.64597, 0.64597), convention="opengl"),  # rot: (0.0, -45, -90) with random z offset
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=19.3,
+@@ -132,7 +132,7 @@ class DoublePiperEnvCfg(LwEmbodimentBase):
+             "right_hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/piper_R/hand_link_r/right_hand_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.2, 0.0, -0.02), rot=(-0.18301, -0.68301, 0.68301, 0.18301), convention="opengl"),
++                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.2, 0.0, -0.02), rot=(-0.68301, 0.68301, 0.18301, -0.18301), convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=19.3,
+@@ -497,3 +497,5 @@ class DoublePiperRLEnvCfg(DoublePiperEnvCfg):
+         )
+ 
+         self.set_reward_gripper_joint_names(["joint.*_l", "joint.*_r"])
++
++# LW Lab 3: authored rot= quaternion literals use XYZW.
+diff --git a/lw_benchhub/core/robots/agilex/piper.py b/lw_benchhub/core/robots/agilex/piper.py
+index bc93357..55c840b 100644
+--- a/lw_benchhub/core/robots/agilex/piper.py
++++ b/lw_benchhub/core/robots/agilex/piper.py
+@@ -116,7 +116,7 @@ class PiperEnvCfg(LwEmbodimentBase):
+             "left_hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/hand_link/left_hand_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.2, 0.0, -0.02), rot=(-0.18301, -0.68301, 0.68301, 0.18301), convention="opengl"),
++                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.2, 0.0, -0.02), rot=(-0.68301, 0.68301, 0.18301, -0.18301), convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=40.6,
+@@ -137,7 +137,7 @@ class PiperEnvCfg(LwEmbodimentBase):
+             "eye_in_hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/dummy_link/eye_in_hand_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.7, -0.7, 0.5), rot=(0.8, 0.5, 0.16657, 0.2414), convention="opengl"),  # rot: (0.0, -45, -90) with random z offset
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.7, -0.7, 0.5), rot=(0.5, 0.16657, 0.2414, 0.8), convention="opengl"),  # rot: (0.0, -45, -90) with random z offset
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=40.6,
+@@ -265,3 +265,5 @@ class PiperRLEnvCfg(PiperEnvCfg):
+         self.action_config.arm_action = mdp.JointPositionActionCfg(
+             asset_name="robot", joint_names=["joint1", "joint2", "joint3", "joint5", "joint6"], scale=1, use_default_offset=True
+         )
++
++# LW Lab 3: authored rot= quaternion literals use XYZW.
+diff --git a/lw_benchhub/core/robots/arx/x7s.py b/lw_benchhub/core/robots/arx/x7s.py
+index daad482..b5b74fe 100644
+--- a/lw_benchhub/core/robots/arx/x7s.py
++++ b/lw_benchhub/core/robots/arx/x7s.py
+@@ -175,7 +175,7 @@ class X7SEnvCfg(LwEmbodimentBase):
+             "left_hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/left_hand_link/left_hand_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.1, 0, 0.12), rot=(0.57923, 0.40558, -0.40558, -0.57923), convention="opengl"),
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.1, 0, 0.12), rot=(0.40558, -0.40558, -0.57923, 0.57923), convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=19.3,
+@@ -195,7 +195,7 @@ class X7SEnvCfg(LwEmbodimentBase):
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/link4/first_person_camera",
+                     offset=TiledCameraCfg.OffsetCfg(pos=(0.1, 0.025, 0.065),
+-                                                    rot=(0.64086, 0.29884, -0.29884, -0.64086),  # 0, -50, -90
++                                                    rot=(0.29884, -0.29884, -0.64086, 0.64086),  # 0, -50, -90
+                                                     convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+@@ -216,7 +216,7 @@ class X7SEnvCfg(LwEmbodimentBase):
+             "right_hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/right_hand_link/right_hand_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.1, 0, 0.12), rot=(0.57923, 0.40558, -0.40558, -0.57923), convention="opengl"),  # 0.0, -70, -90
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.1, 0, 0.12), rot=(0.40558, -0.40558, -0.57923, 0.57923), convention="opengl"),  # 0.0, -70, -90
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=19.3,
+@@ -235,7 +235,7 @@ class X7SEnvCfg(LwEmbodimentBase):
+             "left_shoulder_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/link1/left_shoulder_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.15, 0.9, 1.2), rot=(0.05796, 0.16369, -0.32874, -0.92832), convention="opengl"),
++                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.15, 0.9, 1.2), rot=(0.16369, -0.32874, -0.92832, 0.05796), convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=24.0,
+@@ -254,7 +254,7 @@ class X7SEnvCfg(LwEmbodimentBase):
+             "eye_in_hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/link1/eye_in_hand_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.5, 0, 1.5), rot=(0.70711, 0.0, 0.0, -0.70711), convention="opengl"),
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.5, 0, 1.5), rot=(0.0, 0.0, -0.70711, 0.70711), convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=24.0,
+@@ -273,7 +273,7 @@ class X7SEnvCfg(LwEmbodimentBase):
+             "right_shoulder_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/link1/right_shoulder_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.15, -0.9, 1.2), rot=(0.93905, 0.33254, -0.08216, -0.02909), convention="opengl"),
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.15, -0.9, 1.2), rot=(0.33254, -0.08216, -0.02909, 0.93905), convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=24.0,
+@@ -599,12 +599,12 @@ class X7SEnvCfg(LwEmbodimentBase):
+         rbase_input_y = abs(action.get('rbase', [0, 0])[1])
+         rbase_input_magnitude = max(rbase_input_x, rbase_input_y)
+ 
+-        x_joint_vel = device.robot.data.joint_vel[0, self.rbase_base_x_joint_index].item()
+-        y_joint_vel = device.robot.data.joint_vel[0, self.rbase_base_y_joint_index].item()
+-        yaw_joint_vel = device.robot.data.joint_vel[0, self.rbase_base_yaw_link_index].item()
++        x_joint_vel = device.robot.data.joint_vel.torch[0, self.rbase_base_x_joint_index].item()
++        y_joint_vel = device.robot.data.joint_vel.torch[0, self.rbase_base_y_joint_index].item()
++        yaw_joint_vel = device.robot.data.joint_vel.torch[0, self.rbase_base_yaw_link_index].item()
+ 
+-        left_gripper_force = device.env.scene.sensors["left_gripper_contact"].data.net_forces_w
+-        right_gripper_force = device.env.scene.sensors["right_gripper_contact"].data.net_forces_w
++        left_gripper_force = device.env.scene.sensors["left_gripper_contact"].data.net_forces_w.torch
++        right_gripper_force = device.env.scene.sensors["right_gripper_contact"].data.net_forces_w.torch
+ 
+         # Check if left_gripper_force has any values with absolute value > 0
+         left_gripper_has_force = torch.any(torch.abs(left_gripper_force) > 20)
+@@ -629,9 +629,9 @@ class X7SEnvCfg(LwEmbodimentBase):
+                     self.rbase_base_yaw_link_index != -1):
+                 self.rbase_lock_state = True
+ 
+-                self.rbase_lock_value_base_x = device.robot.data.joint_pos[0, self.rbase_base_x_joint_index].item()
+-                self.rbase_lock_value_base_y = device.robot.data.joint_pos[0, self.rbase_base_y_joint_index].item()
+-                self.rbase_lock_value_base_yaw = device.robot.data.joint_pos[0, self.rbase_base_yaw_link_index].item()
++                self.rbase_lock_value_base_x = device.robot.data.joint_pos.torch[0, self.rbase_base_x_joint_index].item()
++                self.rbase_lock_value_base_y = device.robot.data.joint_pos.torch[0, self.rbase_base_y_joint_index].item()
++                self.rbase_lock_value_base_yaw = device.robot.data.joint_pos.torch[0, self.rbase_base_yaw_link_index].item()
+ 
+                 self.reset_pid_state('base_x')
+                 self.reset_pid_state('base_y')
+@@ -662,9 +662,9 @@ class X7SEnvCfg(LwEmbodimentBase):
+             if (self.rbase_base_x_joint_index != -1 and
+                 self.rbase_base_y_joint_index != -1 and
+                     self.rbase_base_yaw_link_index != -1):
+-                current_x = device.robot.data.joint_pos[0, self.rbase_base_x_joint_index].item()
+-                current_y = device.robot.data.joint_pos[0, self.rbase_base_y_joint_index].item()
+-                current_yaw = device.robot.data.joint_pos[0, self.rbase_base_yaw_link_index].item()
++                current_x = device.robot.data.joint_pos.torch[0, self.rbase_base_x_joint_index].item()
++                current_y = device.robot.data.joint_pos.torch[0, self.rbase_base_y_joint_index].item()
++                current_yaw = device.robot.data.joint_pos.torch[0, self.rbase_base_yaw_link_index].item()
+ 
+                 control_output_x = self.pid_control(self.rbase_lock_value_base_x, current_x, 'base_x')
+                 control_output_y = self.pid_control(self.rbase_lock_value_base_y, current_y, 'base_y')
+@@ -688,10 +688,10 @@ class X7SEnvCfg(LwEmbodimentBase):
+                 base_action[:, :] = torch.tensor([action['rbase'][0] * non_lock_scale, action['rbase'][1] * non_lock_scale, 0],
+                                                  device=action['rbase'].device)
+ 
+-        _cumulative_base, base_quat = math_utils.subtract_frame_transforms(device.robot.data.root_com_pos_w[0],
+-                                                                           device.robot.data.root_com_quat_w[0],
+-                                                                           device.robot.data.body_link_pos_w[0, 4],
+-                                                                           device.robot.data.body_link_quat_w[0, 4])
++        _cumulative_base, base_quat = math_utils.subtract_frame_transforms(device.robot.data.root_com_pos_w.torch[0],
++                                                                           device.robot.data.root_com_quat_w.torch[0],
++                                                                           device.robot.data.body_link_pos_w.torch[0, 4],
++                                                                           device.robot.data.body_link_quat_w.torch[0, 4])
+         base_yaw = T.quat2axisangle(base_quat[[1, 2, 3, 0]])[2]
+         base_quat = T.axisangle2quat(torch.tensor([0, 0, base_yaw], device=device.env.device))
+         base_movement = torch.tensor([_cumulative_base[0], _cumulative_base[1], 0], device=device.env.device)
+@@ -736,9 +736,9 @@ class X7SEnvCfg(LwEmbodimentBase):
+ 
+             # Obtain the pose in the world coordinate system
+             # body_link_pose_w shape: (num_envs, num_bodies, 7) [x, y, z, w, x, y, z]
+-            left_hand_pose_w = robot.data.body_link_pose_w[0, left_hand_idx, :]  # shape: (7,)
+-            right_hand_pose_w = robot.data.body_link_pose_w[0, right_hand_idx, :]  # shape: (7,)
+-            base_link_pose_w = robot.data.body_link_pose_w[0, base_link_idx, :]  # shape: (7,)
++            left_hand_pose_w = robot.data.body_link_pose_w.torch[0, left_hand_idx, :]  # shape: (7,)
++            right_hand_pose_w = robot.data.body_link_pose_w.torch[0, right_hand_idx, :]  # shape: (7,)
++            base_link_pose_w = robot.data.body_link_pose_w.torch[0, base_link_idx, :]  # shape: (7,)
+ 
+             # convert to robot coordinate system (base_link frame)
+             from isaaclab.utils.math import subtract_frame_transforms
+@@ -810,7 +810,7 @@ class X7SEnvCfg(LwEmbodimentBase):
+                 arm_action[:3] = pose_movement
+                 arm_action[3] = combined_quat[3]
+                 arm_action[4:7] = combined_quat[:3]
+-                arm_action[2] = arm_action[2] + device.robot.data.joint_pos[0, 3]
++                arm_action[2] = arm_action[2] + device.robot.data.joint_pos.torch[0, 3]
+                 arm_action = arm_action.repeat(num_envs, 1)
+                 if arm_idx == 0:
+                     left_arm_action = arm_action
+@@ -838,8 +838,8 @@ class X7SEnvCfg(LwEmbodimentBase):
+ 
+             if self.lbase_body_z_index != -1 and self.lbase_body_y_index != -1:
+                 self.lbase_lock_state = True
+-                self.lbase_lock_value_body_z = device.robot.data.joint_pos[0, self.lbase_body_z_index].item()
+-                self.lbase_lock_value_body_y = device.robot.data.joint_pos[0, self.lbase_body_y_index].item()
++                self.lbase_lock_value_body_z = device.robot.data.joint_pos.torch[0, self.lbase_body_z_index].item()
++                self.lbase_lock_value_body_y = device.robot.data.joint_pos.torch[0, self.lbase_body_y_index].item()
+ 
+                 self.reset_pid_state('body_z')
+                 self.reset_pid_state('body_y')
+@@ -859,8 +859,8 @@ class X7SEnvCfg(LwEmbodimentBase):
+ 
+         if self.lbase_lock_state:
+             if self.lbase_body_z_index != -1 and self.lbase_body_y_index != -1:
+-                current_pos_z = device.robot.data.joint_pos[0, self.lbase_body_z_index].item()
+-                current_pos_y = device.robot.data.joint_pos[0, self.lbase_body_y_index].item()
++                current_pos_z = device.robot.data.joint_pos.torch[0, self.lbase_body_z_index].item()
++                current_pos_y = device.robot.data.joint_pos.torch[0, self.lbase_body_y_index].item()
+ 
+                 control_output_body_z = self.pid_control(self.lbase_lock_value_body_z, current_pos_z, 'body_z')
+                 control_output_body_y = self.pid_control(self.lbase_lock_value_body_y, current_pos_y, 'body_y')
+@@ -1082,7 +1082,7 @@ class X7SJointEnvCfg(X7SAbsEnvCfg):
+             "left_hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/left_hand_link/left_hand_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.1, 0, 0.12), rot=(0.57923, 0.40558, -0.40558, -0.57923), convention="opengl"),
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.1, 0, 0.12), rot=(0.40558, -0.40558, -0.57923, 0.57923), convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=19.3,
+@@ -1101,7 +1101,7 @@ class X7SJointEnvCfg(X7SAbsEnvCfg):
+             "right_hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/right_hand_link/right_hand_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.1, 0, 0.12), rot=(0.57923, 0.40558, -0.40558, -0.57923), convention="opengl"),  # 0.0, -70, -90
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.1, 0, 0.12), rot=(0.40558, -0.40558, -0.57923, 0.57923), convention="opengl"),  # 0.0, -70, -90
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=19.3,
+@@ -1120,7 +1120,7 @@ class X7SJointEnvCfg(X7SAbsEnvCfg):
+             "eye_in_hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/link1/eye_in_hand_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.5, 0, 1.5), rot=(0.70711, 0.0, 0.0, -0.70711), convention="opengl"),
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.5, 0, 1.5), rot=(0.0, 0.0, -0.70711, 0.70711), convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=24.0,
+@@ -1150,3 +1150,5 @@ class X7SJointEnvCfg(X7SAbsEnvCfg):
+                                              "right_wrist_y", "right_wrist_z"],
+             scale=1.0, use_default_offset=True
+         )
++
++# LW Lab 3: authored rot= quaternion literals use XYZW.
+diff --git a/lw_benchhub/core/robots/compositional/assets_cfg.py b/lw_benchhub/core/robots/compositional/assets_cfg.py
+index c207384..314529b 100644
+--- a/lw_benchhub/core/robots/compositional/assets_cfg.py
++++ b/lw_benchhub/core/robots/compositional/assets_cfg.py
+@@ -56,7 +56,7 @@ FRANKA_OMRON_CFG = ArticulationCfg(
+     ),
+     init_state=ArticulationCfg.InitialStateCfg(
+         pos=(0, -0.5, 0.05),
+-        rot=(0.707, 0, 0, 0.707),
++        rot=(0, 0, 0.707, 0.707),
+         joint_pos={
+             "panda_joint1": 0.0,
+             "panda_joint2": -0.569,
+@@ -274,3 +274,5 @@ VIS_HELPER_CFG = {
+         )
+     }
+ }
++
++# LW Lab 3: authored rot= quaternion literals use XYZW.
+diff --git a/lw_benchhub/core/robots/compositional/pandaomron.py b/lw_benchhub/core/robots/compositional/pandaomron.py
+index a71ee72..9fe25d8 100644
+--- a/lw_benchhub/core/robots/compositional/pandaomron.py
++++ b/lw_benchhub/core/robots/compositional/pandaomron.py
+@@ -66,7 +66,7 @@ class PandaOmronEmbodiment(LwEmbodimentBase):
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/omron_v2/mobilebase0_support/agentview_left",
+                     offset=TiledCameraCfg.OffsetCfg(pos=(-0.5, 0.35, 1.05),
+-                                                    rot=(0.556238, 0.299353, -0.376787, -0.677509),
++                                                    rot=(0.299353, -0.376787, -0.677509, 0.556238),
+                                                     convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+@@ -86,7 +86,7 @@ class PandaOmronEmbodiment(LwEmbodimentBase):
+             "agentview_right_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/omron_v2/mobilebase0_support/agentview_right",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.5, -0.35, 1.05), rot=(0.677509, 0.376787, -0.299353, -0.556239), convention="opengl"),
++                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.5, -0.35, 1.05), rot=(0.376787, -0.299353, -0.556239, 0.677509), convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=24.0,
+@@ -105,7 +105,7 @@ class PandaOmronEmbodiment(LwEmbodimentBase):
+             "eye_in_hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/omron_v2/Franka/panda_hand/eye_in_hand",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.05, 0, 0), rot=(0, 0.707107, 0.707107, 0), convention="opengl"),
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.05, 0, 0), rot=(0.707107, 0.707107, 0, 0), convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=24.0,
+@@ -130,7 +130,7 @@ class PandaOmronEmbodiment(LwEmbodimentBase):
+         if scene_config is None or not hasattr(scene_config, "robot"):
+             raise RuntimeError("scene_config must be populated with a `robot` before calling `set_robot_initial_pose`.")
+         scene_config.stand.init_state.pos = pose.position_xyz
+-        scene_config.stand.init_state.rot = pose.rotation_wxyz
++        scene_config.stand.init_state.rot = pose.rotation_xyzw
+         return scene_config
+ 
+     def preprocess_device_action(self, action: dict[str, torch.Tensor], device) -> torch.Tensor:
+@@ -150,10 +150,10 @@ class PandaOmronEmbodiment(LwEmbodimentBase):
+             abs_pose = action["arm_abs"]
+             # _cumulative_base = (device.robot.data.body_link_pos_w[0,2]-device.robot.data.root_com_pos_w[0])
+             # base_quat = device.robot.data.body_link_quat_w[0,3]
+-            _cumulative_base, base_quat = math_utils.subtract_frame_transforms(device.robot.data.root_com_pos_w[0],
+-                                                                               device.robot.data.root_com_quat_w[0],
+-                                                                               device.robot.data.body_link_pos_w[0, 2],
+-                                                                               device.robot.data.body_link_quat_w[0, 3])
++            _cumulative_base, base_quat = math_utils.subtract_frame_transforms(device.robot.data.root_com_pos_w.torch[0],
++                                                                               device.robot.data.root_com_quat_w.torch[0],
++                                                                               device.robot.data.body_link_pos_w.torch[0, 2],
++                                                                               device.robot.data.body_link_quat_w.torch[0, 3])
+             # base_quat = T.quat_multiply(device.robot.data.body_link_quat_w[0,3][[1,2,3,0]],device.robot.data.root_com_quat_w[0][[1,2,3,0]], )
+             base_yaw = T.quat2axisangle(base_quat[[1, 2, 3, 0]])[2]
+ 
+@@ -230,7 +230,7 @@ class PandaOmronSceneCfg:
+         update_period=0.0,
+         history_length=1,
+         debug_vis=False,
+-        filter_prim_paths_expr=[f"{{ENV_REGEX_NS}}/Scene/floor.*"],
++        filter_prim_paths_expr=[],  # Lab 3: base placement uses total contact force.
+     )
+ 
+     left_gripper_contact: ContactSensorCfg = ContactSensorCfg(
+@@ -301,7 +301,7 @@ class PandaOmronRelActionsCfg:
+         controller=mdp.DifferentialIKControllerCfg(command_type="pose", use_relative_mode=True, ik_method="dls"),
+         scale=4,
+         body_offset=mdp.DifferentialInverseKinematicsActionCfg.OffsetCfg(pos=(0.0, 0.0, 0.0434),
+-                                                                         rot=(0.9537170, 0, 0, 0.3007058)),
++                                                                         rot=(0, 0, 0.3007058, 0.953717)),
+     )
+     gripper_action = mdp.BinaryJointPositionActionCfg(
+         asset_name="robot",
+@@ -391,3 +391,5 @@ class PandaOmronRLActionsCfg:
+         },  # 01,
+         use_zero_offset=True,  # use default offset is not working for base action
+     )
++
++# LW Lab 3: authored rot= quaternion literals use XYZW.
+diff --git a/lw_benchhub/core/robots/g1_arena/g1_arena.py b/lw_benchhub/core/robots/g1_arena/g1_arena.py
+index 25fcb87..5030d96 100644
+--- a/lw_benchhub/core/robots/g1_arena/g1_arena.py
++++ b/lw_benchhub/core/robots/g1_arena/g1_arena.py
+@@ -109,10 +109,10 @@ class G1BaseEmbodiment(LwEmbodimentBase):
+                 base_action[3] = torch.clamp(base_action[3], min=0.2, max=0.75)
+                 self.init_robot_base_height = base_action[3]
+ 
+-        _cumulative_base, base_quat = math_utils.subtract_frame_transforms(device.robot.data.root_com_pos_w[0],
+-                                                                           device.robot.data.root_com_quat_w[0],
+-                                                                           device.robot.data.body_link_pos_w[0, 3],
+-                                                                           device.robot.data.body_link_quat_w[0, 3])
++        _cumulative_base, base_quat = math_utils.subtract_frame_transforms(device.robot.data.root_com_pos_w.torch[0],
++                                                                           device.robot.data.root_com_quat_w.torch[0],
++                                                                           device.robot.data.body_link_pos_w.torch[0, 3],
++                                                                           device.robot.data.body_link_quat_w.torch[0, 3])
+         # base_quat = T.quat_multiply(device.robot.data.body_link_quat_w[0,3][[1,2,3,0]],device.robot.data.root_com_quat_w[0][[1,2,3,0]], )
+         base_yaw = T.quat2axisangle(base_quat[[1, 2, 3, 0]])[2]
+         base_quat = T.axisangle2quat(torch.tensor([0, 0, base_yaw], device=device.env.device))
+diff --git a/lw_benchhub/core/robots/lerobot/assets_cfg.py b/lw_benchhub/core/robots/lerobot/assets_cfg.py
+index e791dfd..1842ae1 100644
+--- a/lw_benchhub/core/robots/lerobot/assets_cfg.py
++++ b/lw_benchhub/core/robots/lerobot/assets_cfg.py
+@@ -50,7 +50,7 @@ SO101_FOLLOWER_CFG = ArticulationCfg(
+     ),
+     init_state=ArticulationCfg.InitialStateCfg(
+         pos=(-0.20, 0.40, 0.71),
+-        rot=(0.0, 0.0, 0.0, 1.0),
++        rot=(0.0, 0.0, 1.0, 0.0),
+         joint_pos={
+             "shoulder_pan": 0.0,
+             "shoulder_lift": 0.0,
+@@ -137,7 +137,7 @@ SO100_FOLLOWER_CFG = ArticulationCfg(
+     ),
+     init_state=ArticulationCfg.InitialStateCfg(
+         pos=(-0.20, 0.40, 0.71),
+-        rot=(0.0, 0.0, 0.0, 1.0),
++        rot=(0.0, 0.0, 1.0, 0.0),
+         joint_pos={
+             "shoulder_pan": 0.0,
+             "shoulder_lift": 0.0,
+@@ -221,7 +221,7 @@ BI_SO101_FOLLOWER_CFG = ArticulationCfg(
+     ),
+     init_state=ArticulationCfg.InitialStateCfg(
+         pos=(0.0, 0.0, 0.0),
+-        rot=(0.0, 0.0, 0.0, 1.0),
++        rot=(0.0, 0.0, 1.0, 0.0),
+         joint_pos={
+             "left_shoulder_pan": 0.0,
+             "left_shoulder_lift": 0.0,
+@@ -271,7 +271,7 @@ SO101_FOLLOWER_YELLOW_CFG = ArticulationCfg(
+     ),
+     init_state=ArticulationCfg.InitialStateCfg(
+         pos=(-0.20, 0.40, 0.71),
+-        rot=(0.0, 0.0, 0.0, 1.0),
++        rot=(0.0, 0.0, 1.0, 0.0),
+         joint_pos={
+             "shoulder_pan": 0.0,
+             "shoulder_lift": 0.0,
+@@ -292,3 +292,5 @@ SO101_FOLLOWER_YELLOW_CFG = ArticulationCfg(
+     },
+     soft_joint_pos_limit_factor=1,
+ )
++
++# LW Lab 3: authored rot= quaternion literals use XYZW.
+diff --git a/lw_benchhub/core/robots/lerobot/lerobotrl.py b/lw_benchhub/core/robots/lerobot/lerobotrl.py
+index 62eb334..6a29d0b 100644
+--- a/lw_benchhub/core/robots/lerobot/lerobotrl.py
++++ b/lw_benchhub/core/robots/lerobot/lerobotrl.py
+@@ -226,7 +226,7 @@ class BaseLeRobot(LwEmbodimentBase):
+             "hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/gripper/wrist_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.001, 0.1, -0.04), rot=(-0.404379, -0.912179, -0.0451242, 0.0486914), convention="ros"),  # wxyz
++                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.001, 0.1, -0.04), rot=(-0.912179, -0.0451242, 0.0486914, -0.404379), convention="ros"),  # wxyz
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=36.5,
+@@ -246,7 +246,7 @@ class BaseLeRobot(LwEmbodimentBase):
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/camera_base/global_camera",
+                     # offset=TiledCameraCfg.OffsetCfg(pos=(0.25, -0.55, 0.27), rot=(0.74698, 0.54011, 0.23182, 0.31074), convention="opengl"), # RL
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.2, -0.65, 0.3), rot=(0.8, 0.5, 0.16657, 0.2414), convention="opengl"),  # IL
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.2, -0.65, 0.3), rot=(0.5, 0.16657, 0.2414, 0.8), convention="opengl"),  # IL
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=40.6,
+@@ -291,7 +291,7 @@ class LeRobot100RL(LeRobotRL):
+             "global_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/Base/global_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.25, -0.55, 0.27), rot=(0.74698, 0.54011, 0.23182, 0.31074), convention="opengl"),
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.25, -0.55, 0.27), rot=(0.54011, 0.23182, 0.31074, 0.74698), convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=40.6,
+@@ -320,7 +320,7 @@ class LeRobotAbsJointGripperRL(LeRobotRL):
+             "hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/gripper/wrist_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.001, 0.1, -0.04), rot=(-0.404379, -0.912179, -0.0451242, 0.0486914), convention="ros"),  # wxyz
++                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.001, 0.1, -0.04), rot=(-0.912179, -0.0451242, 0.0486914, -0.404379), convention="ros"),  # wxyz
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=36.5,
+@@ -339,7 +339,7 @@ class LeRobotAbsJointGripperRL(LeRobotRL):
+             "global_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/camera_base/global_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.25, -0.55, 0.27), rot=(0.74698, 0.54011, 0.23182, 0.31074), convention="opengl"),
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.25, -0.55, 0.27), rot=(0.54011, 0.23182, 0.31074, 0.74698), convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=40.6,
+@@ -363,3 +363,5 @@ class LeRobotAbsJointGripperRL(LeRobotRL):
+             return processed_action
+         else:
+             raise ValueError("only support so101_leader action")
++
++# LW Lab 3: authored rot= quaternion literals use XYZW.
+diff --git a/lw_benchhub/core/robots/lerobot/lerobotrl_biarm.py b/lw_benchhub/core/robots/lerobot/lerobotrl_biarm.py
+index 85daccb..929d574 100644
+--- a/lw_benchhub/core/robots/lerobot/lerobotrl_biarm.py
++++ b/lw_benchhub/core/robots/lerobot/lerobotrl_biarm.py
+@@ -174,7 +174,7 @@ class LeRobotBiArmRL(LwEmbodimentBase):
+             "left_hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/left/gripper/wrist_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.001, 0.1, -0.04), rot=(-0.404379, -0.912179, -0.0451242, 0.0486914), convention="ros"),  # wxyz
++                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.001, 0.1, -0.04), rot=(-0.912179, -0.0451242, 0.0486914, -0.404379), convention="ros"),  # wxyz
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=36.5,
+@@ -193,7 +193,7 @@ class LeRobotBiArmRL(LwEmbodimentBase):
+             "right_hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/right/gripper/wrist_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.001, 0.1, -0.04), rot=(-0.404379, -0.912179, -0.0451242, 0.0486914), convention="ros"),  # wxyz
++                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.001, 0.1, -0.04), rot=(-0.912179, -0.0451242, 0.0486914, -0.404379), convention="ros"),  # wxyz
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=36.5,
+@@ -212,7 +212,7 @@ class LeRobotBiArmRL(LwEmbodimentBase):
+             "global_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/root_link/global_camera",  # 0 -0.5 0.5 (0.1650476, -0.9862856, 0.0, 0.0) (-161,0,0)
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.0, -0.5, 0.5), rot=(0.1650476, -0.9862856, 0.0, 0.0), convention="ros"),  # wxyz
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.0, -0.5, 0.5), rot=(-0.9862856, 0.0, 0.0, 0.1650476), convention="ros"),  # wxyz
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=28.7,
+@@ -244,3 +244,5 @@ class LeRobotBiArmRL(LwEmbodimentBase):
+             return processed_action
+         else:
+             raise ValueError("only support so101_leader action")
++
++# LW Lab 3: authored rot= quaternion literals use XYZW.
+diff --git a/lw_benchhub/core/robots/robot_arena_base.py b/lw_benchhub/core/robots/robot_arena_base.py
+index 9efe073..5f6401e 100644
+--- a/lw_benchhub/core/robots/robot_arena_base.py
++++ b/lw_benchhub/core/robots/robot_arena_base.py
+@@ -20,7 +20,8 @@ import torch
+ 
+ from isaaclab.assets import ArticulationCfg
+ from isaaclab.envs import ManagerBasedEnv
+-from isaaclab.envs.mdp.recorders.recorders_cfg import ActionStateRecorderManagerCfg, RecorderTerm, RecorderTermCfg
++from isaaclab.envs.mdp.recorders.recorders_cfg import ActionStateRecorderManagerCfg
++from isaaclab.managers import RecorderTerm, RecorderTermCfg
+ from isaaclab.managers import ObservationGroupCfg as ObsGroup, ObservationTermCfg as ObsTerm
+ from isaaclab.utils import configclass
+ from isaaclab.utils.datasets.episode_data import EpisodeData
+@@ -317,7 +318,7 @@ class LwEmbodimentBase(EmbodimentBase):
+             else:
+                 self.init_robot_base_pos_anchor, self.init_robot_base_ori_anchor = self.get_robot_anchor(orchestrator)
+             self.scene_config.robot.init_state.pos = self.init_robot_base_pos_anchor
+-            self.scene_config.robot.init_state.rot = Tn.convert_quat(Tn.mat2quat(Tn.euler2mat(self.init_robot_base_ori_anchor)), to="wxyz")
++            self.scene_config.robot.init_state.rot = Tn.mat2quat(Tn.euler2mat(self.init_robot_base_ori_anchor))
+             self.modify_observation_cameras(orchestrator.task.task_type)
+             self._setup_camera_config(orchestrator.task.task_type)
+         elif orchestrator.task.context.task_backend == "local":
+@@ -330,7 +331,7 @@ class LwEmbodimentBase(EmbodimentBase):
+                 self.init_robot_base_ori_anchor = Tn.mat2euler(Tn.quat2mat(Tn.convert_quat(np.array(self.scene_config.robot.init_state.rot), to="xyzw")))
+             # Ensure local backend initial spawn also uses the computed anchor.
+             self.scene_config.robot.init_state.pos = self.init_robot_base_pos_anchor
+-            self.scene_config.robot.init_state.rot = Tn.convert_quat(Tn.mat2quat(Tn.euler2mat(self.init_robot_base_ori_anchor)), to="wxyz")
++            self.scene_config.robot.init_state.rot = Tn.mat2quat(Tn.euler2mat(self.init_robot_base_ori_anchor))
+             # Keep local replay/teleop camera setup consistent with robocasa path.
+             self.modify_observation_cameras(orchestrator.task.task_type)
+             self._setup_camera_config(orchestrator.task.task_type)
+diff --git a/lw_benchhub/core/robots/unitree/assets_cfg.py b/lw_benchhub/core/robots/unitree/assets_cfg.py
+index 26345f6..bfbff48 100644
+--- a/lw_benchhub/core/robots/unitree/assets_cfg.py
++++ b/lw_benchhub/core/robots/unitree/assets_cfg.py
+@@ -322,7 +322,7 @@ G1_GEARWBC_CFG = ArticulationCfg(
+     prim_path="/World/envs/env_.*/Robot",
+     init_state=ArticulationCfg.InitialStateCfg(
+         pos=(0.8, -1.38, 0.78),
+-        rot=(0.0, 0.0, 0.0, 1.0),
++        rot=(0.0, 0.0, 1.0, 0.0),
+         joint_pos={
+             # target angles [rad]
+             "left_hip_pitch_joint": -0.389,
+@@ -518,3 +518,5 @@ G1_GEARWBC_CFG = ArticulationCfg(
+         ),
+     },
+ )
++
++# LW Lab 3: authored rot= quaternion literals use XYZW.
+diff --git a/lw_benchhub/core/robots/unitree/g1.py b/lw_benchhub/core/robots/unitree/g1.py
+index 93a899e..b6a359c 100644
+--- a/lw_benchhub/core/robots/unitree/g1.py
++++ b/lw_benchhub/core/robots/unitree/g1.py
+@@ -90,7 +90,7 @@ class G1HandRLSceneCfg(G1SceneCfg):
+                 name="tool_thumb_tip",
+                 offset=OffsetCfg(
+                     pos=(0.114, -0.02, 0),
+-                    rot=(0.7071068, 0, 0.7071068, 0),
++                    rot=(0, 0.7071068, 0, 0.7071068),
+                 ),
+             ),
+             FrameTransformerCfg.FrameCfg(
+@@ -274,7 +274,7 @@ class UnitreeG1EnvCfg(LwEmbodimentBase):
+             "left_hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/torso_link/left_hand_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.10209156, 0.02857542, 0.42446595), rot=(0.64367383, 0.26523914, -0.27106013, -0.66472446), convention="opengl"),
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.10209156, 0.02857542, 0.42446595), rot=(0.26523914, -0.27106013, -0.66472446, 0.64367383), convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=24.0,
+@@ -294,7 +294,7 @@ class UnitreeG1EnvCfg(LwEmbodimentBase):
+             "first_person_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/torso_link/first_person_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.10209156, -0.00937542, 0.42446595), rot=(0.64367383, 0.26523914, -0.27106013, -0.66472446), convention="opengl"),
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.10209156, -0.00937542, 0.42446595), rot=(0.26523914, -0.27106013, -0.66472446, 0.64367383), convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=19.3,
+@@ -314,7 +314,7 @@ class UnitreeG1EnvCfg(LwEmbodimentBase):
+             "right_hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/torso_link/right_hand_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.10209156, -0.04657542, 0.42446595), rot=(0.64367383, 0.26523914, -0.27106013, -0.66472446), convention="opengl"),
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.10209156, -0.04657542, 0.42446595), rot=(0.26523914, -0.27106013, -0.66472446, 0.64367383), convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=24.0,
+@@ -334,7 +334,7 @@ class UnitreeG1EnvCfg(LwEmbodimentBase):
+             "left_shoulder_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/torso_link/left_shoulder_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.1, 0.4, 0.5), rot=(0.28818, 0.25453, -0.33065, -0.86188), convention="opengl"),  # -35, -30, -150
++                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.1, 0.4, 0.5), rot=(0.25453, -0.33065, -0.86188, 0.28818), convention="opengl"),  # -35, -30, -150
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=24.0,
+@@ -353,7 +353,7 @@ class UnitreeG1EnvCfg(LwEmbodimentBase):
+             "eye_in_hand_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/torso_link/eye_in_hand_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(0.3, 0, 0.4), rot=(0.70442, 0.06163, -0.06163, -0.70442), convention="opengl"),  # 0, -10, -90
++                    offset=TiledCameraCfg.OffsetCfg(pos=(0.3, 0, 0.4), rot=(0.06163, -0.06163, -0.70442, 0.70442), convention="opengl"),  # 0, -10, -90
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=24.0,
+@@ -372,7 +372,7 @@ class UnitreeG1EnvCfg(LwEmbodimentBase):
+             "right_shoulder_camera": {
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/torso_link/right_shoulder_camera",
+-                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.1, -0.4, 0.5), rot=(0.71134, 0.39777, -0.12609, -0.56558), convention="opengl"),  # 40, -25, -32
++                    offset=TiledCameraCfg.OffsetCfg(pos=(-0.1, -0.4, 0.5), rot=(0.39777, -0.12609, -0.56558, 0.71134), convention="opengl"),  # 40, -25, -32
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+                         focal_length=24.0,
+@@ -392,7 +392,7 @@ class UnitreeG1EnvCfg(LwEmbodimentBase):
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/right_wrist_yaw_link/hand_camera",
+                     offset=TiledCameraCfg.OffsetCfg(pos=(0.04353, -0.01712, 0.16093),
+-                                                    rot=(0.65164, 0.27138, -0.01743, -0.70811),
++                                                    rot=(0.27138, -0.01743, -0.70811, 0.65164),
+                                                     convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+@@ -416,7 +416,7 @@ class UnitreeG1EnvCfg(LwEmbodimentBase):
+                     #                                 rot=(-0.01853, -0.10431, 0.33021, 0.93794),
+                     #                                 convention="opengl"),
+                     offset=TiledCameraCfg.OffsetCfg(pos=(0.9, 0, 0.24521),
+-                                                    rot=(0.56538, 0.43517, 0.42607, 0.55627),
++                                                    rot=(0.43517, 0.42607, 0.55627, 0.56538),
+                                                     convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+@@ -437,7 +437,7 @@ class UnitreeG1EnvCfg(LwEmbodimentBase):
+                 "camera_cfg": TiledCameraCfg(
+                     prim_path="{ENV_REGEX_NS}/Robot/d435_link/d435_camera",
+                     offset=TiledCameraCfg.OffsetCfg(pos=(0, 0, 0),
+-                                                    rot=(0.52217, 0.4768, -0.4768, -0.52217),
++                                                    rot=(0.4768, -0.4768, -0.52217, 0.52217),
+                                                     convention="opengl"),
+                     data_types=["rgb"],
+                     spawn=sim_utils.PinholeCameraCfg(
+@@ -479,10 +479,10 @@ class UnitreeG1HandEnvCfg(UnitreeG1EnvCfg):
+ 
+     def preprocess_device_action(self, action: dict[str, torch.Tensor], device, base_move=True) -> torch.Tensor:
+         base_action = action["base"]
+-        _cumulative_base, base_quat = math_utils.subtract_frame_transforms(device.robot.data.root_com_pos_w[0],
+-                                                                           device.robot.data.root_com_quat_w[0],
+-                                                                           device.robot.data.body_link_pos_w[0, 4],
+-                                                                           device.robot.data.body_link_quat_w[0, 4])
++        _cumulative_base, base_quat = math_utils.subtract_frame_transforms(device.robot.data.root_com_pos_w.torch[0],
++                                                                           device.robot.data.root_com_quat_w.torch[0],
++                                                                           device.robot.data.body_link_pos_w.torch[0, 4],
++                                                                           device.robot.data.body_link_quat_w.torch[0, 4])
+         # base_quat = T.quat_multiply(device.robot.data.body_link_quat_w[0,3][[1,2,3,0]],device.robot.data.root_com_quat_w[0][[1,2,3,0]], )
+         base_yaw = T.quat2axisangle(base_quat[[1, 2, 3, 0]])[2]
+         base_quat = T.axisangle2quat(torch.tensor([0, 0, base_yaw], device=device.env.device))
+@@ -690,9 +690,9 @@ class UnitreeG1ControllerEnvCfg(UnitreeG1EnvCfg):
+         base_input_y = abs(action.get('rbase', [0, 0])[1])
+         base_input_magnitude = max(base_input_x, base_input_y)
+ 
+-        x_joint_vel = device.robot.data.joint_vel[0, self.base_x_joint_index].item()
+-        y_joint_vel = device.robot.data.joint_vel[0, self.base_y_joint_index].item()
+-        yaw_joint_vel = device.robot.data.joint_vel[0, self.base_yaw_joint_index].item()
++        x_joint_vel = device.robot.data.joint_vel.torch[0, self.base_x_joint_index].item()
++        y_joint_vel = device.robot.data.joint_vel.torch[0, self.base_y_joint_index].item()
++        yaw_joint_vel = device.robot.data.joint_vel.torch[0, self.base_yaw_joint_index].item()
+ 
+         # Auto-lock logic: lock when input magnitude is small
+         if not self.base_lock_state and base_input_magnitude < self.base_auto_lock_threshold and abs(x_joint_vel) < 0.01 and abs(y_joint_vel) < 0.01 and abs(yaw_joint_vel) < 0.01:
+@@ -708,9 +708,9 @@ class UnitreeG1ControllerEnvCfg(UnitreeG1EnvCfg):
+                 self.base_lock_state = True
+ 
+                 # Use joint positions for locking
+-                self.base_lock_value_x = device.robot.data.joint_pos[0, self.base_x_joint_index].item()
+-                self.base_lock_value_y = device.robot.data.joint_pos[0, self.base_y_joint_index].item()
+-                self.base_lock_value_yaw = device.robot.data.joint_pos[0, self.base_yaw_joint_index].item()
++                self.base_lock_value_x = device.robot.data.joint_pos.torch[0, self.base_x_joint_index].item()
++                self.base_lock_value_y = device.robot.data.joint_pos.torch[0, self.base_y_joint_index].item()
++                self.base_lock_value_yaw = device.robot.data.joint_pos.torch[0, self.base_yaw_joint_index].item()
+ 
+                 # TODO: use joint pos target instead of joint pos for locking
+                 # x_target = device.robot.data.joint_pos_target[0, self.base_x_joint_index].item()
+@@ -745,9 +745,9 @@ class UnitreeG1ControllerEnvCfg(UnitreeG1EnvCfg):
+                 self.base_y_joint_index != -1 and
+                     self.base_yaw_joint_index != -1):
+                 # Use joint positions for PID control
+-                current_x = device.robot.data.joint_pos[0, self.base_x_joint_index].item()
+-                current_y = device.robot.data.joint_pos[0, self.base_y_joint_index].item()
+-                current_yaw = device.robot.data.joint_pos[0, self.base_yaw_joint_index].item()
++                current_x = device.robot.data.joint_pos.torch[0, self.base_x_joint_index].item()
++                current_y = device.robot.data.joint_pos.torch[0, self.base_y_joint_index].item()
++                current_yaw = device.robot.data.joint_pos.torch[0, self.base_yaw_joint_index].item()
+ 
+                 control_output_x = self.pid_control(self.base_lock_value_x, current_x, 'base_x')
+                 control_output_y = self.pid_control(self.base_lock_value_y, current_y, 'base_y')
+@@ -774,10 +774,10 @@ class UnitreeG1ControllerEnvCfg(UnitreeG1EnvCfg):
+                 base_action = torch.tensor([action['rbase'][0] * non_lock_scale, action['rbase'][1] * non_lock_scale, 0],
+                                            device=action['rbase'].device)
+ 
+-        _cumulative_base, base_quat = math_utils.subtract_frame_transforms(device.robot.data.root_com_pos_w[0],
+-                                                                           device.robot.data.root_com_quat_w[0],
+-                                                                           device.robot.data.body_link_pos_w[0, 4],
+-                                                                           device.robot.data.body_link_quat_w[0, 4])
++        _cumulative_base, base_quat = math_utils.subtract_frame_transforms(device.robot.data.root_com_pos_w.torch[0],
++                                                                           device.robot.data.root_com_quat_w.torch[0],
++                                                                           device.robot.data.body_link_pos_w.torch[0, 4],
++                                                                           device.robot.data.body_link_quat_w.torch[0, 4])
+         base_yaw = T.quat2axisangle(base_quat[[1, 2, 3, 0]])[2]
+         base_quat = T.axisangle2quat(torch.tensor([0, 0, base_yaw], device=device.env.device))
+         base_movement = torch.tensor([_cumulative_base[0], _cumulative_base[1], 0], device=device.env.device)
+@@ -850,10 +850,10 @@ class UnitreeG1LocoHandEnvCfg(UnitreeG1LocoEnvCfg):
+             left_arm_action = action["left_arm_delta"]
+             right_arm_action = action["right_arm_delta"]
+         else:  # Absolute mode
+-            _cumulative_base, base_quat = math_utils.subtract_frame_transforms(device.robot.data.root_com_pos_w[0],
+-                                                                               device.robot.data.root_com_quat_w[0],
+-                                                                               device.robot.data.body_link_pos_w[0, 4],
+-                                                                               device.robot.data.body_link_quat_w[0, 4])
++            _cumulative_base, base_quat = math_utils.subtract_frame_transforms(device.robot.data.root_com_pos_w.torch[0],
++                                                                               device.robot.data.root_com_quat_w.torch[0],
++                                                                               device.robot.data.body_link_pos_w.torch[0, 4],
++                                                                               device.robot.data.body_link_quat_w.torch[0, 4])
+             # base_quat = T.quat_multiply(device.robot.data.body_link_quat_w[0,3][[1,2,3,0]],device.robot.data.root_com_quat_w[0][[1,2,3,0]], )
+             base_yaw = T.quat2axisangle(base_quat[[1, 2, 3, 0]])[2]
+             base_quat = T.axisangle2quat(torch.tensor([0, 0, base_yaw], device=device.env.device))
+@@ -903,10 +903,10 @@ class UnitreeG1LocoControllerEnvCfg(UnitreeG1LocoEnvCfg):
+             left_arm_action = action["left_arm_delta"]
+             right_arm_action = action["right_arm_delta"]
+         else:  # Absolute mode
+-            _cumulative_base, base_quat = math_utils.subtract_frame_transforms(device.robot.data.root_com_pos_w[0],
+-                                                                               device.robot.data.root_com_quat_w[0],
+-                                                                               device.robot.data.body_link_pos_w[0, 4],
+-                                                                               device.robot.data.body_link_quat_w[0, 4])
++            _cumulative_base, base_quat = math_utils.subtract_frame_transforms(device.robot.data.root_com_pos_w.torch[0],
++                                                                               device.robot.data.root_com_quat_w.torch[0],
++                                                                               device.robot.data.body_link_pos_w.torch[0, 4],
++                                                                               device.robot.data.body_link_quat_w.torch[0, 4])
+             # base_quat = T.quat_multiply(device.robot.data.body_link_quat_w[0,3][[1,2,3,0]],device.robot.data.root_com_quat_w[0][[1,2,3,0]], )
+             base_yaw = T.quat2axisangle(base_quat[[1, 2, 3, 0]])[2]
+             base_quat = T.axisangle2quat(torch.tensor([0, 0, base_yaw], device=device.env.device))
+@@ -1076,10 +1076,10 @@ class UnitreeG1ControllerDecoupledWBCEnvCfg(UnitreeG1ControllerEnvCfg):
+                 base_action[3] = torch.clamp(torch.tensor(target_height), min=0.2, max=0.75)
+                 self.init_robot_base_height = base_action[3].item()
+ 
+-        _cumulative_base, base_quat = math_utils.subtract_frame_transforms(device.robot.data.root_com_pos_w[0],
+-                                                                           device.robot.data.root_com_quat_w[0],
+-                                                                           device.robot.data.body_link_pos_w[0, 3],
+-                                                                           device.robot.data.body_link_quat_w[0, 3])
++        _cumulative_base, base_quat = math_utils.subtract_frame_transforms(device.robot.data.root_com_pos_w.torch[0],
++                                                                           device.robot.data.root_com_quat_w.torch[0],
++                                                                           device.robot.data.body_link_pos_w.torch[0, 3],
++                                                                           device.robot.data.body_link_quat_w.torch[0, 3])
+         # base_quat = T.quat_multiply(device.robot.data.body_link_quat_w[0,3][[1,2,3,0]],device.robot.data.root_com_quat_w[0][[1,2,3,0]], )
+         base_yaw = T.quat2axisangle(base_quat[[1, 2, 3, 0]])[2]
+         base_quat = T.axisangle2quat(torch.tensor([0, 0, base_yaw], device=device.env.device))
+@@ -1190,3 +1190,5 @@ class UnitreeG1ControllerDecoupledWBCEnvCfg(UnitreeG1ControllerEnvCfg):
+                 target_pitch = current_angle
+ 
+         return target_pitch, new_dead_zone_state
++
++# LW Lab 3: authored rot= quaternion literals use XYZW.
+diff --git a/lw_benchhub/core/scenes/kitchen/kitchen.py b/lw_benchhub/core/scenes/kitchen/kitchen.py
+index 5fbfe93..f8fdaef 100644
+--- a/lw_benchhub/core/scenes/kitchen/kitchen.py
++++ b/lw_benchhub/core/scenes/kitchen/kitchen.py
+@@ -153,9 +153,12 @@ class LwScene(Scene, NoDeepcopyMixin):
+         env_cfg.num_envs = self.num_envs
+         env_cfg.scene_backend = self.scene_backend
+ 
+-        env_cfg.sim.physx.bounce_threshold_velocity = 0.2
+-        env_cfg.sim.physx.bounce_threshold_velocity = 0.01
+-        env_cfg.sim.physx.friction_correlation_distance = 0.00625
++        from isaaclab_physx.physics import PhysxCfg
++        if env_cfg.sim.physics is None:
++            env_cfg.sim.physics = PhysxCfg()
++        env_cfg.sim.physics.bounce_threshold_velocity = 0.2
++        env_cfg.sim.physics.bounce_threshold_velocity = 0.01
++        env_cfg.sim.physics.friction_correlation_distance = 0.00625
+         env_cfg.sim.render.enable_translucency = True
+ 
+         scene_origin = np.mean(self.scene_range, axis=0)
+diff --git a/lw_benchhub/core/tasks/base.py b/lw_benchhub/core/tasks/base.py
+index ac4e924..e6b1eb4 100644
+--- a/lw_benchhub/core/tasks/base.py
++++ b/lw_benchhub/core/tasks/base.py
+@@ -22,7 +22,7 @@ import lazy_import
+ import numpy as np
+ import torch
+ 
+-from lightwheel_sdk.loader import ENDPOINT
++from lightwheel_sdk.client import ENDPOINT
+ from isaaclab.managers import EventTermCfg as EventTerm
+ from isaaclab.managers import ObservationGroupCfg as ObsGroup
+ from isaaclab.managers import RewardTermCfg as RewTerm
+@@ -247,9 +247,12 @@ class LwTaskBase(TaskBase, NoDeepcopyMixin):
+         env_cfg.sim.dt = 1 / 100  # physics frequency: 100Hz
+         env_cfg.sim.render_interval = 4  # render frequency: 25Hz
+         env_cfg.decimation = 2  # action frequency: 50Hz
+-        env_cfg.sim.physx.bounce_threshold_velocity = 0.2
+-        env_cfg.sim.physx.bounce_threshold_velocity = 0.01
+-        env_cfg.sim.physx.friction_correlation_distance = 0.00625
++        from isaaclab_physx.physics import PhysxCfg
++        if env_cfg.sim.physics is None:
++            env_cfg.sim.physics = PhysxCfg()
++        env_cfg.sim.physics.bounce_threshold_velocity = 0.2
++        env_cfg.sim.physics.bounce_threshold_velocity = 0.01
++        env_cfg.sim.physics.friction_correlation_distance = 0.00625
+         env_cfg.rerender_on_reset = True
+         return env_cfg
+ 
+diff --git a/lw_benchhub/scripts/autosim/sample_region_visualization.py b/lw_benchhub/scripts/autosim/sample_region_visualization.py
+index aac8330..632256c 100644
+--- a/lw_benchhub/scripts/autosim/sample_region_visualization.py
++++ b/lw_benchhub/scripts/autosim/sample_region_visualization.py
+@@ -227,7 +227,7 @@ def main():
+     if args_cli.show_object_pos:
+         for _ in range(args_cli.num_resets):
+             env.reset()
+-            pos = env.scene.rigid_objects[obj_name].data.root_pos_w[0].cpu().numpy()
++            pos = env.scene.rigid_objects[obj_name].data.root_pos_w.torch[0].cpu().numpy()
+             obj_positions.append(pos.tolist())  # xyz three-dimensional
+ 
+     visualize_in_sim(
+diff --git a/lw_benchhub/scripts/maniskill_ppo/camera_alignment.py b/lw_benchhub/scripts/maniskill_ppo/camera_alignment.py
+index ae28b43..525f7c4 100644
+--- a/lw_benchhub/scripts/maniskill_ppo/camera_alignment.py
++++ b/lw_benchhub/scripts/maniskill_ppo/camera_alignment.py
+@@ -94,8 +94,8 @@ def quat2mat(quaternion):
+ 
+ def set_camera_follow_pose(env, pos_offset, rot_offset_wxyz):
+     # 1) Get the world pose of the robot base
+-    robot_q_wxyz = env.scene.articulations["robot"].data.body_quat_w[..., 2, :][0].cpu().numpy()  # (w,x,y,z)
+-    robot_pos = env.scene.articulations["robot"].data.body_pos_w[..., 2, :][0].cpu().numpy()      # (3,)
++    robot_q_wxyz = env.scene.articulations["robot"].data.body_quat_w.torch[..., 2, :][0].cpu().numpy()  # (w,x,y,z)
++    robot_pos = env.scene.articulations["robot"].data.body_pos_w.torch[..., 2, :][0].cpu().numpy()      # (3,)
+ 
+     # 2) Position offset -> world frame
+     robot_q_xyzw = robot_q_wxyz[[1, 2, 3, 0]]
+diff --git a/lw_benchhub/scripts/maniskill_ppo/eval_real.py b/lw_benchhub/scripts/maniskill_ppo/eval_real.py
+index ea744f5..7aee8d0 100644
+--- a/lw_benchhub/scripts/maniskill_ppo/eval_real.py
++++ b/lw_benchhub/scripts/maniskill_ppo/eval_real.py
+@@ -237,7 +237,7 @@ def main(args):
+ 
+                 next_obs['rgb'] = torch.tensor(real_cam_obs['global_camera']['rgb'], device=args_cli.device)
+                 action = agent.agent.get_action(next_obs, deterministic=True)
+-                joint_pos = env.env.scene.articulations['robot'].data.joint_pos.clone()
++                joint_pos = env.env.scene.articulations['robot'].data.joint_pos.torch.clone()
+                 next_obs, reward, terminations, truncations, infos = env.step(action)
+                 next_done = torch.logical_or(terminations, truncations).to(torch.float32)
+                 # real_target_qpos = env.env.scene.articulations['robot'].data.joint_pos.clone()
+@@ -251,7 +251,7 @@ def main(args):
+                 if args_cli.debug:
+                     qposs.append(follower.qpos)
+                     real_target_qposs.append(real_target_qpos.cpu())
+-                    sim_qpos.append(env.env.scene.articulations['robot'].data.joint_pos.clone().cpu().numpy())
++                    sim_qpos.append(env.env.scene.articulations['robot'].data.joint_pos.torch.clone().cpu().numpy())
+                     sim_imgs = next_obs['policy']['image_global'].squeeze(0).cpu().numpy()
+                     real_imgs = real_cam_obs['global_camera']['rgb'].squeeze(0)
+                     overlaid_imgs = overlay_envs(real_imgs, sim_imgs)
+diff --git a/lw_benchhub/utils/gripper_utils.py b/lw_benchhub/utils/gripper_utils.py
+index df3c7b7..3254bf5 100644
+--- a/lw_benchhub/utils/gripper_utils.py
++++ b/lw_benchhub/utils/gripper_utils.py
+@@ -27,7 +27,7 @@ def dynamic_reset_gripper_effort_limit_sim(env, teleop_device):
+ 
+ 
+ def write_gripper_effort_limit_sim(env, env_arm):
+-    gripper_pos = env_arm.data.body_link_pos_w[:, -1]  # [num_envs, 3]
++    gripper_pos = env_arm.data.body_link_pos_w.torch[:, -1]  # [num_envs, 3]
+     num_envs = gripper_pos.shape[0]
+ 
+     object_positions = []
+@@ -35,9 +35,9 @@ def write_gripper_effort_limit_sim(env, env_arm):
+     object_names = []
+ 
+     for name, obj in env.scene._rigid_objects.items():
+-        pos = obj.data.body_link_pos_w[:, 0]  # [num_envs, 3]
++        pos = obj.data.body_link_pos_w.torch[:, 0]  # [num_envs, 3]
+         object_positions.append(pos)
+-        object_masses.append(obj.data.default_mass)
++        object_masses.append(obj.data.default_mass.torch)
+         object_names.append(name)
+ 
+     if not object_positions:
+diff --git a/lw_benchhub/utils/isaaclab_utils/__init__.py b/lw_benchhub/utils/isaaclab_utils/__init__.py
+index 66ca5c6..b39bb31 100644
+--- a/lw_benchhub/utils/isaaclab_utils/__init__.py
++++ b/lw_benchhub/utils/isaaclab_utils/__init__.py
+@@ -20,9 +20,9 @@ if typing.TYPE_CHECKING:
+ def get_robot_joint_target_from_scene(scene):  # : InteractiveScene):
+     # only articulations have joints
+     return {
+-        "joint_pos_target": scene.articulations["robot"].data.joint_pos_target.clone(),
+-        "joint_vel_target": scene.articulations["robot"].data.joint_vel_target.clone(),
+-        "joint_effort_target": scene.articulations["robot"].data.joint_effort_target.clone()
++        "joint_pos_target": scene.articulations["robot"].data.joint_pos_target.torch.clone(),
++        "joint_vel_target": scene.articulations["robot"].data.joint_vel_target.torch.clone(),
++        "joint_effort_target": scene.articulations["robot"].data.joint_effort_target.torch.clone()
+     }
+ 
+ 
+diff --git a/lw_benchhub/utils/monkey_patch.py b/lw_benchhub/utils/monkey_patch.py
+index 100db4e..9ec3437 100644
+--- a/lw_benchhub/utils/monkey_patch.py
++++ b/lw_benchhub/utils/monkey_patch.py
+@@ -678,13 +678,13 @@ def patch_termination_manager():
+     TerminationManager.compute = compute
+ 
+ 
+-patch_reset()
++# Lab 3: use native implementation instead of patch_reset().
+ patch_configclass()
+-patch_recorder_manager_ep_meta()
+-patch_recorder_manager_joint_targets()
+-patch_step()
++# Lab 3: use native implementation instead of patch_recorder_manager_ep_meta().
++# Lab 3: use native implementation instead of patch_recorder_manager_joint_targets().
++# Lab 3: use native implementation instead of patch_step().
+ patch_yaml_load()
+-patch_reward_manager()
+-patch_create_teleop_device()
+-patch_isaaclab_tasks_mdp()
+-patch_termination_manager()
++# Lab 3: use native implementation instead of patch_reward_manager().
++# Lab 3: use native implementation instead of patch_create_teleop_device().
++# Lab 3: use native implementation instead of patch_isaaclab_tasks_mdp().
++# Lab 3: use native implementation instead of patch_termination_manager().
+diff --git a/lw_benchhub/utils/object_utils.py b/lw_benchhub/utils/object_utils.py
+index 91a1dc5..e904076 100644
+--- a/lw_benchhub/utils/object_utils.py
++++ b/lw_benchhub/utils/object_utils.py
+@@ -65,14 +65,14 @@ def obj_inside_of(env: ManagerBasedEnv, obj_name: str, fixture_id: str, partial_
+ 
+             # get the position and quaternion of object
+             if obj_name in env.scene.articulations:
+-                obj_pos = env.scene.articulations[obj_name].data.body_com_pos_w[i, 0, :].cpu().numpy()
++                obj_pos = env.scene.articulations[obj_name].data.body_com_pos_w.torch[i, 0, :].cpu().numpy()
+                 obj_quat = T.convert_quat(
+-                    env.scene.articulations[obj_name].data.body_com_quat_w[i, 0, :].cpu().numpy(), to="xyzw"
++                    env.scene.articulations[obj_name].data.body_com_quat_w.torch[i, 0, :].cpu().numpy(), to="xyzw"
+                 )
+             elif obj_name in env.scene.rigid_objects:
+-                obj_pos = env.scene.rigid_objects[obj_name].data.body_com_pos_w[i, 0, :].cpu().numpy()
++                obj_pos = env.scene.rigid_objects[obj_name].data.body_com_pos_w.torch[i, 0, :].cpu().numpy()
+                 obj_quat = T.convert_quat(
+-                    env.scene.rigid_objects[obj_name].data.body_com_quat_w[i, 0, :].cpu().numpy(), to="xyzw"
++                    env.scene.rigid_objects[obj_name].data.body_com_quat_w.torch[i, 0, :].cpu().numpy(), to="xyzw"
+                 )
+ 
+             if partial_check:
+@@ -411,13 +411,13 @@ def check_obj_in_receptacle(env: ManagerBasedEnv, obj_name: str, receptacle_name
+         is_contact = torch.tensor([False], device=env.device).repeat(env.scene.num_envs)  # (env_num, )
+ 
+     if obj_name in env.scene.articulations:
+-        obj_pos = env.scene.articulations[obj_name].data.body_com_pos_w[:, 0, :]
++        obj_pos = env.scene.articulations[obj_name].data.body_com_pos_w.torch[:, 0, :]
+     elif obj_name in env.scene.rigid_objects:
+-        obj_pos = env.scene.rigid_objects[obj_name].data.body_com_pos_w[:, 0, :]
++        obj_pos = env.scene.rigid_objects[obj_name].data.body_com_pos_w.torch[:, 0, :]
+     if receptacle_name in env.scene.articulations:
+-        recep_pos = env.scene.articulations[receptacle_name].data.body_com_pos_w[:, 0, :]
++        recep_pos = env.scene.articulations[receptacle_name].data.body_com_pos_w.torch[:, 0, :]
+     elif receptacle_name in env.scene.rigid_objects:
+-        recep_pos = env.scene.rigid_objects[receptacle_name].data.body_com_pos_w[:, 0, :]
++        recep_pos = env.scene.rigid_objects[receptacle_name].data.body_com_pos_w.torch[:, 0, :]
+ 
+     if th is None:
+         th = recep.horizontal_radius
+@@ -429,7 +429,7 @@ def check_fxtr_upright(env, fixture_name, th=15):
+     """
+     Check if the fixture is upright based on its rotation.
+     """
+-    fixture_quat_wxyz = env.scene.articulations[fixture_name].data.body_com_quat_w
++    fixture_quat_wxyz = env.scene.articulations[fixture_name].data.body_com_quat_w.torch
+     fixture_quat_xyzw = T.convert_quat(fixture_quat_wxyz.cpu().numpy(), to="xyzw")
+     fixture_quat_xyzw = torch.tensor(fixture_quat_xyzw, device=env.device)
+     roll, pitch, yaw = euler_xyz_from_quat(fixture_quat_xyzw, degrees=True)
+@@ -442,7 +442,7 @@ def check_obj_upright(env, obj_name, th=15):
+     """
+     Check if the object is upright based on its rotation.
+     """
+-    obj_quat = env.scene[obj_name].data.root_quat_w
++    obj_quat = env.scene[obj_name].data.root_quat_w.torch
+     roll, pitch, y = euler_xyz_from_quat(obj_quat)
+     is_upright = (torch.abs(roll) < th) & (torch.abs(pitch) < th)
+ 
+@@ -455,7 +455,7 @@ def check_obj_scrubbed(env, sponge_name, obj_name):
+     """
+     # Check if sponge is in contact with bowl
+     in_contact = check_obj_in_receptacle(env, sponge_name, obj_name)
+-    sponge_pos = env.scene.rigid_objects[sponge_name].data.body_com_pos_w[:, 0, :]
++    sponge_pos = env.scene.rigid_objects[sponge_name].data.body_com_pos_w.torch[:, 0, :]
+     prev_sponge_pos = getattr(env, "prev_sponge_pos", sponge_pos)
+ 
+     movement_vector = sponge_pos - prev_sponge_pos
+@@ -477,13 +477,13 @@ def check_obj_in_receptacle_no_contact(env: ManagerBasedEnv, obj_name: str, rece
+     check if object is in receptacle object based on threshold
+     """
+     if obj_name in env.scene.articulations:
+-        obj_pos = env.scene.articulations[obj_name].data.body_com_pos_w[:, 0, :]
++        obj_pos = env.scene.articulations[obj_name].data.body_com_pos_w.torch[:, 0, :]
+     elif obj_name in env.scene.rigid_objects:
+-        obj_pos = env.scene.rigid_objects[obj_name].data.body_com_pos_w[:, 0, :]
++        obj_pos = env.scene.rigid_objects[obj_name].data.body_com_pos_w.torch[:, 0, :]
+     if receptacle_name in env.scene.articulations:
+-        recep_pos = env.scene.articulations[receptacle_name].data.body_com_pos_w[:, 0, :]
++        recep_pos = env.scene.articulations[receptacle_name].data.body_com_pos_w.torch[:, 0, :]
+     elif receptacle_name in env.scene.rigid_objects:
+-        recep_pos = env.scene.rigid_objects[receptacle_name].data.body_com_pos_w[:, 0, :]
++        recep_pos = env.scene.rigid_objects[receptacle_name].data.body_com_pos_w.torch[:, 0, :]
+     if th is None:
+         th = env.cfg.isaaclab_arena_env.task.objects[receptacle_name].horizontal_radius * 0.7
+     is_closed = torch.norm(obj_pos[:, :2] - recep_pos[:, :2], dim=-1) < th  # (env_num, )
+@@ -519,8 +519,8 @@ def check_fixture_in_receptacle(env: ManagerBasedEnv, fixture_name: str, fixture
+ 
+     recep = env.cfg.isaaclab_arena_env.task.objects[receptacle_name]
+ 
+-    fix_pos = torch.tensor(env.scene.articulations[fixture_object].data.root_link_pos_w[..., 0:2])
+-    recep_pos = torch.mean(env.scene.rigid_objects[receptacle_name].data.body_com_pos_w, dim=1)  # (env_num, 3)
++    fix_pos = torch.tensor(env.scene.articulations[fixture_object].data.root_link_pos_w.torch[..., 0:2])
++    recep_pos = torch.mean(env.scene.rigid_objects[receptacle_name].data.body_com_pos_w.torch, dim=1)  # (env_num, 3)
+     if th is None:
+         th = recep.horizontal_radius * 0.7
+     is_closed = torch.norm(fix_pos[:, :2] - recep_pos[:, :2], dim=-1) < th  # (env_num, )
+@@ -540,7 +540,7 @@ def check_obj_grasped(env, obj_name, threshold=0.035):
+         gripper_joints = [name for name in robot_articulation if "finger_joint" in name]
+ 
+     joint_index = [robot_articulation.index(joint) for joint in gripper_joints]
+-    gripper_joint_positions = env.scene.articulations["robot"].data.joint_pos[:, joint_index]
++    gripper_joint_positions = env.scene.articulations["robot"].data.joint_pos.torch[:, joint_index]
+     gripper_closed = (gripper_joint_positions < threshold).all()
+     is_contact = torch.tensor([False], dtype=torch.bool, device=env.device).repeat(env.num_envs)
+     for gripper_name in [name for name in list(env.scene.sensors.keys()) if "gripper" in name and "contact" in name]:
+@@ -555,7 +555,7 @@ def gripper_obj_far(env, obj_name="obj", th=0.25, eef_name=None, force_th=0.1) -
+ 
+     # Check if object is in rigid_objects
+     if obj_name in env.cfg.isaaclab_arena_env.task.objects and obj_name in env.scene.rigid_objects:
+-        obj_pos = env.scene.rigid_objects[obj_name].data.body_com_pos_w  # (num_envs, num_bodies, 3)
++        obj_pos = env.scene.rigid_objects[obj_name].data.body_com_pos_w.torch  # (num_envs, num_bodies, 3)
+     else:
+         # Articulation object: use all body centers of mass
+         if not isinstance(obj_name, str):
+@@ -564,10 +564,10 @@ def gripper_obj_far(env, obj_name="obj", th=0.25, eef_name=None, force_th=0.1) -
+         # Get the articulation object
+         articulation_obj = env.scene.articulations[obj_name]
+         # Get all body centers of mass (includes root + all joints)
+-        obj_pos = articulation_obj.data.body_com_pos_w  # (num_envs, num_bodies, 3)
++        obj_pos = articulation_obj.data.body_com_pos_w.torch  # (num_envs, num_bodies, 3)
+ 
+     if eef_name is None:
+-        gripper_site_pos = env.scene["ee_frame"].data.target_pos_w  # (num_envs, num_eefs, 3)
++        gripper_site_pos = env.scene["ee_frame"].data.target_pos_w.torch  # (num_envs, num_eefs, 3)
+     else:
+         eef_frame_data = env.scene['ee_frame'].data
+         eef_index = eef_frame_data.target_frame_names.index(eef_name)
+@@ -618,10 +618,10 @@ def gripper_fixture_far(env: ManagerBasedEnv, fixture_object: str, th: float = 0
+         torch.Tensor: (num_envs,) - True if gripper is far from fixture for each environment
+     """
+     # Get fixture position for all environments
+-    fix_pos = torch.tensor(env.scene.articulations[fixture_object].data.root_link_pos_w[..., 0:2])  # (num_envs, 2)
++    fix_pos = torch.tensor(env.scene.articulations[fixture_object].data.root_link_pos_w.torch[..., 0:2])  # (num_envs, 2)
+ 
+     # Get gripper position for all environments
+-    gripper_site_pos = env.scene["ee_frame"].data.target_pos_w  # (num_envs, num_eefs, 3)
++    gripper_site_pos = env.scene["ee_frame"].data.target_pos_w.torch  # (num_envs, num_eefs, 3)
+ 
+     # Calculate distance between gripper and fixture for all environments
+     gripper_fixture_dist = torch.norm(gripper_site_pos[:, :, :2] - fix_pos.unsqueeze(1), dim=-1)  # (num_envs, num_eefs)
+@@ -637,7 +637,7 @@ def obj_cos(env: ManagerBasedEnv, obj_name: str = "obj", ref: Tuple[float, float
+     def cos(u, v):
+         return np.dot(u, v) / max(np.linalg.norm(u) * np.linalg.norm(v), 1e-10)
+ 
+-    obj_quat = torch.mean(env.scene.rigid_objects[obj_name].data.body_com_quat_w, dim=1)[0]
++    obj_quat = torch.mean(env.scene.rigid_objects[obj_name].data.body_com_quat_w.torch, dim=1)[0]
+     obj_quat_np = obj_quat.detach().cpu().numpy()
+     obj_mat = T.quat2mat(obj_quat_np)
+     return cos(obj_mat[:, 2], np.array(ref))
+@@ -723,7 +723,7 @@ def check_object_stable(env: ManagerBasedEnv, obj: str, threshold: float = 0.5)
+     '''
+     check if the object is stable
+     '''
+-    obj_vel = env.scene.rigid_objects[obj].data.body_com_vel_w[:, 0, :]
++    obj_vel = env.scene.rigid_objects[obj].data.body_com_vel_w.torch[:, 0, :]
+     obj_vel_norm = torch.norm(obj_vel, dim=-1)
+     return obj_vel_norm < threshold
+ 
+@@ -795,15 +795,15 @@ def check_place_obj1_on_obj2(env: ManagerBasedEnv, obj1: str, obj2: str, th_z_ax
+     if obj1 in env.cfg.isaaclab_arena_env.task.objects:
+         if obj1 in env.scene.rigid_objects:
+             obj1_obj = env.cfg.isaaclab_arena_env.task.objects[obj1]
+-            obj1_pos = torch.mean(env.scene.rigid_objects[obj1].data.body_com_pos_w, dim=1)  # (num_envs, 3)
+-            obj1_vel = torch.mean(env.scene.rigid_objects[obj1].data.body_com_vel_w, dim=1)  # (num_envs, 3)
+-            obj1_quat = torch.mean(env.scene.rigid_objects[obj1].data.body_com_quat_w, dim=1)  # (num_envs, 4)
++            obj1_pos = torch.mean(env.scene.rigid_objects[obj1].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
++            obj1_vel = torch.mean(env.scene.rigid_objects[obj1].data.body_com_vel_w.torch, dim=1)  # (num_envs, 3)
++            obj1_quat = torch.mean(env.scene.rigid_objects[obj1].data.body_com_quat_w.torch, dim=1)  # (num_envs, 4)
+             obj1_rot_mat = matrix_from_quat(obj1_quat)  # (num_envs, 3, 3)
+         elif obj1 in env.scene.articulations:
+             obj1_obj = env.cfg.isaaclab_arena_env.task.objects[obj1]
+-            obj1_pos = torch.mean(env.scene.articulations[obj1].data.body_com_pos_w, dim=1)  # (num_envs, 3)
+-            obj1_vel = torch.mean(env.scene.articulations[obj1].data.body_com_vel_w, dim=1)  # (num_envs, 3)
+-            obj1_quat = torch.mean(env.scene.articulations[obj1].data.body_com_quat_w, dim=1)  # (num_envs, 4)
++            obj1_pos = torch.mean(env.scene.articulations[obj1].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
++            obj1_vel = torch.mean(env.scene.articulations[obj1].data.body_com_vel_w.torch, dim=1)  # (num_envs, 3)
++            obj1_quat = torch.mean(env.scene.articulations[obj1].data.body_com_quat_w.torch, dim=1)  # (num_envs, 4)
+             obj1_rot_mat = matrix_from_quat(obj1_quat)  # (num_envs, 3, 3)
+     else:
+         obj1_name = obj1 if isinstance(obj1, str) else obj1.name
+@@ -815,10 +815,10 @@ def check_place_obj1_on_obj2(env: ManagerBasedEnv, obj1: str, obj2: str, th_z_ax
+     if obj2 in env.cfg.isaaclab_arena_env.task.objects:
+         if obj2 in env.scene.rigid_objects:
+             obj2_obj = env.cfg.isaaclab_arena_env.task.objects[obj2]
+-            obj2_pos = torch.mean(env.scene.rigid_objects[obj2].data.body_com_pos_w, dim=1)  # (num_envs, 3)
++            obj2_pos = torch.mean(env.scene.rigid_objects[obj2].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
+         elif obj2 in env.scene.articulations:
+             obj2_obj = env.cfg.isaaclab_arena_env.task.objects[obj2]
+-            obj2_pos = torch.mean(env.scene.articulations[obj2].data.body_com_pos_w, dim=1)  # (num_envs, 3)
++            obj2_pos = torch.mean(env.scene.articulations[obj2].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
+     else:
+         obj2_obj = obj2
+         obj2_name = obj2 if isinstance(obj2, str) else obj2.name
+@@ -850,9 +850,9 @@ def check_place_obj1_on_obj2(env: ManagerBasedEnv, obj1: str, obj2: str, th_z_ax
+ 
+ def get_object_pos(env, obj_name):
+     if obj_name in env.scene.articulations:
+-        return env.scene.articulations[obj_name].data.body_com_pos_w[:, 0, :]
++        return env.scene.articulations[obj_name].data.body_com_pos_w.torch[:, 0, :]
+     elif obj_name in env.scene.rigid_objects:
+-        return env.scene.rigid_objects[obj_name].data.body_com_pos_w[:, 0, :]
++        return env.scene.rigid_objects[obj_name].data.body_com_pos_w.torch[:, 0, :]
+ 
+ 
+ def check_near(obj1_pos, obj2_pos, th=0.2):
+@@ -889,9 +889,9 @@ def check_place_obj1_side_by_obj2(env: ManagerBasedEnv, obj1: str, obj2: str, ch
+     # Get object positions - use torch.mean for multi-body objects like check_place_obj1_on_obj2
+     if obj1 in env.cfg.isaaclab_arena_env.task.objects:
+         obj1_obj = env.cfg.isaaclab_arena_env.task.objects[obj1]
+-        obj1_pos = torch.mean(env.scene.rigid_objects[obj1].data.body_com_pos_w, dim=1)  # (num_envs, 3)
+-        obj1_vel = torch.mean(env.scene.rigid_objects[obj1].data.body_com_vel_w, dim=1)  # (num_envs, 3)
+-        obj1_quat = torch.mean(env.scene.rigid_objects[obj1].data.body_com_quat_w, dim=1)  # (num_envs, 4)
++        obj1_pos = torch.mean(env.scene.rigid_objects[obj1].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
++        obj1_vel = torch.mean(env.scene.rigid_objects[obj1].data.body_com_vel_w.torch, dim=1)  # (num_envs, 3)
++        obj1_quat = torch.mean(env.scene.rigid_objects[obj1].data.body_com_quat_w.torch, dim=1)  # (num_envs, 4)
+         obj1_rot_mat = matrix_from_quat(obj1_quat)  # (num_envs, 3, 3)
+     else:
+         obj1_obj = obj1
+@@ -903,7 +903,7 @@ def check_place_obj1_side_by_obj2(env: ManagerBasedEnv, obj1: str, obj2: str, ch
+ 
+     if obj2 in env.cfg.isaaclab_arena_env.task.objects:
+         obj2_obj = env.cfg.isaaclab_arena_env.task.objects[obj2]
+-        obj2_pos = torch.mean(env.scene.rigid_objects[obj2].data.body_com_pos_w, dim=1)  # (num_envs, 3)
++        obj2_pos = torch.mean(env.scene.rigid_objects[obj2].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
+     else:
+         obj2_obj = obj2
+         obj2_name = obj2 if isinstance(obj2, str) else obj2.name
+@@ -996,7 +996,7 @@ def check_obj_location_on_stove(env: ManagerBasedEnv, stove: Fixture, obj_name:
+     """
+ 
+     knobs_state = stove.get_knobs_state(env=env)
+-    obj_pos = env.scene.rigid_objects[obj_name].data.body_com_pos_w[..., 0, :]
++    obj_pos = env.scene.rigid_objects[obj_name].data.body_com_pos_w.torch[..., 0, :]
+     obj_on_stove = check_obj_fixture_contact(env, obj_name, stove)
+     stove_pos = torch.tensor(stove.pos, device=env.device)
+     stove_rot = T.euler2mat(torch.tensor([0.0, 0.0, stove.rot], device=env.device)).to(dtype=torch.float32)
+@@ -1025,7 +1025,7 @@ def check_obj_location_on_stove(env: ManagerBasedEnv, stove: Fixture, obj_name:
+ 
+ 
+ def is_obj_z_up(env: ManagerBasedEnv, obj_name: str = "obj", th: float = 5.0) -> torch.Tensor:
+-    obj_quat = env.scene[obj_name].data.root_quat_w
++    obj_quat = env.scene[obj_name].data.root_quat_w.torch
+     r, p, y = euler_xyz_from_quat(obj_quat)
+     th = th * torch.pi / 180.0
+     return torch.logical_and(torch.abs(r) < th, torch.abs(p) < th)
+@@ -1038,8 +1038,8 @@ def grasp_obj(env, obj_name='obj', threshold=0.15):
+ 
+ 
+ def put_obj_to_coffee_machine(env: ManagerBasedEnv, obj_name: str = "obj", judge_obj_in_coffee_machine: callable = None) -> torch.Tensor:
+-    obj_height = env.scene.rigid_objects[obj_name].data.body_com_pos_w[:, 0, 2]
+-    default_obj_height = env.scene.rigid_objects[obj_name].data.default_root_state[:, 2]
++    obj_height = env.scene.rigid_objects[obj_name].data.body_com_pos_w.torch[:, 0, 2]
++    default_obj_height = env.scene.rigid_objects[obj_name].data.default_root_state.torch[:, 2]
+     higher_than_default = obj_height > default_obj_height
+ 
+     close_to_obj = torch.logical_not(gripper_obj_far(env, obj_name, th=0.15, eef_name="tool_left_arm"))
+@@ -1067,14 +1067,14 @@ def obj_fixture_bbox_min_dist(env: ManagerBasedEnv, obj_name: str, fixture: Fixt
+         fix_min_i = fix_min + env.scene.env_origins[i].cpu().numpy()
+         fix_max_i = fix_max + env.scene.env_origins[i].cpu().numpy()
+         if obj_name in env.scene.rigid_objects:
+-            obj_pos = env.scene.rigid_objects[obj_name].data.body_com_pos_w[i, 0, :].cpu().numpy()
++            obj_pos = env.scene.rigid_objects[obj_name].data.body_com_pos_w.torch[i, 0, :].cpu().numpy()
+             obj_quat = T.convert_quat(
+-                env.scene.rigid_objects[obj_name].data.body_com_quat_w[i, 0, :].cpu().numpy(), to="xyzw"
++                env.scene.rigid_objects[obj_name].data.body_com_quat_w.torch[i, 0, :].cpu().numpy(), to="xyzw"
+             )
+         elif obj_name in env.scene.articulations:
+-            obj_pos = env.scene.articulations[obj_name].data.body_com_pos_w[i, 0, :].cpu().numpy()
++            obj_pos = env.scene.articulations[obj_name].data.body_com_pos_w.torch[i, 0, :].cpu().numpy()
+             obj_quat = T.convert_quat(
+-                env.scene.articulations[obj_name].data.body_com_quat_w[i, 0, :].cpu().numpy(), to="xyzw"
++                env.scene.articulations[obj_name].data.body_com_quat_w.torch[i, 0, :].cpu().numpy(), to="xyzw"
+             )
+         obj = env.cfg.isaaclab_arena_env.task.objects[obj_name]
+         obj_pts = obj.get_bbox_points(trans=obj_pos, rot=obj_quat)
+@@ -1143,7 +1143,7 @@ def calculate_contact_force(env: ManagerBasedEnv, geom: str | USDObject | Fixtur
+     calculate the contact force on the geom
+     """
+     if f"{geom}_contact" in env.scene.sensors:
+-        return torch.max(env.scene.sensors[f"{geom}_contact"].data.net_forces_w, dim=-1).values
++        return torch.max(env.scene.sensors[f"{geom}_contact"].data.net_forces_w.torch, dim=-1).values
+     else:
+         return torch.tensor([0.0], device=env.device).repeat(env.num_envs)
+ 
+diff --git a/lw_benchhub/utils/place_utils/env_utils.py b/lw_benchhub/utils/place_utils/env_utils.py
+index ebb2534..c6aed66 100644
+--- a/lw_benchhub/utils/place_utils/env_utils.py
++++ b/lw_benchhub/utils/place_utils/env_utils.py
+@@ -1246,11 +1246,11 @@ def set_robot_to_position(env: ManagerBasedRLEnv, global_pos, global_ori, keep_z
+         # default to all environments
+         env_ids = torch.arange(env.scene.num_envs, device=env.device, dtype=torch.int64)
+     if keep_z:
+-        robot_z = env.scene.articulations["robot"].data.root_pos_w[0, 2]
++        robot_z = env.scene.articulations["robot"].data.root_pos_w.torch[0, 2]
+     else:
+         robot_z = global_pos[2]
+     robot_pos = torch.tensor([[global_pos[0], global_pos[1], robot_z]], dtype=torch.float32, device=env.device) + env.scene.env_origins[env_ids]
+-    robot_quat = T.convert_quat(T.mat2quat(T.euler2mat(global_ori)), "wxyz")
++    robot_quat = T.mat2quat(T.euler2mat(global_ori))
+     env.cfg.isaaclab_arena_env.embodiment.scene_config.robot.init_state.pos = robot_pos
+     env.cfg.isaaclab_arena_env.embodiment.scene_config.robot.init_state.rot = robot_quat
+     robot_quat = torch.tensor(robot_quat, dtype=torch.float32, device=env.device).unsqueeze(0).repeat(env_ids.shape[0], 1)
+@@ -1424,7 +1424,7 @@ def detect_robot_out_of_scene(env: ManagerBasedRLEnv, robot_bbox, scene_bbox):
+ def detect_robot_collision(env: ManagerBasedRLEnv, env_ids=None) -> bool:
+     # check if base contact is available
+     if "base_contact" in env.scene.sensors:
+-        robot_contact = env.scene.sensors["base_contact"].data.net_forces_w[env_ids]
++        robot_contact = env.scene.sensors["base_contact"].data.net_forces_w.torch[env_ids]
+         return torch.all(torch.max(robot_contact, dim=-1).values > 0.0)
+     else:
+         return False
+@@ -1475,13 +1475,13 @@ def get_safe_robot_anchor(cfg, unsafe_anchor_pos, unsafe_anchor_ori):
+ def set_camera_follow_pose(env: ManagerBasedRLEnv, offset, lookat):
+     if env.cfg.isaaclab_arena_env.embodiment.robot_base_link is not None:
+         robot_base_link_idx = env.scene.articulations["robot"].data.body_names.index(env.cfg.isaaclab_arena_env.embodiment.robot_base_link)
+-        robot_mat = T.quat2mat(env.scene.articulations["robot"].data.body_com_quat_w[..., robot_base_link_idx, :][0].cpu().numpy()[[1, 2, 3, 0]])
+-        robot_pos = env.scene.articulations["robot"].data.body_com_pos_w[..., robot_base_link_idx, :][0].cpu().numpy()
++        robot_mat = T.quat2mat(env.scene.articulations["robot"].data.body_com_quat_w.torch[..., robot_base_link_idx, :][0].cpu().numpy()[[1, 2, 3, 0]])
++        robot_pos = env.scene.articulations["robot"].data.body_com_pos_w.torch[..., robot_base_link_idx, :][0].cpu().numpy()
+         robot_pos += (robot_mat @ np.array(offset).reshape(3, 1))[:, 0]
+         robot_lookat = robot_pos + (robot_mat @ np.array(lookat).reshape(3, 1))[:, 0]
+     else:
+-        robot_mat = T.quat2mat(env.scene.articulations["robot"].data.body_com_quat_w[..., 0, :][0].cpu().numpy()[[1, 2, 3, 0]])
+-        robot_pos = env.scene.articulations["robot"].data.body_com_pos_w[..., 0, :][0].cpu().numpy()
++        robot_mat = T.quat2mat(env.scene.articulations["robot"].data.body_com_quat_w.torch[..., 0, :][0].cpu().numpy()[[1, 2, 3, 0]])
++        robot_pos = env.scene.articulations["robot"].data.body_com_pos_w.torch[..., 0, :][0].cpu().numpy()
+         robot_pos += (robot_mat @ np.array(offset).reshape(3, 1))[:, 0]
+         robot_lookat = robot_pos + (robot_mat @ np.array(lookat).reshape(3, 1))[:, 0]
+ 
+diff --git a/lw_benchhub/utils/usd_utils.py b/lw_benchhub/utils/usd_utils.py
+index f31a89f..e26896a 100644
+--- a/lw_benchhub/utils/usd_utils.py
++++ b/lw_benchhub/utils/usd_utils.py
+@@ -14,7 +14,7 @@
+ 
+ import math
+ import os
+-from turtle import st
++# Removed unused turtle import: headless runtime does not include Tk.
+ 
+ import numpy as np
+ from pxr import Gf, PhysxSchema, Sdf, Usd, UsdGeom, UsdPhysics, UsdShade, UsdSkel
+diff --git a/lw_benchhub_rl/lift_obj/mdp/observations.py b/lw_benchhub_rl/lift_obj/mdp/observations.py
+index 7acc3ab..296e9f2 100644
+--- a/lw_benchhub_rl/lift_obj/mdp/observations.py
++++ b/lw_benchhub_rl/lift_obj/mdp/observations.py
+@@ -35,9 +35,9 @@ def object_position_in_robot_root_frame(
+     """The position of the object in the robot's root frame."""
+     robot: RigidObject = env.scene[robot_cfg.name]
+     object: RigidObject = env.scene[object_cfg.name]
+-    object_pos_w = object.data.root_pos_w[:, :3]
++    object_pos_w = object.data.root_pos_w.torch[:, :3]
+     object_pos_b, _ = subtract_frame_transforms(
+-        robot.data.root_state_w[:, :3], robot.data.root_state_w[:, 3:7], object_pos_w
++        robot.data.root_state_w.torch[:, :3], robot.data.root_state_w.torch[:, 3:7], object_pos_w
+     )
+     return object_pos_b
+ 
+@@ -52,7 +52,7 @@ def camera_position_in_robot_root_frame(
+     object: RigidObject = env.scene[object_cfg.name]
+     object_pos_w = object.data.pos_w[:, :3]
+     object_pos_b, _ = subtract_frame_transforms(
+-        robot.data.root_state_w[:, :3], robot.data.root_state_w[:, 3:7], object_pos_w
++        robot.data.root_state_w.torch[:, :3], robot.data.root_state_w.torch[:, 3:7], object_pos_w
+     )
+     quat_w_ros = object.data.quat_w_ros[:, :4]
+     object_pos_b_with_quat = torch.concatenate([object_pos_b, quat_w_ros], dim=1)
+diff --git a/lw_benchhub_rl/lift_obj/mdp/rewards.py b/lw_benchhub_rl/lift_obj/mdp/rewards.py
+index f7a346d..14f81fd 100644
+--- a/lw_benchhub_rl/lift_obj/mdp/rewards.py
++++ b/lw_benchhub_rl/lift_obj/mdp/rewards.py
+@@ -32,13 +32,13 @@ def object_is_lifted(
+ ) -> torch.Tensor:
+     """Reward the agent for lifting the object above the minimal height."""
+     object: RigidObject = env.scene[object_cfg.name]
+-    return torch.where(object.data.root_pos_w[:, 2] < minimal_height, 0.0, 1.0)
++    return torch.where(object.data.root_pos_w.torch[:, 2] < minimal_height, 0.0, 1.0)
+ 
+ 
+ def hand_is_lifted(
+         env: ManagerBasedRLEnv, minimal_height: float,) -> torch.Tensor:
+     """Reward the agent for lifting the object above the minimal height."""
+-    ee_tcp_pos = env.scene["ee_frame"].data.target_pos_w[..., 0, :]
++    ee_tcp_pos = env.scene["ee_frame"].data.target_pos_w.torch[..., 0, :]
+     return torch.where(ee_tcp_pos[:, 2] < minimal_height, -1.0, 0.0)
+ 
+ 
+@@ -52,10 +52,10 @@ def object_is_lifted_grasped(
+     object: RigidObject = env.scene[object_cfg.name]
+     ee_frame = env.scene[ee_frame_cfg.name]
+ 
+-    current_height = object.data.root_pos_w[:, 2]
+-    object_pos = object.data.root_pos_w
+-    object_velocity = object.data.root_lin_vel_w
+-    ee_pos = ee_frame.data.target_pos_w[..., 0, :]
++    current_height = object.data.root_pos_w.torch[:, 2]
++    object_pos = object.data.root_pos_w.torch
++    object_velocity = object.data.root_lin_vel_w.torch
++    ee_pos = ee_frame.data.target_pos_w.torch[..., 0, :]
+ 
+     if not hasattr(env, '_initial_object_height'):
+         env._initial_object_height = current_height.clone()
+@@ -81,10 +81,10 @@ def object_is_lifted_grasped(
+ 
+ def gripper_close_action_reward(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg,
+                                 close_distance_threshold: float = 0.1) -> torch.Tensor:
+-    ee_frame_pos = env.scene["ee_frame"].data.target_pos_w[..., 0, :]
+-    object_pos = env.scene["object"].data.root_pos_w
++    ee_frame_pos = env.scene["ee_frame"].data.target_pos_w.torch[..., 0, :]
++    object_pos = env.scene["object"].data.root_pos_w.torch
+     distance = torch.norm(object_pos - ee_frame_pos, dim=1)
+-    gripper_joint_pos = env.scene[asset_cfg.name].data.joint_pos[:, asset_cfg.joint_ids]
++    gripper_joint_pos = env.scene[asset_cfg.name].data.joint_pos.torch[:, asset_cfg.joint_ids]
+     gripper_closeness = torch.sum(torch.abs(gripper_joint_pos), dim=-1)
+     is_near_target = distance < close_distance_threshold
+     reward_near = is_near_target.float() * gripper_closeness
+@@ -104,9 +104,9 @@ def object_ee_distance(
+     object: RigidObject = env.scene[object_cfg.name]
+     ee_frame: FrameTransformer = env.scene[ee_frame_cfg.name]
+     # Target object position: (num_envs, 3)
+-    cube_pos_w = object.data.root_pos_w
++    cube_pos_w = object.data.root_pos_w.torch
+     # End-effector position: (num_envs, 3)
+-    ee_w = ee_frame.data.target_pos_w[..., 0, :]
++    ee_w = ee_frame.data.target_pos_w.torch[..., 0, :]
+     # Distance of the end-effector to the object: (num_envs,)
+     object_ee_distance = torch.norm(cube_pos_w - ee_w, dim=1)
+     return 1 - torch.tanh(object_ee_distance / std)
+@@ -115,21 +115,21 @@ def object_ee_distance(
+ def grasp_handle(
+     env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg,
+ ) -> torch.Tensor:
+-    ee_frame_pos = env.scene["ee_frame"].data.target_pos_w[..., 0, :]
+-    object_pos = env.scene["object"].data.root_pos_w
++    ee_frame_pos = env.scene["ee_frame"].data.target_pos_w.torch[..., 0, :]
++    object_pos = env.scene["object"].data.root_pos_w.torch
+     distance = torch.norm(object_pos - ee_frame_pos, dim=1)
+     is_gripper_close = distance < 0.04
+-    gripper_joint_pos = env.scene[asset_cfg.name].data.joint_pos[:, asset_cfg.joint_ids]
++    gripper_joint_pos = env.scene[asset_cfg.name].data.joint_pos.torch[:, asset_cfg.joint_ids]
+     return torch.sum(torch.abs(gripper_joint_pos), dim=-1) * (is_gripper_close + 0.01)
+ 
+ 
+ def grasp_handle_fine_grained(
+     env: ManagerBasedRLEnv
+ ) -> torch.Tensor:
+-    ee_thumb_pos = env.scene["ee_frame"].data.target_pos_w[..., 1, :]
+-    ee_index_pos = env.scene["ee_frame"].data.target_pos_w[..., 2, :]
+-    ee_middle_pos = env.scene["ee_frame"].data.target_pos_w[..., 3, :]
+-    object_pos = env.scene["object"].data.root_pos_w
++    ee_thumb_pos = env.scene["ee_frame"].data.target_pos_w.torch[..., 1, :]
++    ee_index_pos = env.scene["ee_frame"].data.target_pos_w.torch[..., 2, :]
++    ee_middle_pos = env.scene["ee_frame"].data.target_pos_w.torch[..., 3, :]
++    object_pos = env.scene["object"].data.root_pos_w.torch
+     distance_2 = torch.norm(object_pos - ee_thumb_pos, dim=1)
+     distance_3 = torch.norm(object_pos - ee_index_pos, dim=1)
+     distance_4 = torch.norm(object_pos - ee_middle_pos, dim=1)
+@@ -151,15 +151,15 @@ def object_goal_distance(
+     command = env.command_manager.get_command(command_name)
+     # compute the desired position in the world frame
+     des_pos_b = command[:, :3]
+-    des_pos_w, _ = combine_frame_transforms(robot.data.root_state_w[:, :3], robot.data.root_state_w[:, 3:7], des_pos_b)
++    des_pos_w, _ = combine_frame_transforms(robot.data.root_state_w.torch[:, :3], robot.data.root_state_w.torch[:, 3:7], des_pos_b)
+     # distance of the end-effector to the object: (num_envs,)
+-    distance = torch.norm(des_pos_w - object.data.root_pos_w[:, :3], dim=1)
++    distance = torch.norm(des_pos_w - object.data.root_pos_w.torch[:, :3], dim=1)
+     # rewarded if the object is lifted above the threshold
+-    return (object.data.root_pos_w[:, 2] > minimal_height) * (1 - torch.tanh(distance / std))
++    return (object.data.root_pos_w.torch[:, 2] > minimal_height) * (1 - torch.tanh(distance / std))
+ 
+ 
+ def align_ee_handle(env: ManagerBasedRLEnv) -> torch.Tensor:
+-    ee_tcp_quat = env.scene["ee_frame"].data.target_quat_w[..., 0, :]
++    ee_tcp_quat = env.scene["ee_frame"].data.target_quat_w.torch[..., 0, :]
+ 
+     ee_tcp_rot_mat = matrix_from_quat(ee_tcp_quat)
+     handle_z = torch.tensor([0.0, 0.0, 1.0], device=ee_tcp_quat.device)
+@@ -171,7 +171,7 @@ def align_ee_handle(env: ManagerBasedRLEnv) -> torch.Tensor:
+ 
+ 
+ def target_qpos_reward(env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg):
+-    arm_joint_pos = env.scene[asset_cfg.name].data.joint_pos[:, asset_cfg.joint_ids]
++    arm_joint_pos = env.scene[asset_cfg.name].data.joint_pos.torch[:, asset_cfg.joint_ids]
+     lift_object = object_is_lifted(env, 0.97)
+     target_qpos = torch.pi / 2 * torch.ones_like(arm_joint_pos)
+     return -1 * torch.norm(torch.abs(target_qpos - torch.abs(arm_joint_pos)) / torch.abs(target_qpos), dim=-1) * (1 - lift_object)
+@@ -186,10 +186,10 @@ def object_ee_distance_maniskill(
+     # extract the used quantities (to enable type-hinting)
+     object: RigidObject = env.scene[object_cfg.name]
+     ee_frame: FrameTransformer = env.scene[ee_frame_cfg.name]
+-    gripper = ee_frame.data.target_pos_w[..., 0, :]
+-    jaw = ee_frame.data.target_pos_w[..., 1, :]
++    gripper = ee_frame.data.target_pos_w.torch[..., 0, :]
++    jaw = ee_frame.data.target_pos_w.torch[..., 1, :]
+     # Target object position: (num_envs, 3)
+-    cube_pos_w = object.data.root_pos_w
++    cube_pos_w = object.data.root_pos_w.torch
+     # End-effector position: (num_envs, 3)
+     ee_w = (gripper + jaw) / 2
+     # Distance of the end-effector to the object: (num_envs,)
+@@ -275,7 +275,7 @@ def object_is_grasped_and_placed_maniskill(
+ 
+     is_grasp = object_is_grasped_maniskill(env, min_force, max_angel)
+ 
+-    target_qpos = env.scene['robot'].data.joint_pos
++    target_qpos = env.scene['robot'].data.joint_pos.torch
+     device = target_qpos.device
+     rest_qpos = torch.tensor(list(env.scene['robot'].cfg.init_state.joint_pos.values()), device=device)
+ 
+diff --git a/lw_benchhub_rl/lift_obj/mdp/terminations.py b/lw_benchhub_rl/lift_obj/mdp/terminations.py
+index 79084e6..d6f1404 100644
+--- a/lw_benchhub_rl/lift_obj/mdp/terminations.py
++++ b/lw_benchhub_rl/lift_obj/mdp/terminations.py
+@@ -54,9 +54,9 @@ def object_reached_goal(
+     command = env.command_manager.get_command(command_name)
+     # compute the desired position in the world frame
+     des_pos_b = command[:, :3]
+-    des_pos_w, _ = combine_frame_transforms(robot.data.root_state_w[:, :3], robot.data.root_state_w[:, 3:7], des_pos_b)
++    des_pos_w, _ = combine_frame_transforms(robot.data.root_state_w.torch[:, :3], robot.data.root_state_w.torch[:, 3:7], des_pos_b)
+     # distance of the end-effector to the object: (num_envs,)
+-    distance = torch.norm(des_pos_w - object.data.root_pos_w[:, :3], dim=1)
++    distance = torch.norm(des_pos_w - object.data.root_pos_w.torch[:, :3], dim=1)
+ 
+     # rewarded if the object is lifted above the threshold
+     return distance < threshold
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_10/L10K3_turn_on_the_stove_and_put_the_moka_pot_on_it.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_10/L10K3_turn_on_the_stove_and_put_the_moka_pot_on_it.py
+index ec3f8c1..8ce9234 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_10/L10K3_turn_on_the_stove_and_put_the_moka_pot_on_it.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_10/L10K3_turn_on_the_stove_and_put_the_moka_pot_on_it.py
+@@ -37,7 +37,7 @@ class L10K3TurnOnTheStoveAndPutTheMokaPotOnIt(L90K3TurnOnTheStove):
+             lower, upper = 0.35, 2 * np.pi - 0.35
+             knob_on = (abs_knob >= lower) & (abs_knob <= upper)
+             knob_success = knob_success | knob_on
+-        mokapot_pos = env.scene.articulations[self.mokapot.name].data.root_pos_w[0, :].cpu().numpy()
++        mokapot_pos = env.scene.articulations[self.mokapot.name].data.root_pos_w.torch[0, :].cpu().numpy()
+         moka_success = OU.point_in_fixture(mokapot_pos, self.stove, only_2d=True)
+         moka_success = torch.tensor([moka_success], device=env.device).repeat(env.num_envs)
+         return knob_success & moka_success & OU.gripper_obj_far(env, "mokapot_1_front_group_1", 0.35)
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90K10_close_the_top_drawer_of_the_cabinet_and_put_the_black_bowl_on_top_of_it.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90K10_close_the_top_drawer_of_the_cabinet_and_put_the_black_bowl_on_top_of_it.py
+index 164a1d5..4c727be 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90K10_close_the_top_drawer_of_the_cabinet_and_put_the_black_bowl_on_top_of_it.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90K10_close_the_top_drawer_of_the_cabinet_and_put_the_black_bowl_on_top_of_it.py
+@@ -109,7 +109,7 @@ class L90K10CloseTheTopDrawerOfTheCabinetAndPutTheBlackBowlOnTopOfIt(LiberoDrawe
+     def _check_success(self, env):
+         # Check if the top drawer is closed
+         drawer_closed = self.drawer.is_closed(env, [self.top_drawer_joint_name])
+-        bowl_pos = env.scene.rigid_objects[self.akita_black_bowl].data.root_pos_w[0, :].cpu().numpy()
++        bowl_pos = env.scene.rigid_objects[self.akita_black_bowl].data.root_pos_w.torch[0, :].cpu().numpy()
+         bowl_on_drawer = OU.point_in_fixture(bowl_pos, self.drawer, only_2d=True)
+         bowl_on_drawer_tensor = torch.tensor(bowl_on_drawer, dtype=torch.bool, device=env.device).repeat(env.num_envs)
+         # Check if gripper is far from the bowl
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90K9_put_the_frying_pan_under_the_cabinet_shelf.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90K9_put_the_frying_pan_under_the_cabinet_shelf.py
+index ada9b49..13134ea 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90K9_put_the_frying_pan_under_the_cabinet_shelf.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90K9_put_the_frying_pan_under_the_cabinet_shelf.py
+@@ -102,6 +102,6 @@ class L90K9PutTheFryingPanUnderTheCabinetShelf(LwTaskBase):
+         is_gripper_obj_far = OU.gripper_obj_far(env, self.frying_pan, th=0.4)
+         pot_on_shelf = OU.check_obj_in_receptacle_no_contact(env, self.frying_pan, self.shelf)
+         pot_is_stable = OU.check_object_stable(env, self.frying_pan)
+-        pan_z = env.scene.rigid_objects[self.frying_pan].data.body_com_pos_w[0, 0, 2]
+-        shelf_z = env.scene.rigid_objects[self.shelf].data.body_com_pos_w[0, 0, 2]
++        pan_z = env.scene.rigid_objects[self.frying_pan].data.body_com_pos_w.torch[0, 0, 2]
++        shelf_z = env.scene.rigid_objects[self.shelf].data.body_com_pos_w.torch[0, 0, 2]
+         return is_gripper_obj_far & pot_on_shelf & pot_is_stable & (pan_z < shelf_z)
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90L2_pick_up_the_butter_and_put_it_in_the_basket.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90L2_pick_up_the_butter_and_put_it_in_the_basket.py
+index 1cf0dad..a59eaea 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90L2_pick_up_the_butter_and_put_it_in_the_basket.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90L2_pick_up_the_butter_and_put_it_in_the_basket.py
+@@ -148,8 +148,8 @@ class L90L2PickUpTheButterAndPutItInTheBasket(LwTaskBase):
+ 
+         far_from_objects = self._gripper_obj_farfrom_objects(env)
+ 
+-        obj_pos = torch.mean(env.scene.rigid_objects["butter"].data.body_com_pos_w, dim=1)  # (num_envs, 3)
+-        basket_pos = torch.mean(env.scene.rigid_objects["basket"].data.body_com_pos_w, dim=1)  # (num_envs, 3)
++        obj_pos = torch.mean(env.scene.rigid_objects["butter"].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
++        basket_pos = torch.mean(env.scene.rigid_objects["basket"].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
+ 
+         xy_dist = torch.norm(obj_pos[:, :2] - basket_pos[:, :2], dim=-1)  # (num_envs,)
+         object_in_basket_xy = xy_dist < 0.5
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90S1_pick_up_the_book_and_place_it_in_the_left_compartment_of_the_caddy.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90S1_pick_up_the_book_and_place_it_in_the_left_compartment_of_the_caddy.py
+index 85913c7..1524158 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90S1_pick_up_the_book_and_place_it_in_the_left_compartment_of_the_caddy.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90S1_pick_up_the_book_and_place_it_in_the_left_compartment_of_the_caddy.py
+@@ -91,8 +91,8 @@ class L90S1PickUpTheBookAndPlaceItInTheLeftCompartmentOfTheCaddy(LwTaskBase):
+     def _check_success(self, env):
+ 
+         # Get full 3D positions for all environments
+-        book_pos_full = torch.mean(env.scene.rigid_objects[self.book].data.body_com_pos_w, dim=1)  # (num_envs, 3)
+-        caddy_pos_full = torch.mean(env.scene.rigid_objects[self.desk_caddy].data.body_com_pos_w, dim=1)  # (num_envs, 3)
++        book_pos_full = torch.mean(env.scene.rigid_objects[self.book].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
++        caddy_pos_full = torch.mean(env.scene.rigid_objects[self.desk_caddy].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
+ 
+         # Check 1: gripper far from book
+         is_gripper_obj_far = OU.gripper_obj_far(env, self.book)  # tensor (num_envs,)
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90S1_pick_up_the_book_and_place_it_in_the_right_compartment_of_the_caddy.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90S1_pick_up_the_book_and_place_it_in_the_right_compartment_of_the_caddy.py
+index 9d52eda..1a67ff6 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90S1_pick_up_the_book_and_place_it_in_the_right_compartment_of_the_caddy.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_90/L90S1_pick_up_the_book_and_place_it_in_the_right_compartment_of_the_caddy.py
+@@ -91,8 +91,8 @@ class L90S1PickUpTheBookAndPlaceItInTheRightCompartmentOfTheCaddy(LwTaskBase):
+     def _check_success(self, env):
+ 
+         # Get full 3D positions for all environments
+-        book_pos_full = torch.mean(env.scene.rigid_objects[self.book].data.body_com_pos_w, dim=1)  # (num_envs, 3)
+-        caddy_pos_full = torch.mean(env.scene.rigid_objects[self.desk_caddy].data.body_com_pos_w, dim=1)  # (num_envs, 3)
++        book_pos_full = torch.mean(env.scene.rigid_objects[self.book].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
++        caddy_pos_full = torch.mean(env.scene.rigid_objects[self.desk_caddy].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
+ 
+         # Check 1: gripper far from book
+         is_gripper_obj_far = OU.gripper_obj_far(env, self.book)  # tensor (num_envs,)
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_goal/LG_put_the_bowl_on_the_stove.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_goal/LG_put_the_bowl_on_the_stove.py
+index 171775a..a5c8b0c 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_goal/LG_put_the_bowl_on_the_stove.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_goal/LG_put_the_bowl_on_the_stove.py
+@@ -114,7 +114,7 @@ class LGPutTheBowlOnTheStove(LiberoGoalTasksBase):
+     def _check_success(self, env):
+         # Check if the bowl is on the stove
+         # Get bowl position and check if it's on the stove
+-        bowl_pos = env.scene.rigid_objects[self.akita_black_bowl].data.root_pos_w[0, :].cpu().numpy()
++        bowl_pos = env.scene.rigid_objects[self.akita_black_bowl].data.root_pos_w.torch[0, :].cpu().numpy()
+         bowl_on_stove = OU.point_in_fixture(bowl_pos, self.stove, only_2d=True)
+         bowl_on_stove_tensor = torch.tensor(bowl_on_stove, dtype=torch.bool, device=env.device).repeat(env.num_envs)
+         # Check if gripper is far from the bowl
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_goal/LG_put_the_bowl_on_top_of_the_cabinet.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_goal/LG_put_the_bowl_on_top_of_the_cabinet.py
+index 300bafc..f63f6ff 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_goal/LG_put_the_bowl_on_top_of_the_cabinet.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_goal/LG_put_the_bowl_on_top_of_the_cabinet.py
+@@ -113,7 +113,7 @@ class LGPutTheBowlOnTopOfTheCabinet(LiberoGoalTasksBase):
+     def _check_success(self, env):
+         # Check if the bowl is on top of the drawer
+         # Get bowl position and check if it's on the drawer
+-        bowl_pos = env.scene.rigid_objects[self.akita_black_bowl].data.root_pos_w[0, :].cpu().numpy()
++        bowl_pos = env.scene.rigid_objects[self.akita_black_bowl].data.root_pos_w.torch[0, :].cpu().numpy()
+         bowl_on_drawer = OU.point_in_fixture(bowl_pos, self.drawer, only_2d=True)
+         bowl_on_drawer_tensor = torch.tensor(bowl_on_drawer, dtype=torch.bool, device=env.device).repeat(env.num_envs)
+         # Check if gripper is far from the bowl
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_goal/LG_put_the_wine_bottle_on_the_rack.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_goal/LG_put_the_wine_bottle_on_the_rack.py
+index 7fe7363..b4ab145 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_goal/LG_put_the_wine_bottle_on_the_rack.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_goal/LG_put_the_wine_bottle_on_the_rack.py
+@@ -113,7 +113,7 @@ class LGPutTheWineBottleOnTheRack(LiberoGoalTasksBase):
+     def _check_success(self, env):
+         # Check if the wine bottle is on the rack
+         # Get wine bottle position and check if it's on the rack
+-        wine_bottle_pos = env.scene.rigid_objects[self.wine_bottle].data.root_pos_w[0, :].cpu().numpy()
++        wine_bottle_pos = env.scene.rigid_objects[self.wine_bottle].data.root_pos_w.torch[0, :].cpu().numpy()
+         bottle_on_rack = OU.point_in_fixture(wine_bottle_pos, self.winerack, only_2d=True)
+         bottle_on_rack_tensor = torch.tensor(bottle_on_rack, dtype=torch.bool, device=env.device).repeat(env.num_envs)
+         # Check if gripper is far from the wine bottle
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_goal/LG_put_the_wine_bottle_on_top_of_the_cabinet.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_goal/LG_put_the_wine_bottle_on_top_of_the_cabinet.py
+index cf36ce5..cf1b1fc 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_goal/LG_put_the_wine_bottle_on_top_of_the_cabinet.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_goal/LG_put_the_wine_bottle_on_top_of_the_cabinet.py
+@@ -112,7 +112,7 @@ class LGPutTheWineBottleOnTopOfTheCabinet(LiberoGoalTasksBase):
+     def _check_success(self, env):
+         # Check if the wine bottle is on top of the drawer
+         # Get wine bottle position and check if it's on the drawer
+-        wine_bottle_pos = env.scene.rigid_objects[self.wine_bottle].data.root_pos_w[0, :].cpu().numpy()
++        wine_bottle_pos = env.scene.rigid_objects[self.wine_bottle].data.root_pos_w.torch[0, :].cpu().numpy()
+         bottle_on_drawer = OU.point_in_fixture(wine_bottle_pos, self.drawer, only_2d=True)
+         bottle_on_drawer_tensor = torch.tensor(bottle_on_drawer, dtype=torch.bool, device=env.device).repeat(env.num_envs)
+         # Check if gripper is far from the wine bottle
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_object/LO_pick_up_the_chocolate_pudding_and_place_it_in_the_basket.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_object/LO_pick_up_the_chocolate_pudding_and_place_it_in_the_basket.py
+index 426d20c..7badbbf 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_object/LO_pick_up_the_chocolate_pudding_and_place_it_in_the_basket.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_object/LO_pick_up_the_chocolate_pudding_and_place_it_in_the_basket.py
+@@ -93,8 +93,8 @@ class LOPickUpTheChocolatePuddingAndPlaceItInTheBasket(PutObjectInBasketBase):
+ 
+         is_gripper_obj_far = OU.gripper_obj_far(env, self.chocolate_pudding)
+ 
+-        obj_pos = torch.mean(env.scene.rigid_objects[self.chocolate_pudding].data.body_com_pos_w, dim=1)  # (num_envs, 3)
+-        basket_pos = torch.mean(env.scene.rigid_objects[self.basket].data.body_com_pos_w, dim=1)  # (num_envs, 3)
++        obj_pos = torch.mean(env.scene.rigid_objects[self.chocolate_pudding].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
++        basket_pos = torch.mean(env.scene.rigid_objects[self.basket].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
+ 
+         xy_dist = torch.norm(obj_pos[:, :2] - basket_pos[:, :2], dim=-1)  # (num_envs,)
+ 
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_object/LO_pick_up_the_salad_dressing_and_place_it_in_the_basket.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_object/LO_pick_up_the_salad_dressing_and_place_it_in_the_basket.py
+index 37e62f5..c783198 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_object/LO_pick_up_the_salad_dressing_and_place_it_in_the_basket.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_object/LO_pick_up_the_salad_dressing_and_place_it_in_the_basket.py
+@@ -117,11 +117,11 @@ class LOPickUpTheSaladDressingAndPlaceItInTheBasket(PutObjectInBasketBase):
+ 
+         # Get positions
+         salad_pos = torch.tensor(
+-            env.scene.articulations[self.salad_dressing.name].data.root_link_pos_w,
++            env.scene.articulations[self.salad_dressing.name].data.root_link_pos_w.torch,
+             device=env.device
+         )
+         basket_pos = torch.mean(
+-            env.scene.rigid_objects[self.basket].data.body_com_pos_w,
++            env.scene.rigid_objects[self.basket].data.body_com_pos_w.torch,
+             dim=1
+         )
+ 
+@@ -136,7 +136,7 @@ class LOPickUpTheSaladDressingAndPlaceItInTheBasket(PutObjectInBasketBase):
+         is_inside_vertically = (z_diff > -0.10) & (z_diff < 0.05)
+ 
+         # Check 4: Salad dressing should be stable (not moving)
+-        salad_vel = env.scene.articulations[self.salad_dressing.name].data.root_lin_vel_w
++        salad_vel = env.scene.articulations[self.salad_dressing.name].data.root_lin_vel_w.torch
+         salad_vel_norm = torch.norm(salad_vel, dim=-1)
+         is_stable = salad_vel_norm < 0.15
+ 
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_black_bowl_between_plate_and_ramekin_and_place_it_on_plate.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_black_bowl_between_plate_and_ramekin_and_place_it_on_plate.py
+index 0329f6c..edf3bdf 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_black_bowl_between_plate_and_ramekin_and_place_it_on_plate.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_black_bowl_between_plate_and_ramekin_and_place_it_on_plate.py
+@@ -76,8 +76,8 @@ class LSPickUpBlackBowlBetweenPlateAndRamekinAndPlaceItOnPlate(PutBlackBowlOnPla
+         '''
+         is_gripper_obj_far = OU.gripper_obj_far(env, self.bowl_target)
+ 
+-        bowl_pos = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_pos_w, dim=1)  # (num_envs, 3)
+-        plate_pos = torch.mean(env.scene.rigid_objects[self.plate].data.body_com_pos_w, dim=1)  # (num_envs, 3)
++        bowl_pos = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
++        plate_pos = torch.mean(env.scene.rigid_objects[self.plate].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
+ 
+         xy_distance = torch.norm(bowl_pos[:, :2] - plate_pos[:, :2], dim=1)
+         bowl_centered = xy_distance < 0.08
+@@ -85,7 +85,7 @@ class LSPickUpBlackBowlBetweenPlateAndRamekinAndPlaceItOnPlate(PutBlackBowlOnPla
+         z_diff = bowl_pos[:, 2] - plate_pos[:, 2]
+         bowl_on_plate_height = (z_diff > 0.01) & (z_diff < 0.15)
+ 
+-        bowl_vel = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_vel_w, dim=1)  # (num_envs, 3)
++        bowl_vel = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_vel_w.torch, dim=1)  # (num_envs, 3)
+         bowl_speed = torch.norm(bowl_vel, dim=1)
+ 
+         bowl_stable = bowl_speed < 0.05
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_black_bowl_in_top_drawer_of_wooden_cabinet_and_place_it_on_plate.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_black_bowl_in_top_drawer_of_wooden_cabinet_and_place_it_on_plate.py
+index 5c68305..b784e87 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_black_bowl_in_top_drawer_of_wooden_cabinet_and_place_it_on_plate.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_black_bowl_in_top_drawer_of_wooden_cabinet_and_place_it_on_plate.py
+@@ -72,8 +72,8 @@ class LSPickUpBlackBowlInTopDrawerOfWoodenCabinetAndPlaceItOnPlate(PutBlackBowlO
+         '''
+         is_gripper_obj_far = OU.gripper_obj_far(env, self.bowl_target)
+ 
+-        bowl_pos = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_pos_w, dim=1)  # (num_envs, 3)
+-        plate_pos = torch.mean(env.scene.rigid_objects[self.plate].data.body_com_pos_w, dim=1)  # (num_envs, 3)
++        bowl_pos = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
++        plate_pos = torch.mean(env.scene.rigid_objects[self.plate].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
+ 
+         xy_distance = torch.norm(bowl_pos[:, :2] - plate_pos[:, :2], dim=1)
+         bowl_centered = xy_distance < 0.08
+@@ -81,7 +81,7 @@ class LSPickUpBlackBowlInTopDrawerOfWoodenCabinetAndPlaceItOnPlate(PutBlackBowlO
+         z_diff = bowl_pos[:, 2] - plate_pos[:, 2]
+         bowl_on_plate_height = (z_diff > 0.01) & (z_diff < 0.15)
+ 
+-        bowl_vel = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_vel_w, dim=1)  # (num_envs, 3)
++        bowl_vel = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_vel_w.torch, dim=1)  # (num_envs, 3)
+         bowl_speed = torch.norm(bowl_vel, dim=1)
+ 
+         bowl_stable = bowl_speed < 0.05
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.py
+index 7cf6cfe..abe470e 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_from_table_center_and_place_it_on_the_plate.py
+@@ -85,8 +85,8 @@ class LSPickUpTheBlackBowlFromTableCenterAndPlaceItOnThePlate(PutBlackBowlOnPlat
+         '''
+         is_gripper_obj_far = OU.gripper_obj_far(env, self.bowl_target)
+ 
+-        bowl_pos = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_pos_w, dim=1)  # (num_envs, 3)
+-        plate_pos = torch.mean(env.scene.rigid_objects[self.plate].data.body_com_pos_w, dim=1)  # (num_envs, 3)
++        bowl_pos = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
++        plate_pos = torch.mean(env.scene.rigid_objects[self.plate].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
+ 
+         xy_distance = torch.norm(bowl_pos[:, :2] - plate_pos[:, :2], dim=1)
+         bowl_centered = xy_distance < 0.1
+@@ -94,7 +94,7 @@ class LSPickUpTheBlackBowlFromTableCenterAndPlaceItOnThePlate(PutBlackBowlOnPlat
+         z_diff = bowl_pos[:, 2] - plate_pos[:, 2]
+         bowl_on_plate_height = (z_diff > 0.01) & (z_diff < 0.15)
+ 
+-        bowl_vel = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_vel_w, dim=1)  # (num_envs, 3)
++        bowl_vel = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_vel_w.torch, dim=1)  # (num_envs, 3)
+         bowl_speed = torch.norm(bowl_vel, dim=1)
+ 
+         bowl_stable = bowl_speed < 0.05
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.py
+index 1f4bc72..77c7e02 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate.py
+@@ -77,8 +77,8 @@ class LSPickUpTheBlackBowlNextToTheCookieBoxAndPlaceItOnThePlate(PutBlackBowlOnP
+         '''
+         is_gripper_obj_far = OU.gripper_obj_far(env, self.bowl_target)
+ 
+-        bowl_pos = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_pos_w, dim=1)  # (num_envs, 3)
+-        plate_pos = torch.mean(env.scene.rigid_objects[self.plate].data.body_com_pos_w, dim=1)  # (num_envs, 3)
++        bowl_pos = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
++        plate_pos = torch.mean(env.scene.rigid_objects[self.plate].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
+ 
+         xy_distance = torch.norm(bowl_pos[:, :2] - plate_pos[:, :2], dim=1)
+         bowl_centered = xy_distance < 0.08
+@@ -86,7 +86,7 @@ class LSPickUpTheBlackBowlNextToTheCookieBoxAndPlaceItOnThePlate(PutBlackBowlOnP
+         z_diff = bowl_pos[:, 2] - plate_pos[:, 2]
+         bowl_on_plate_height = (z_diff > 0.01) & (z_diff < 0.15)
+ 
+-        bowl_vel = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_vel_w, dim=1)  # (num_envs, 3)
++        bowl_vel = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_vel_w.torch, dim=1)  # (num_envs, 3)
+         bowl_speed = torch.norm(bowl_vel, dim=1)
+ 
+         bowl_stable = bowl_speed < 0.05
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.py
+index 31c5637..eb0164c 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate.py
+@@ -76,8 +76,8 @@ class LSPickUpTheBlackBowlNextToThePlateAndPlaceItOnThePlate(PutBlackBowlOnPlate
+         '''
+         is_gripper_obj_far = OU.gripper_obj_far(env, self.bowl_target)
+ 
+-        bowl_pos = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_pos_w, dim=1)  # (num_envs, 3)
+-        plate_pos = torch.mean(env.scene.rigid_objects[self.plate].data.body_com_pos_w, dim=1)  # (num_envs, 3)
++        bowl_pos = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
++        plate_pos = torch.mean(env.scene.rigid_objects[self.plate].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
+ 
+         xy_distance = torch.norm(bowl_pos[:, :2] - plate_pos[:, :2], dim=1)
+         bowl_centered = xy_distance < 0.08
+@@ -85,7 +85,7 @@ class LSPickUpTheBlackBowlNextToThePlateAndPlaceItOnThePlate(PutBlackBowlOnPlate
+         z_diff = bowl_pos[:, 2] - plate_pos[:, 2]
+         bowl_on_plate_height = (z_diff > 0.01) & (z_diff < 0.15)
+ 
+-        bowl_vel = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_vel_w, dim=1)  # (num_envs, 3)
++        bowl_vel = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_vel_w.torch, dim=1)  # (num_envs, 3)
+         bowl_speed = torch.norm(bowl_vel, dim=1)
+ 
+         bowl_stable = bowl_speed < 0.05
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.py
+index a1f6d46..6ea75bc 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate.py
+@@ -76,8 +76,8 @@ class LSPickUpTheBlackBowlNextToTheRamekinAndPlaceItOnThePlate(PutBlackBowlOnPla
+         '''
+         is_gripper_obj_far = OU.gripper_obj_far(env, self.bowl_target)
+ 
+-        bowl_pos = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_pos_w, dim=1)  # (num_envs, 3)
+-        plate_pos = torch.mean(env.scene.rigid_objects[self.plate].data.body_com_pos_w, dim=1)  # (num_envs, 3)
++        bowl_pos = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
++        plate_pos = torch.mean(env.scene.rigid_objects[self.plate].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
+ 
+         xy_distance = torch.norm(bowl_pos[:, :2] - plate_pos[:, :2], dim=1)
+         bowl_centered = xy_distance < 0.08
+@@ -85,7 +85,7 @@ class LSPickUpTheBlackBowlNextToTheRamekinAndPlaceItOnThePlate(PutBlackBowlOnPla
+         z_diff = bowl_pos[:, 2] - plate_pos[:, 2]
+         bowl_on_plate_height = (z_diff > 0.01) & (z_diff < 0.15)
+ 
+-        bowl_vel = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_vel_w, dim=1)  # (num_envs, 3)
++        bowl_vel = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_vel_w.torch, dim=1)  # (num_envs, 3)
+         bowl_speed = torch.norm(bowl_vel, dim=1)
+ 
+         bowl_stable = bowl_speed < 0.05
+diff --git a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.py b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.py
+index 87a6f60..e86c135 100644
+--- a/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.py
++++ b/lw_benchhub_tasks/lightwheel_libero_tasks/libero_spatial/LS_pick_up_the_black_bowl_on_the_cookie_box_and_place_it_on_the_plate.py
+@@ -77,8 +77,8 @@ class LSPickUpTheBlackBowlOnTheCookieBoxAndPlaceItOnThePlate(PutBlackBowlOnPlate
+         '''
+         is_gripper_obj_far = OU.gripper_obj_far(env, self.bowl_target)
+ 
+-        bowl_pos = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_pos_w, dim=1)  # (num_envs, 3)
+-        plate_pos = torch.mean(env.scene.rigid_objects[self.plate].data.body_com_pos_w, dim=1)  # (num_envs, 3)
++        bowl_pos = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
++        plate_pos = torch.mean(env.scene.rigid_objects[self.plate].data.body_com_pos_w.torch, dim=1)  # (num_envs, 3)
+ 
+         xy_distance = torch.norm(bowl_pos[:, :2] - plate_pos[:, :2], dim=1)
+         bowl_centered = xy_distance < 0.08
+@@ -86,7 +86,7 @@ class LSPickUpTheBlackBowlOnTheCookieBoxAndPlaceItOnThePlate(PutBlackBowlOnPlate
+         z_diff = bowl_pos[:, 2] - plate_pos[:, 2]
+         bowl_on_plate_height = (z_diff > 0.01) & (z_diff < 0.15)
+ 
+-        bowl_vel = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_vel_w, dim=1)  # (num_envs, 3)
++        bowl_vel = torch.mean(env.scene.rigid_objects[self.bowl_target].data.body_com_vel_w.torch, dim=1)  # (num_envs, 3)
+         bowl_speed = torch.norm(bowl_vel, dim=1)
+ 
+         bowl_stable = bowl_speed < 0.05
+diff --git a/lw_benchhub_tasks/lightwheel_robocasa_tasks/multi_stage/baking/organize_baking_ingredients.py b/lw_benchhub_tasks/lightwheel_robocasa_tasks/multi_stage/baking/organize_baking_ingredients.py
+index 8479566..ef8af8b 100644
+--- a/lw_benchhub_tasks/lightwheel_robocasa_tasks/multi_stage/baking/organize_baking_ingredients.py
++++ b/lw_benchhub_tasks/lightwheel_robocasa_tasks/multi_stage/baking/organize_baking_ingredients.py
+@@ -123,10 +123,10 @@ class OrganizeBakingIngredients(LwTaskBase):
+ 
+         th = 0.2
+ 
+-        bowl_pos = env.scene.rigid_objects["bowl"].data.body_com_pos_w[:, 0, :]
+-        egg1_pos = env.scene.rigid_objects["egg1"].data.body_com_pos_w[:, 0, :]
+-        egg2_pos = env.scene.rigid_objects["egg2"].data.body_com_pos_w[:, 0, :]
+-        milk_pos = env.scene.rigid_objects["milk"].data.body_com_pos_w[:, 0, :]
++        bowl_pos = env.scene.rigid_objects["bowl"].data.body_com_pos_w.torch[:, 0, :]
++        egg1_pos = env.scene.rigid_objects["egg1"].data.body_com_pos_w.torch[:, 0, :]
++        egg2_pos = env.scene.rigid_objects["egg2"].data.body_com_pos_w.torch[:, 0, :]
++        milk_pos = env.scene.rigid_objects["milk"].data.body_com_pos_w.torch[:, 0, :]
+ 
+         # check if the objects are near the bowl
+         bowl_egg1_close = torch.norm(bowl_pos - egg1_pos, dim=-1) < th
+diff --git a/lw_benchhub_tasks/lightwheel_robocasa_tasks/multi_stage/restocking_supplies/restock_pantry.py b/lw_benchhub_tasks/lightwheel_robocasa_tasks/multi_stage/restocking_supplies/restock_pantry.py
+index f616b82..3511797 100644
+--- a/lw_benchhub_tasks/lightwheel_robocasa_tasks/multi_stage/restocking_supplies/restock_pantry.py
++++ b/lw_benchhub_tasks/lightwheel_robocasa_tasks/multi_stage/restocking_supplies/restock_pantry.py
+@@ -156,9 +156,9 @@ class RestockPantry(LwTaskBase):
+         obj = self.objects[obj_name]
+         can = self.objects["cab_obj1"]
+         other_obj = self.objects["cab_obj2"]
+-        obj_pos = env.scene.rigid_objects[obj.task_name].data.body_com_pos_w[:, 0, :]
+-        can_pos = env.scene.rigid_objects[can.task_name].data.body_com_pos_w[:, 0, :]
+-        other_obj_pos = env.scene.rigid_objects[other_obj.task_name].data.body_com_pos_w[:, 0, :]
++        obj_pos = env.scene.rigid_objects[obj.task_name].data.body_com_pos_w.torch[:, 0, :]
++        can_pos = env.scene.rigid_objects[can.task_name].data.body_com_pos_w.torch[:, 0, :]
++        other_obj_pos = env.scene.rigid_objects[other_obj.task_name].data.body_com_pos_w.torch[:, 0, :]
+ 
+         can_dist = torch.linalg.norm(obj_pos - can_pos)
+         other_dist = torch.linalg.norm(other_obj_pos - obj_pos)
+diff --git a/lw_benchhub_tasks/lightwheel_robocasa_tasks/multi_stage/tidying_cabinets_and_drawers/organize_cleaning_supplies.py b/lw_benchhub_tasks/lightwheel_robocasa_tasks/multi_stage/tidying_cabinets_and_drawers/organize_cleaning_supplies.py
+index 6378e60..8cf93cd 100644
+--- a/lw_benchhub_tasks/lightwheel_robocasa_tasks/multi_stage/tidying_cabinets_and_drawers/organize_cleaning_supplies.py
++++ b/lw_benchhub_tasks/lightwheel_robocasa_tasks/multi_stage/tidying_cabinets_and_drawers/organize_cleaning_supplies.py
+@@ -125,7 +125,7 @@ class OrganizeCleaningSupplies(LwTaskBase):
+         Returns the distance of the object from the sink
+         """
+         sink_points = torch.tensor(np.stack(self.sink.get_ext_sites(all_points=True, relative=False)), device=env.device).unsqueeze(0)  # (1, 8, 3)
+-        obj_point = env.scene.rigid_objects[obj_name].data.body_com_pos_w[..., 0:1, :]  # (env_num, 1, 3)
++        obj_point = env.scene.rigid_objects[obj_name].data.body_com_pos_w.torch[..., 0:1, :]  # (env_num, 1, 3)
+ 
+         all_dists = torch.norm(sink_points - obj_point, dim=-1)  # (env_num, 8)
+         return torch.min(all_dists, dim=-1).values
+diff --git a/lw_benchhub_tasks/lightwheel_robocasa_tasks/multi_stage/washing_dishes/dry_drinkware.py b/lw_benchhub_tasks/lightwheel_robocasa_tasks/multi_stage/washing_dishes/dry_drinkware.py
+index 745bfdc..62ee78d 100644
+--- a/lw_benchhub_tasks/lightwheel_robocasa_tasks/multi_stage/washing_dishes/dry_drinkware.py
++++ b/lw_benchhub_tasks/lightwheel_robocasa_tasks/multi_stage/washing_dishes/dry_drinkware.py
+@@ -100,7 +100,7 @@ class DryDrinkware(LwTaskBase):
+         return roll_x, pitch_y, yaw_z
+ 
+     def _check_success(self, env):
+-        mug_rot = env.scene.rigid_objects["mug"].data.body_com_quat_w[:, 0, :]
++        mug_rot = env.scene.rigid_objects["mug"].data.body_com_quat_w.torch[:, 0, :]
+         # make sure the mug is placed upside down
+         mug_euler = []
+         for i in range(mug_rot.shape[0]):
+diff --git a/lw_benchhub_tasks/lightwheel_robocasa_tasks/single_stage/kitchen_coffee.py b/lw_benchhub_tasks/lightwheel_robocasa_tasks/single_stage/kitchen_coffee.py
+index 8c8723c..07dddb4 100644
+--- a/lw_benchhub_tasks/lightwheel_robocasa_tasks/single_stage/kitchen_coffee.py
++++ b/lw_benchhub_tasks/lightwheel_robocasa_tasks/single_stage/kitchen_coffee.py
+@@ -186,8 +186,8 @@ class CoffeeSetupMug(PnPCoffee):
+ 
+     def _check_success(self, env):
+         result = super()._check_success(env)
+-        obj_height = env.scene.rigid_objects["obj"].data.body_com_pos_w[:, 0, 2]
+-        default_obj_height = env.scene.rigid_objects["obj"].data.default_root_state[:, 2]
++        obj_height = env.scene.rigid_objects["obj"].data.body_com_pos_w.torch[:, 0, 2]
++        default_obj_height = env.scene.rigid_objects["obj"].data.default_root_state.torch[:, 2]
+         higher_than_default = obj_height > default_obj_height
+         return result & higher_than_default
+ 
+diff --git a/lw_benchhub_tasks/lightwheel_robocasa_tasks/single_stage/kitchen_navigate.py b/lw_benchhub_tasks/lightwheel_robocasa_tasks/single_stage/kitchen_navigate.py
+index 37c8936..11557a3 100644
+--- a/lw_benchhub_tasks/lightwheel_robocasa_tasks/single_stage/kitchen_navigate.py
++++ b/lw_benchhub_tasks/lightwheel_robocasa_tasks/single_stage/kitchen_navigate.py
+@@ -129,10 +129,10 @@ class NavigateKitchen(LwTaskBase):
+             bool: True if the task is successful, False otherwise.
+         """
+         base_id = env.scene.articulations['robot'].data.body_names.index(env.cfg.isaaclab_arena_env.embodiment.robot_base_link)
+-        base_pos = env.scene.articulations['robot'].data.body_com_pos_w[..., base_id, :]
++        base_pos = env.scene.articulations['robot'].data.body_com_pos_w.torch[..., base_id, :]
+         target_pos = torch.tensor(self.target_pos, device=base_pos.device, dtype=base_pos.dtype).unsqueeze(0).repeat(env.num_envs, 1)
+         pos_check = torch.linalg.norm(target_pos[:, :2] - base_pos[:, :2], dim=-1) <= 0.20
+-        base_ori = env.scene.articulations['robot'].data.body_com_quat_w[..., base_id, :]
++        base_ori = env.scene.articulations['robot'].data.body_com_quat_w.torch[..., base_id, :]
+         base_ori = self.quat2euler_torch(base_ori)
+         ori_check = torch.cos(torch.tensor(self.target_ori[2], device=env.device).repeat(env.num_envs) - base_ori[:, 2]) >= 0.98
+ 
+@@ -153,7 +153,7 @@ class NavigateKitchen(LwTaskBase):
+             quat = quat.unsqueeze(0)
+             squeeze_flag = True
+         # Extract quaternion components
+-        w, x, y, z = quat[:, 0], quat[:, 1], quat[:, 2], quat[:, 3]
++        x, y, z, w = quat[:, 0], quat[:, 1], quat[:, 2], quat[:, 3]  # Lab 3 XYZW
+         # Compute yaw (z-axis rotation)
+         yaw = torch.atan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z))
+         # Compute pitch (y-axis rotation)
+diff --git a/lw_benchhub_tasks/lightwheel_robocasa_tasks/single_stage/lift_obj.py b/lw_benchhub_tasks/lightwheel_robocasa_tasks/single_stage/lift_obj.py
+index 535ad49..a74dd70 100644
+--- a/lw_benchhub_tasks/lightwheel_robocasa_tasks/single_stage/lift_obj.py
++++ b/lw_benchhub_tasks/lightwheel_robocasa_tasks/single_stage/lift_obj.py
+@@ -85,7 +85,7 @@ class LiftObj(LwTaskBase):
+         if self.context.execute_mode == ExecuteMode.TRAIN:
+             return torch.tensor([False], device=env.device).repeat(env.num_envs)
+ 
+-        object_height = env.scene['object'].data.root_pos_w[:, 2]
++        object_height = env.scene['object'].data.root_pos_w.torch[:, 2]
+         is_height_sufficient = (object_height >= 0.965)
+ 
+         success = is_height_sufficient

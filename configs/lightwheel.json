@@ -1,0 +1,19 @@
+{
+  "backend": "lightwheel",
+  "task": "NavigateKitchen",
+  "scene": "robocasakitchen-4-2",
+  "robot": "PandaOmron-Rel",
+  "seed": 0,
+  "num_envs": 1,
+  "episode_length_s": 12.0,
+  "lightwheel_root": "../external/LW-BenchHub",
+  "human": {
+    "enabled": true,
+    "motion": "../outputs/isaac_human/trumans_744000/motion_kitchen_walk.npz",
+    "skeleton": "../outputs/isaac_human/trumans_744000/smplx_skeleton_male.json",
+    "skin": "../outputs/isaac_human/trumans_744000/smplx_skin_male.npz",
+    "yaw": 3.1391195028617807,
+    "translation": [5.245475675666777, -3.5562388577135713, 0.0],
+    "start_delay_s": 0.0
+  }
+}

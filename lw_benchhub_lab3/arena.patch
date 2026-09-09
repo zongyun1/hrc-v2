@@ -1,0 +1,360 @@
+diff --git a/isaaclab_arena/assets/object.py b/isaaclab_arena/assets/object.py
+index 3032217..47c5c62 100644
+--- a/isaaclab_arena/assets/object.py
++++ b/isaaclab_arena/assets/object.py
+@@ -102,5 +102,5 @@ class Object(ObjectBase):
+         # Optionally specify initial pose
+         if self.initial_pose is not None:
+             object_cfg.init_state.pos = self.initial_pose.position_xyz
+-            object_cfg.init_state.rot = self.initial_pose.rotation_wxyz
++            object_cfg.init_state.rot = self.initial_pose.rotation_xyzw
+         return object_cfg
+diff --git a/isaaclab_arena/assets/object_base.py b/isaaclab_arena/assets/object_base.py
+index 39ddbda..5781d8c 100644
+--- a/isaaclab_arena/assets/object_base.py
++++ b/isaaclab_arena/assets/object_base.py
+@@ -74,7 +74,7 @@ class ObjectBase(Asset, ABC):
+         # We require that the asset has been added to the scene under its name.
+         assert self.name in env.scene.keys(), f"Asset {self.name} not found in scene"
+         if (self.object_type == ObjectType.RIGID) or (self.object_type == ObjectType.ARTICULATION):
+-            object_pose = env.scene[self.name].data.root_pose_w.clone()
++            object_pose = env.scene[self.name].data.root_pose_w.torch.clone()
+         elif self.object_type == ObjectType.BASE:
+             object_pose = torch.cat(env.scene[self.name].get_world_poses(), dim=-1)
+         else:
+diff --git a/isaaclab_arena/assets/object_reference.py b/isaaclab_arena/assets/object_reference.py
+index 2b27716..db6c694 100644
+--- a/isaaclab_arena/assets/object_reference.py
++++ b/isaaclab_arena/assets/object_reference.py
+@@ -55,7 +55,7 @@ class ObjectReference(ObjectBase):
+             prim_path=self.prim_path,
+             init_state=RigidObjectCfg.InitialStateCfg(
+                 pos=initial_pose.position_xyz,
+-                rot=initial_pose.rotation_wxyz,
++                rot=initial_pose.rotation_xyzw,
+             ),
+         )
+         return object_cfg
+@@ -68,7 +68,7 @@ class ObjectReference(ObjectBase):
+             actuators={},
+             init_state=ArticulationCfg.InitialStateCfg(
+                 pos=initial_pose.position_xyz,
+-                rot=initial_pose.rotation_wxyz,
++                rot=initial_pose.rotation_xyzw,
+             ),
+         )
+         return object_cfg
+@@ -80,7 +80,7 @@ class ObjectReference(ObjectBase):
+             prim_path=self.prim_path,
+             init_state=AssetBaseCfg.InitialStateCfg(
+                 pos=initial_pose.position_xyz,
+-                rot=initial_pose.rotation_wxyz,
++                rot=initial_pose.rotation_xyzw,
+             ),
+         )
+         return object_cfg
+diff --git a/isaaclab_arena/embodiments/embodiment_base.py b/isaaclab_arena/embodiments/embodiment_base.py
+index e5be80d..6f5c4eb 100644
+--- a/isaaclab_arena/embodiments/embodiment_base.py
++++ b/isaaclab_arena/embodiments/embodiment_base.py
+@@ -90,7 +90,7 @@ class EmbodimentBase(Asset):
+         if scene_config is None or not hasattr(scene_config, "robot"):
+             raise RuntimeError("scene_config must be populated with a `robot` before calling `set_robot_initial_pose`.")
+         scene_config.robot.init_state.pos = pose.position_xyz
+-        scene_config.robot.init_state.rot = pose.rotation_wxyz
++        scene_config.robot.init_state.rot = pose.rotation_xyzw
+         return scene_config
+ 
+     def get_recorder_term_cfg(self) -> RecorderManagerBaseCfg:
+diff --git a/isaaclab_arena/embodiments/franka/franka.py b/isaaclab_arena/embodiments/franka/franka.py
+index 9e2a585..af58572 100644
+--- a/isaaclab_arena/embodiments/franka/franka.py
++++ b/isaaclab_arena/embodiments/franka/franka.py
+@@ -70,7 +70,7 @@ class FrankaSceneCfg:
+     # TODO(alexmillane, 2025-07-28): We probably want to make the stand an optional addition.
+     stand: AssetBaseCfg = AssetBaseCfg(
+         prim_path="{ENV_REGEX_NS}/Robot_Stand",
+-        init_state=AssetBaseCfg.InitialStateCfg(pos=[-0.05, 0.0, 0.0], rot=[1.0, 0.0, 0.0, 0.0]),
++        init_state=AssetBaseCfg.InitialStateCfg(pos=[-0.05, 0.0, 0.0], rot=(0.0, 0.0, 0.0, 1.0)),
+         spawn=UsdFileCfg(
+             usd_path="https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/4.5/Isaac/Props/Mounts/Stand/stand_instanceable.usd",
+             scale=(1.2, 1.2, 1.7),
+@@ -319,3 +319,5 @@ class FrankaMimicEnv(ManagerBasedRLMimicEnv):
+         object_pose_matrix = get_rigid_and_articulated_object_poses(state, env_ids)
+ 
+         return object_pose_matrix
++
++# LW Lab 3: authored rot= quaternion literals use XYZW.
+diff --git a/isaaclab_arena/embodiments/franka/observations.py b/isaaclab_arena/embodiments/franka/observations.py
+index e5dca2d..cfe7683 100644
+--- a/isaaclab_arena/embodiments/franka/observations.py
++++ b/isaaclab_arena/embodiments/franka/observations.py
+@@ -12,7 +12,7 @@ from isaaclab.managers import SceneEntityCfg
+ 
+ def gripper_pos(env: ManagerBasedRLEnv, robot_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+     robot: Articulation = env.scene[robot_cfg.name]
+-    finger_joint_1 = robot.data.joint_pos[:, -1].clone().unsqueeze(1)
+-    finger_joint_2 = -1 * robot.data.joint_pos[:, -2].clone().unsqueeze(1)
++    finger_joint_1 = robot.data.joint_pos.torch[:, -1].clone().unsqueeze(1)
++    finger_joint_2 = -1 * robot.data.joint_pos.torch[:, -2].clone().unsqueeze(1)
+ 
+     return torch.cat((finger_joint_1, finger_joint_2), dim=1)
+diff --git a/isaaclab_arena/embodiments/g1/g1.py b/isaaclab_arena/embodiments/g1/g1.py
+index 48fbc9b..a1402d3 100644
+--- a/isaaclab_arena/embodiments/g1/g1.py
++++ b/isaaclab_arena/embodiments/g1/g1.py
+@@ -141,7 +141,7 @@ class G1SceneCfg:
+         prim_path="/World/envs/env_.*/Robot",
+         init_state=ArticulationCfg.InitialStateCfg(
+             pos=(0.8, -1.38, 0.78),
+-            rot=(0.0, 0.0, 0.0, 1.0),
++            rot=(0.0, 0.0, 1.0, 0.0),
+             joint_pos={
+                 # target angles [rad]
+                 "left_hip_pitch_joint": -0.1,
+@@ -760,7 +760,7 @@ class G1MimicEnv(ManagerBasedRLMimicEnv):
+             env_ids = slice(None)
+ 
+         # Get pelvis inverse transform to convert from world to pelvis frame
+-        pelvis_pose_w = self.scene["robot"].data.body_link_state_w[
++        pelvis_pose_w = self.scene["robot"].data.body_link_state_w.torch[
+             :, self.scene["robot"].data.body_names.index("pelvis"), :
+         ]
+         pelvis_position_w = pelvis_pose_w[:, :3] - self.scene.env_origins
+@@ -778,3 +778,5 @@ class G1MimicEnv(ManagerBasedRLMimicEnv):
+             object_pose_matrix[obj_name] = object_pose_pelvis_frame
+ 
+         return object_pose_matrix
++
++# LW Lab 3: authored rot= quaternion literals use XYZW.
+diff --git a/isaaclab_arena/metrics/object_moved.py b/isaaclab_arena/metrics/object_moved.py
+index fe96340..41965af 100644
+--- a/isaaclab_arena/metrics/object_moved.py
++++ b/isaaclab_arena/metrics/object_moved.py
+@@ -25,7 +25,7 @@ class ObjectVelocityRecorder(RecorderTerm):
+ 
+     def record_post_step(self):
+         # NOTE(alexmillane, 2025-09-30): This assumes the the object is a rigid object.
+-        object_linear_velocity = self._env.scene[self.object_name].data.root_link_vel_w[:, :3]
++        object_linear_velocity = self._env.scene[self.object_name].data.root_link_vel_w.torch[:, :3]
+         assert object_linear_velocity.shape == (self._env.num_envs, 3)
+         return self.name, object_linear_velocity
+ 
+diff --git a/isaaclab_arena/tasks/terminations.py b/isaaclab_arena/tasks/terminations.py
+index b6ea7d0..56c98ba 100644
+--- a/isaaclab_arena/tasks/terminations.py
++++ b/isaaclab_arena/tasks/terminations.py
+@@ -26,14 +26,14 @@ def object_on_destination(
+     # force_matrix_w shape is (N, B, M, 3), where N is the number of sensors, B is number of bodies in each sensor
+     # and ``M`` is the number of filtered bodies.
+     # We assume B = 1 and M = 1
+-    assert sensor.data.force_matrix_w.shape[2] == 1
+-    assert sensor.data.force_matrix_w.shape[1] == 1
++    assert sensor.data.force_matrix_w.torch.shape[2] == 1
++    assert sensor.data.force_matrix_w.torch.shape[1] == 1
+     # NOTE(alexmillane, 2025-08-04): We expect the binary flags to have shape (N, )
+     # where N is the number of envs.
+-    force_matrix_norm = torch.norm(sensor.data.force_matrix_w.clone(), dim=-1).reshape(-1)
++    force_matrix_norm = torch.norm(sensor.data.force_matrix_w.torch.clone(), dim=-1).reshape(-1)
+     force_above_threshold = force_matrix_norm > force_threshold
+ 
+-    velocity_w = object.data.root_lin_vel_w
++    velocity_w = object.data.root_lin_vel_w.torch
+     velocity_w_norm = torch.norm(velocity_w, dim=-1)
+     velocity_below_threshold = velocity_w_norm < velocity_threshold
+ 
+@@ -59,11 +59,11 @@ def objects_in_proximity(
+     target_object: RigidObject = env.scene[target_object_cfg.name]
+ 
+     # Get positions relative to environment origin
+-    object_pos = object.data.root_pos_w - env.scene.env_origins
++    object_pos = object.data.root_pos_w.torch - env.scene.env_origins
+ 
+     # Get positions relative to environment origin
+-    object_pos = object.data.root_pos_w - env.scene.env_origins
+-    target_object_pos = target_object.data.root_pos_w - env.scene.env_origins
++    object_pos = object.data.root_pos_w.torch - env.scene.env_origins
++    target_object_pos = target_object.data.root_pos_w.torch - env.scene.env_origins
+ 
+     # object to target object
+     x_separation = torch.abs(object_pos[:, 0] - target_object_pos[:, 0])
+diff --git a/isaaclab_arena/terms/articulations.py b/isaaclab_arena/terms/articulations.py
+index 4ecea1e..195e30c 100644
+--- a/isaaclab_arena/terms/articulations.py
++++ b/isaaclab_arena/terms/articulations.py
+@@ -22,4 +22,4 @@ def joint_acc(env: ManagerBasedEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("
+     """
+     # extract the used quantities (to enable type-hinting)
+     asset: Articulation = env.scene[asset_cfg.name]
+-    return asset.data.joint_acc[:, asset_cfg.joint_ids]
++    return asset.data.joint_acc.torch[:, asset_cfg.joint_ids]
+diff --git a/isaaclab_arena/terms/transforms.py b/isaaclab_arena/terms/transforms.py
+index 6d469dd..96b4cc0 100644
+--- a/isaaclab_arena/terms/transforms.py
++++ b/isaaclab_arena/terms/transforms.py
+@@ -31,8 +31,8 @@ def transform_pose_from_world_to_target_frame(
+         target_frame_name in asset.data.body_names
+     ), f"Target frame {target_frame_name} not found in asset {asset_cfg.name}"
+ 
+-    target_link_pose_w = asset.data.body_link_state_w[:, asset.data.body_names.index(target_link_name), :]
+-    target_frame_pose_w = asset.data.body_link_state_w[:, asset.data.body_names.index(target_frame_name), :]
++    target_link_pose_w = asset.data.body_link_state_w.torch[:, asset.data.body_names.index(target_link_name), :]
++    target_frame_pose_w = asset.data.body_link_state_w.torch[:, asset.data.body_names.index(target_frame_name), :]
+ 
+     # Convert to pose matrix
+     target_link_position_w = target_link_pose_w[:, :3]
+@@ -98,7 +98,7 @@ def get_asset_position(
+ ) -> torch.Tensor:
+     """Get the robot position."""
+     asset: Articulation = env.scene[asset_cfg.name]
+-    return asset.data.root_pos_w
++    return asset.data.root_pos_w.torch
+ 
+ 
+ def get_asset_quaternion(
+@@ -107,4 +107,4 @@ def get_asset_quaternion(
+ ) -> torch.Tensor:
+     """Get the robot quaternion."""
+     asset: Articulation = env.scene[asset_cfg.name]
+-    return asset.data.root_quat_w
++    return asset.data.root_quat_w.torch
+diff --git a/isaaclab_arena/tests/test_g1_wbc_embodiment.py b/isaaclab_arena/tests/test_g1_wbc_embodiment.py
+index 02fb022..568132b 100644
+--- a/isaaclab_arena/tests/test_g1_wbc_embodiment.py
++++ b/isaaclab_arena/tests/test_g1_wbc_embodiment.py
+@@ -104,7 +104,7 @@ def _test_wbc_joint_standing_idle_actions(simulation_app) -> bool:
+ 
+     def assert_standing_idle(env: ManagerBasedEnv, robot_init_base_pose: np.ndarray):
+         # get robot base pose after actions call
+-        robot_base_pose = env.scene["robot"].data.root_link_pose_w[0, :3].cpu().numpy()
++        robot_base_pose = env.scene["robot"].data.root_link_pose_w.torch[0, :3].cpu().numpy()
+         # check if robot base pose is close to initial base pose
+         robot_xy_error = np.linalg.norm(robot_base_pose[:2] - robot_init_base_pose[:2])
+         assert robot_xy_error < STANDING_POSITION_XY_EPS, "Robot moved away from initial position."
+@@ -142,7 +142,7 @@ def _test_wbc_pink_standing_idle_actions(simulation_app) -> bool:
+ 
+     def assert_standing_idle(env: ManagerBasedEnv, robot_init_base_pose: np.ndarray):
+         # get robot base pose after actions call
+-        robot_base_pose = env.scene["robot"].data.root_link_pose_w[0, :3].cpu().numpy()
++        robot_base_pose = env.scene["robot"].data.root_link_pose_w.torch[0, :3].cpu().numpy()
+         # check if robot base pose is close to initial base pose
+         robot_xy_error = np.linalg.norm(robot_base_pose[:2] - robot_init_base_pose[:2])
+         assert robot_xy_error < STANDING_POSITION_XY_EPS, "Robot moved away from initial position."
+diff --git a/isaaclab_arena/tests/test_object_on_termination.py b/isaaclab_arena/tests/test_object_on_termination.py
+index c2cd676..eafde4a 100644
+--- a/isaaclab_arena/tests/test_object_on_termination.py
++++ b/isaaclab_arena/tests/test_object_on_termination.py
+@@ -75,9 +75,9 @@ def _test_object_on_destination_termination(simulation_app) -> bool:
+                 actions = torch.zeros(env.action_space.shape, device=env.unwrapped.device)
+                 _, _, terminated, _, _ = env.step(actions)
+                 # Get the force on the pick up object.
+-                forces_vec.append(sensor.data.net_forces_w.clone())
+-                force_matrix_vec.append(sensor.data.force_matrix_w.clone())
+-                velocities_vec.append(env.scene[cracker_box.name].data.root_lin_vel_w.clone())
++                forces_vec.append(sensor.data.net_forces_w.torch.clone())
++                force_matrix_vec.append(sensor.data.force_matrix_w.torch.clone())
++                velocities_vec.append(env.scene[cracker_box.name].data.root_lin_vel_w.torch.clone())
+ 
+                 # Try the termination.
+                 condition_met_vec.append(
+diff --git a/isaaclab_arena/tests/test_robot_initial_position.py b/isaaclab_arena/tests/test_robot_initial_position.py
+index 6a296be..b9d4de3 100644
+--- a/isaaclab_arena/tests/test_robot_initial_position.py
++++ b/isaaclab_arena/tests/test_robot_initial_position.py
+@@ -59,7 +59,7 @@ def _test_robot_initial_position(simulation_app):
+                 env.step(actions)
+ 
+         # Check the robot ended up at the correct position.
+-        robot_position = env.scene["robot"].data.root_link_pose_w[0, :3].cpu().numpy()
++        robot_position = env.scene["robot"].data.root_link_pose_w.torch[0, :3].cpu().numpy()
+         robot_position_error = np.linalg.norm(robot_position - np.array(robot_init_position))
+         print(f"Robot position error: {robot_position_error}")
+         assert robot_position_error < INITIAL_POSITION_EPS, "Robot ended up at the wrong position."
+diff --git a/isaaclab_arena/utils/isaaclab_utils/resets.py b/isaaclab_arena/utils/isaaclab_utils/resets.py
+index 6423460..15b3edb 100644
+--- a/isaaclab_arena/utils/isaaclab_utils/resets.py
++++ b/isaaclab_arena/utils/isaaclab_utils/resets.py
+@@ -12,13 +12,13 @@ def reset_all_articulation_joints(env: ManagerBasedEnv, env_ids: torch.Tensor):
+     """Reset the articulation joints to the initial state."""
+     for articulation_asset in env.scene.articulations.values():
+         # obtain default and deal with the offset for env origins
+-        default_root_state = articulation_asset.data.default_root_state[env_ids].clone()
++        default_root_state = articulation_asset.data.default_root_state.torch[env_ids].clone()
+         default_root_state[:, 0:3] += env.scene.env_origins[env_ids]
+         # set into the physics simulation
+         articulation_asset.write_root_pose_to_sim(default_root_state[:, :7], env_ids=env_ids)
+         articulation_asset.write_root_velocity_to_sim(default_root_state[:, 7:], env_ids=env_ids)
+         # obtain default joint positions
+-        default_joint_pos = articulation_asset.data.default_joint_pos[env_ids].clone()
+-        default_joint_vel = articulation_asset.data.default_joint_vel[env_ids].clone()
++        default_joint_pos = articulation_asset.data.default_joint_pos.torch[env_ids].clone()
++        default_joint_vel = articulation_asset.data.default_joint_vel.torch[env_ids].clone()
+         # set into the physics simulation
+         articulation_asset.write_joint_state_to_sim(default_joint_pos, default_joint_vel, env_ids=env_ids)
+diff --git a/isaaclab_arena/utils/joint_utils.py b/isaaclab_arena/utils/joint_utils.py
+index a91684f..fce4450 100644
+--- a/isaaclab_arena/utils/joint_utils.py
++++ b/isaaclab_arena/utils/joint_utils.py
+@@ -24,8 +24,8 @@ def get_normalized_joint_position(env: ManagerBasedEnv, asset_cfg: SceneEntityCf
+     articulation = env.scene.articulations[asset_cfg.name]
+     assert len(asset_cfg.joint_names) == 1, "Only one joint name is supported for now."
+     joint_index = articulation.data.joint_names.index(asset_cfg.joint_names[0])
+-    joint_position = articulation.data.joint_pos[:, joint_index]
+-    joint_position_limits = articulation.data.joint_pos_limits[0, joint_index, :]
++    joint_position = articulation.data.joint_pos.torch[:, joint_index]
++    joint_position_limits = articulation.data.joint_pos_limits.torch[0, joint_index, :]
+     joint_min, joint_max = joint_position_limits[0], joint_position_limits[1]
+     normalized_position = normalize_value(joint_position, joint_min, joint_max)
+     if joint_min < 0.0:
+@@ -40,7 +40,7 @@ def set_normalized_joint_position(
+     articulation = env.scene.articulations[asset_cfg.name]
+     assert len(asset_cfg.joint_names) == 1, "Only one joint name is supported for now."
+     joint_index = articulation.data.joint_names.index(asset_cfg.joint_names[0])
+-    joint_position_limits = articulation.data.joint_pos_limits[0, joint_index, :]
++    joint_position_limits = articulation.data.joint_pos_limits.torch[0, joint_index, :]
+     joint_min, joint_max = joint_position_limits[0], joint_position_limits[1]
+     if joint_min < 0.0:
+         target_joint_position = 1 - target_joint_position
+diff --git a/isaaclab_arena/utils/locomanip_mimic_patch.py b/isaaclab_arena/utils/locomanip_mimic_patch.py
+index 5c8e5b5..309aea7 100644
+--- a/isaaclab_arena/utils/locomanip_mimic_patch.py
++++ b/isaaclab_arena/utils/locomanip_mimic_patch.py
+@@ -299,7 +299,7 @@ def patch_generate():  # noqa: C901
+ 
+                 # Update visualization if motion planner is available
+                 if motion_planner and motion_planner.visualize_spheres:
+-                    current_joints = self.env.scene["robot"].data.joint_pos[env_id]
++                    current_joints = self.env.scene["robot"].data.joint_pos.torch[env_id]
+                     motion_planner._update_visualization_at_joint_positions(current_joints)
+ 
+                 eef_waypoint_dict[eef_name] = waypoint
+diff --git a/isaaclab_arena/utils/pose.py b/isaaclab_arena/utils/pose.py
+index 0b4eb67..1a17ada 100644
+--- a/isaaclab_arena/utils/pose.py
++++ b/isaaclab_arena/utils/pose.py
+@@ -25,6 +25,10 @@ class Pose:
+     rotation_wxyz: tuple[float, float, float, float] = (1.0, 0.0, 0.0, 0.0)
+     """Quaternion from frame A to frame B. Order is (w, x, y, z)."""
+ 
++    @property
++    def rotation_xyzw(self):
++        return self.rotation_wxyz[1:] + self.rotation_wxyz[:1]
++
+     def __post_init__(self):
+         assert isinstance(self.position_xyz, tuple)
+         assert isinstance(self.rotation_wxyz, tuple)
+@@ -64,11 +68,11 @@ def compose_poses(T_C_B: Pose, T_B_A: Pose) -> Pose:
+     Returns:
+         The pose taking points from A to C.
+     """
+-    R_B_A = matrix_from_quat(torch.tensor(T_B_A.rotation_wxyz))
+-    R_C_B = matrix_from_quat(torch.tensor(T_C_B.rotation_wxyz))
++    R_B_A = matrix_from_quat(torch.tensor(T_B_A.rotation_xyzw))
++    R_C_B = matrix_from_quat(torch.tensor(T_C_B.rotation_xyzw))
+     # Compose the rotations
+     R_C_A = R_C_B @ R_B_A
+     q_C_A = quat_from_matrix(R_C_A)
+     # Compose the translations
+     t_C_A = R_C_B @ torch.tensor(T_B_A.position_xyz) + torch.tensor(T_C_B.position_xyz)
+-    return Pose(position_xyz=tuple(t_C_A.tolist()), rotation_wxyz=tuple(q_C_A.tolist()))
++    return Pose(position_xyz=tuple(t_C_A.tolist()), rotation_wxyz=tuple(q_C_A[[3, 0, 1, 2]].tolist()))

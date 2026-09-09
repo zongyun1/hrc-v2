@@ -69,6 +69,7 @@ retarget/*_only/
 
 # Vendored repos / large local data (e.g. third_party/manicast has its own .git)
 third_party/
+external/
 
 # Human notes
 notes/
