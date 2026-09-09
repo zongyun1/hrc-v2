@@ -1,0 +1,2295 @@
+{
+  "source_commit": "238d039be495e66faf7cdfa720cfa37b9a76db30",
+  "files": [
+    {
+      "source": ".gitmodules",
+      "archive": "history/genesis/.gitmodules",
+      "origin": "git_head"
+    },
+    {
+      "source": "CLAUDE.md",
+      "archive": "history/genesis/CLAUDE.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "LEGACY_GENESIS.md",
+      "archive": "history/genesis/README.md",
+      "origin": "working_tree"
+    },
+    {
+      "source": "SYNC_AICR.md",
+      "archive": "history/genesis/SYNC_AICR.md",
+      "origin": "working_tree"
+    },
+    {
+      "source": "baseline/rdt_overrides/README.md",
+      "archive": "history/genesis/baseline/rdt_overrides/README.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "baseline/rdt_overrides/configs/dataset_control_freq.json",
+      "archive": "history/genesis/baseline/rdt_overrides/configs/dataset_control_freq.json",
+      "origin": "git_head"
+    },
+    {
+      "source": "baseline/rdt_overrides/configs/finetune_datasets.json",
+      "archive": "history/genesis/baseline/rdt_overrides/configs/finetune_datasets.json",
+      "origin": "git_head"
+    },
+    {
+      "source": "baseline/rdt_overrides/configs/finetune_sample_weights.json",
+      "archive": "history/genesis/baseline/rdt_overrides/configs/finetune_sample_weights.json",
+      "origin": "git_head"
+    },
+    {
+      "source": "baseline/rdt_overrides/data/hdf5_vla_dataset.py",
+      "archive": "history/genesis/baseline/rdt_overrides/data/hdf5_vla_dataset.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "baseline/rdt_overrides/train/train.py",
+      "archive": "history/genesis/baseline/rdt_overrides/train/train.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "baseline/servers/act_server.py",
+      "archive": "history/genesis/baseline/servers/act_server.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "baseline/servers/diffusion_policy_server.py",
+      "archive": "history/genesis/baseline/servers/diffusion_policy_server.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "baseline/servers/dp3_server.py",
+      "archive": "history/genesis/baseline/servers/dp3_server.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "baseline/servers/lerobot_server.py",
+      "archive": "history/genesis/baseline/servers/lerobot_server.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "baseline/servers/openvla_oft_server.py",
+      "archive": "history/genesis/baseline/servers/openvla_oft_server.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "baseline/servers/rdt_server.py",
+      "archive": "history/genesis/baseline/servers/rdt_server.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/arx_x5.yml",
+      "archive": "history/genesis/config/arx_x5.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/avatars/celebrity_Jensen_Huang.yml",
+      "archive": "history/genesis/config/avatars/celebrity_Jensen_Huang.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/avatars/custom_Adrian_Keller.yml",
+      "archive": "history/genesis/config/avatars/custom_Adrian_Keller.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/avatars/custom_Clara_Voss.yml",
+      "archive": "history/genesis/config/avatars/custom_Clara_Voss.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/avatars/custom_Malik_Okoro.yml",
+      "archive": "history/genesis/config/avatars/custom_Malik_Okoro.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/avatars/mixamo_Emily_Johnson.yml",
+      "archive": "history/genesis/config/avatars/mixamo_Emily_Johnson.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/default.yml",
+      "archive": "history/genesis/config/default.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/deliver_easy_random.yml",
+      "archive": "history/genesis/config/deliver_easy_random.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/deliver_whitelist_random.yml",
+      "archive": "history/genesis/config/deliver_whitelist_random.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/eval_avatar_random_video.yml",
+      "archive": "history/genesis/config/eval_avatar_random_video.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/eval_avatar_random_video_early.yml",
+      "archive": "history/genesis/config/eval_avatar_random_video_early.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/eval_cab_inter_random_policy_smoke.yml",
+      "archive": "history/genesis/config/eval_cab_inter_random_policy_smoke.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/eval_categorize_interrupt_random_policy_smoke.yml",
+      "archive": "history/genesis/config/eval_categorize_interrupt_random_policy_smoke.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/eval_place_dual_shoes_interrupt_random_policy_smoke.yml",
+      "archive": "history/genesis/config/eval_place_dual_shoes_interrupt_random_policy_smoke.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/eval_place_food_in_skillet_interrupt_smoke.yml",
+      "archive": "history/genesis/config/eval_place_food_in_skillet_interrupt_smoke.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/eval_pour_water_random_policy.yml",
+      "archive": "history/genesis/config/eval_pour_water_random_policy.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/exr/abandoned_garage_4k.yml",
+      "archive": "history/genesis/config/exr/abandoned_garage_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/exr/brown_photostudio_02_4k.yml",
+      "archive": "history/genesis/config/exr/brown_photostudio_02_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/exr/church_meeting_room_4k.yml",
+      "archive": "history/genesis/config/exr/church_meeting_room_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/exr/ferndale_studio_11_4k.yml",
+      "archive": "history/genesis/config/exr/ferndale_studio_11_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/exr/glasshouse_interior_4k.yml",
+      "archive": "history/genesis/config/exr/glasshouse_interior_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/exr/marry_hall_4k.yml",
+      "archive": "history/genesis/config/exr/marry_hall_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/exr/mirrored_hall_4k.yml",
+      "archive": "history/genesis/config/exr/mirrored_hall_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/exr/pav_studio_03_4k.yml",
+      "archive": "history/genesis/config/exr/pav_studio_03_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/exr/photo_studio_01_4k.yml",
+      "archive": "history/genesis/config/exr/photo_studio_01_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/exr/university_workshop_4k.yml",
+      "archive": "history/genesis/config/exr/university_workshop_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/feed_hammer.yml",
+      "archive": "history/genesis/config/feed_hammer.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/feed_screwdriver.yml",
+      "archive": "history/genesis/config/feed_screwdriver.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/franka.yml",
+      "archive": "history/genesis/config/franka.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/hri_v2_fixed_table.yml",
+      "archive": "history/genesis/config/hri_v2_fixed_table.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/injured_walking.yaml",
+      "archive": "history/genesis/config/injured_walking.yaml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/iv_pole_walking.yaml",
+      "archive": "history/genesis/config/iv_pole_walking.yaml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/latest_genesis/blocks_ranking_rgb_assist_avatar_hd.yml",
+      "archive": "history/genesis/config/latest_genesis/blocks_ranking_rgb_assist_avatar_hd.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/latest_genesis/blocks_ranking_rgb_hd.yml",
+      "archive": "history/genesis/config/latest_genesis/blocks_ranking_rgb_hd.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/latest_genesis/blocks_ranking_rgb_neutral_hd.yml",
+      "archive": "history/genesis/config/latest_genesis/blocks_ranking_rgb_neutral_hd.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/latest_genesis/pour_water_no_avatar.yml",
+      "archive": "history/genesis/config/latest_genesis/pour_water_no_avatar.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/latest_genesis/pour_water_no_avatar_recorded.yml",
+      "archive": "history/genesis/config/latest_genesis/pour_water_no_avatar_recorded.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/latest_genesis/pour_water_nyx.yml",
+      "archive": "history/genesis/config/latest_genesis/pour_water_nyx.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/latest_genesis/pour_water_static_avatar_hd.yml",
+      "archive": "history/genesis/config/latest_genesis/pour_water_static_avatar_hd.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/latest_genesis/take_from_human_easy_static_avatar_hd.yml",
+      "archive": "history/genesis/config/latest_genesis/take_from_human_easy_static_avatar_hd.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/neutral_motion_open_bottle.yml",
+      "archive": "history/genesis/config/neutral_motion_open_bottle.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/neutral_motion_put_objects_in_bowl.yml",
+      "archive": "history/genesis/config/neutral_motion_put_objects_in_bowl.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/neutral_motion_sitting_clap.yml",
+      "archive": "history/genesis/config/neutral_motion_sitting_clap.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/neutral_motion_take_objects_from_bowl.yml",
+      "archive": "history/genesis/config/neutral_motion_take_objects_from_bowl.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/neutral_motion_talking.yml",
+      "archive": "history/genesis/config/neutral_motion_talking.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/neutral_motion_typing.yml",
+      "archive": "history/genesis/config/neutral_motion_typing.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/neutral_motion_use_mouse.yml",
+      "archive": "history/genesis/config/neutral_motion_use_mouse.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/neutral_motion_using_a_fax.yml",
+      "archive": "history/genesis/config/neutral_motion_using_a_fax.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/neutral_motion_wipe_table_1.yml",
+      "archive": "history/genesis/config/neutral_motion_wipe_table_1.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/neutral_motion_wipe_table_2.yml",
+      "archive": "history/genesis/config/neutral_motion_wipe_table_2.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/neutral_motion_wipe_table_2_reverse.yml",
+      "archive": "history/genesis/config/neutral_motion_wipe_table_2_reverse.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/neutral_motion_writing.yml",
+      "archive": "history/genesis/config/neutral_motion_writing.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/object_aug_dump_bin_assist_milk.yml",
+      "archive": "history/genesis/config/object_aug_dump_bin_assist_milk.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/object_aug_dump_bin_interrupt_milk.yml",
+      "archive": "history/genesis/config/object_aug_dump_bin_interrupt_milk.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/object_aug_put_object_cabinet_assist_jam.yml",
+      "archive": "history/genesis/config/object_aug_put_object_cabinet_assist_jam.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/object_aug_put_object_cabinet_interrupt_can.yml",
+      "archive": "history/genesis/config/object_aug_put_object_cabinet_interrupt_can.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/object_aug_put_object_cabinet_interrupt_jam.yml",
+      "archive": "history/genesis/config/object_aug_put_object_cabinet_interrupt_jam.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/object_aug_put_object_cabinet_interrupt_milk.yml",
+      "archive": "history/genesis/config/object_aug_put_object_cabinet_interrupt_milk.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/object_aug_put_object_cabinet_rubikscube.yml",
+      "archive": "history/genesis/config/object_aug_put_object_cabinet_rubikscube.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/openvla_collect.yml",
+      "archive": "history/genesis/config/openvla_collect.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/pour_water_no_avatar.yml",
+      "archive": "history/genesis/config/pour_water_no_avatar.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/raytracer.yml",
+      "archive": "history/genesis/config/raytracer.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/raytracer_fast.yml",
+      "archive": "history/genesis/config/raytracer_fast.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/simplified_one_pick_collect.yml",
+      "archive": "history/genesis/config/simplified_one_pick_collect.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/cate_int_luisa/abandoned_garage_4k.yml",
+      "archive": "history/genesis/config/sweep/cate_int_luisa/abandoned_garage_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/cate_int_luisa/brown_photostudio_02_4k.yml",
+      "archive": "history/genesis/config/sweep/cate_int_luisa/brown_photostudio_02_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/cate_int_luisa/church_meeting_room_4k.yml",
+      "archive": "history/genesis/config/sweep/cate_int_luisa/church_meeting_room_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/cate_int_luisa/ferndale_studio_11_4k.yml",
+      "archive": "history/genesis/config/sweep/cate_int_luisa/ferndale_studio_11_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/cate_int_luisa/glasshouse_interior_4k.yml",
+      "archive": "history/genesis/config/sweep/cate_int_luisa/glasshouse_interior_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/cate_int_luisa/marry_hall_4k.yml",
+      "archive": "history/genesis/config/sweep/cate_int_luisa/marry_hall_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/cate_int_luisa/pav_studio_03_4k.yml",
+      "archive": "history/genesis/config/sweep/cate_int_luisa/pav_studio_03_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/cate_int_luisa/photo_studio_01_4k.yml",
+      "archive": "history/genesis/config/sweep/cate_int_luisa/photo_studio_01_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/cate_int_luisa/university_workshop_4k.yml",
+      "archive": "history/genesis/config/sweep/cate_int_luisa/university_workshop_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_00.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_00.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_01.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_01.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_02.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_02.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_03.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_03.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_04.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_04.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_05.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_05.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_06.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_06.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_07.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_07.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_08.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_08.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_09.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_09.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_10.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_10.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_11.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_11.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_12.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_12.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_13.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_13.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_14.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_14.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_15.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_15.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_16.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_16.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_17.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_17.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_18.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_18.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy/run_19.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy/run_19.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_00.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_00.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_01.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_01.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_02.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_02.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_04.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_04.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_05.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_05.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_06.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_06.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_07.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_07.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_08.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_08.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_09.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_09.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_10.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_10.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_11.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_11.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_12.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_12.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_13.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_13.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_15.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_15.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_16.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_16.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_17.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_17.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/deliver_easy_luisa/run_19.yml",
+      "archive": "history/genesis/config/sweep/deliver_easy_luisa/run_19.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/stamp_luisa/abandoned_garage_4k.yml",
+      "archive": "history/genesis/config/sweep/stamp_luisa/abandoned_garage_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/stamp_luisa/brown_photostudio_02_4k.yml",
+      "archive": "history/genesis/config/sweep/stamp_luisa/brown_photostudio_02_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/stamp_luisa/church_meeting_room_4k.yml",
+      "archive": "history/genesis/config/sweep/stamp_luisa/church_meeting_room_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/stamp_luisa/ferndale_studio_11_4k.yml",
+      "archive": "history/genesis/config/sweep/stamp_luisa/ferndale_studio_11_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/stamp_luisa/glasshouse_interior_4k.yml",
+      "archive": "history/genesis/config/sweep/stamp_luisa/glasshouse_interior_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/stamp_luisa/marry_hall_4k.yml",
+      "archive": "history/genesis/config/sweep/stamp_luisa/marry_hall_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/stamp_luisa/pav_studio_03_4k.yml",
+      "archive": "history/genesis/config/sweep/stamp_luisa/pav_studio_03_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/stamp_luisa/photo_studio_01_4k.yml",
+      "archive": "history/genesis/config/sweep/stamp_luisa/photo_studio_01_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/sweep/stamp_luisa/university_workshop_4k.yml",
+      "archive": "history/genesis/config/sweep/stamp_luisa/university_workshop_4k.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/task/lift_bottle.yml",
+      "archive": "history/genesis/config/task/lift_bottle.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/task/pick_and_place.yml",
+      "archive": "history/genesis/config/task/pick_and_place.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/task/pour_water.yml",
+      "archive": "history/genesis/config/task/pour_water.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/ur5_wsg.yml",
+      "archive": "history/genesis/config/ur5_wsg.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/vla.yml",
+      "archive": "history/genesis/config/vla.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/with_irrelevant_objects.yml",
+      "archive": "history/genesis/config/with_irrelevant_objects.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/xarm7.yml",
+      "archive": "history/genesis/config/xarm7.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/xarm7_dump_bin_min_final_z.yml",
+      "archive": "history/genesis/config/xarm7_dump_bin_min_final_z.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/xarm7_table22339_redcube.yml",
+      "archive": "history/genesis/config/xarm7_table22339_redcube.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "config/xarm7_table22339_redcube_z066.yml",
+      "archive": "history/genesis/config/xarm7_table22339_redcube_z066.yml",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/avatar_arm_ik.md",
+      "archive": "history/genesis/docs/avatar_arm_ik.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/collect-data-portable.md",
+      "archive": "history/genesis/docs/collect-data-portable.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/diffusion-policy-finetune-portable.md",
+      "archive": "history/genesis/docs/diffusion-policy-finetune-portable.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/factory_task_inventory.md",
+      "archive": "history/genesis/docs/factory_task_inventory.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/factory_tasks.md",
+      "archive": "history/genesis/docs/factory_tasks.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/general/README.md",
+      "archive": "history/genesis/docs/general/README.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/general/aicr_remote_rules.md",
+      "archive": "history/genesis/docs/general/aicr_remote_rules.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/general/claude_agent_status_howto.md",
+      "archive": "history/genesis/docs/general/claude_agent_status_howto.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/general/gpu_resources.md",
+      "archive": "history/genesis/docs/general/gpu_resources.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/general/grasp_helper_howto.md",
+      "archive": "history/genesis/docs/general/grasp_helper_howto.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/general/nyx_render_howto.md",
+      "archive": "history/genesis/docs/general/nyx_render_howto.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/general/running_jobs.md",
+      "archive": "history/genesis/docs/general/running_jobs.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/general/topdown_direction_debug_howto.md",
+      "archive": "history/genesis/docs/general/topdown_direction_debug_howto.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/household_human_motion_plan.md",
+      "archive": "history/genesis/docs/household_human_motion_plan.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/kitchen_scene.md",
+      "archive": "history/genesis/docs/kitchen_scene.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/latest_genesis_status.md",
+      "archive": "history/genesis/docs/latest_genesis_status.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/lerobot-language-instructions.md",
+      "archive": "history/genesis/docs/lerobot-language-instructions.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/lerobot-tasks-parquet-schema-bug.md",
+      "archive": "history/genesis/docs/lerobot-tasks-parquet-schema-bug.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/luisa_render.md",
+      "archive": "history/genesis/docs/luisa_render.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/mixamo-motion-conversion.md",
+      "archive": "history/genesis/docs/mixamo-motion-conversion.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/neutral_avatar_parallel_handoff.md",
+      "archive": "history/genesis/docs/neutral_avatar_parallel_handoff.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/neutral_region_visualization_splits.md",
+      "archive": "history/genesis/docs/neutral_region_visualization_splits.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/nyx_render.md",
+      "archive": "history/genesis/docs/nyx_render.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/object_catalog.md",
+      "archive": "history/genesis/docs/object_catalog.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/parallel_nenvs_feasibility.md",
+      "archive": "history/genesis/docs/parallel_nenvs_feasibility.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/phase1_architecture.md",
+      "archive": "history/genesis/docs/phase1_architecture.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/pi0-pi05-pretrained-load-issue.md",
+      "archive": "history/genesis/docs/pi0-pi05-pretrained-load-issue.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/place_dual_shoes_grip_fix.md",
+      "archive": "history/genesis/docs/place_dual_shoes_grip_fix.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/pregrasp_sampling.md",
+      "archive": "history/genesis/docs/pregrasp_sampling.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/rdt-finetune-speedup.md",
+      "archive": "history/genesis/docs/rdt-finetune-speedup.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/rdt-loader-schema-issue.md",
+      "archive": "history/genesis/docs/rdt-loader-schema-issue.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/stamp_documents-6dof-bug.md",
+      "archive": "history/genesis/docs/stamp_documents-6dof-bug.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/task_matrix_stride10_status.md",
+      "archive": "history/genesis/docs/task_matrix_stride10_status.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/vla-finetune-pipeline.md",
+      "archive": "history/genesis/docs/vla-finetune-pipeline.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/vla-inference-control-pipeline.md",
+      "archive": "history/genesis/docs/vla-inference-control-pipeline.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/workflows/README.md",
+      "archive": "history/genesis/docs/workflows/README.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/workflows/act_train_eval_howto.md",
+      "archive": "history/genesis/docs/workflows/act_train_eval_howto.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "docs/workflows/eval_scene_init_howto.md",
+      "archive": "history/genesis/docs/workflows/eval_scene_init_howto.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/__init__.py",
+      "archive": "history/genesis/envs/__init__.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/__init__.py",
+      "archive": "history/genesis/envs/avatar/__init__.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/arm_ik.py",
+      "archive": "history/genesis/envs/avatar/arm_ik.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/collider.py",
+      "archive": "history/genesis/envs/avatar/collider.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/collision_checker.py",
+      "archive": "history/genesis/envs/avatar/collision_checker.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/controller.py",
+      "archive": "history/genesis/envs/avatar/controller.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/eval_mode_mixin.py",
+      "archive": "history/genesis/envs/avatar/eval_mode_mixin.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/human_motion.py",
+      "archive": "history/genesis/envs/avatar/human_motion.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/inspect_motion_mixin.py",
+      "archive": "history/genesis/envs/avatar/inspect_motion_mixin.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/kinematic_skin.py",
+      "archive": "history/genesis/envs/avatar/kinematic_skin.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/model_list.py",
+      "archive": "history/genesis/envs/avatar/model_list.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/motions/__init__.py",
+      "archive": "history/genesis/envs/avatar/motions/__init__.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/motions/base_motion_module.py",
+      "archive": "history/genesis/envs/avatar/motions/base_motion_module.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/motions/drawer_pull_motion.py",
+      "archive": "history/genesis/envs/avatar/motions/drawer_pull_motion.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/motions/improved_pick_place_motion.py",
+      "archive": "history/genesis/envs/avatar/motions/improved_pick_place_motion.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/motions/palm_orient.py",
+      "archive": "history/genesis/envs/avatar/motions/palm_orient.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/motions/palm_ref_pose.json",
+      "archive": "history/genesis/envs/avatar/motions/palm_ref_pose.json",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/motions/pick_place_motion.py",
+      "archive": "history/genesis/envs/avatar/motions/pick_place_motion.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/motions/play_animation_motion.py",
+      "archive": "history/genesis/envs/avatar/motions/play_animation_motion.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/motions/replay_motion_module.py",
+      "archive": "history/genesis/envs/avatar/motions/replay_motion_module.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/motions/styled_pick_place_motion.py",
+      "archive": "history/genesis/envs/avatar/motions/styled_pick_place_motion.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/motions/transition_motion.py",
+      "archive": "history/genesis/envs/avatar/motions/transition_motion.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/motions/turn_motion.py",
+      "archive": "history/genesis/envs/avatar/motions/turn_motion.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/motions/walk_motion.py",
+      "archive": "history/genesis/envs/avatar/motions/walk_motion.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/motions/wipe_table_motion.py",
+      "archive": "history/genesis/envs/avatar/motions/wipe_table_motion.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/robot.py",
+      "archive": "history/genesis/envs/avatar/robot.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/avatar/utils.py",
+      "archive": "history/genesis/envs/avatar/utils.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/base_task.py",
+      "archive": "history/genesis/envs/base_task.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/camera.py",
+      "archive": "history/genesis/envs/camera.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/exr_envmap.py",
+      "archive": "history/genesis/envs/exr_envmap.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/genesis_compat.py",
+      "archive": "history/genesis/envs/genesis_compat.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/grasp.py",
+      "archive": "history/genesis/envs/grasp.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/manicast/__init__.py",
+      "archive": "history/genesis/envs/manicast/__init__.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/manicast/avatar_pose_net.py",
+      "archive": "history/genesis/envs/manicast/avatar_pose_net.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/manicast/detector.py",
+      "archive": "history/genesis/envs/manicast/detector.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/manicast/stsgcn.py",
+      "archive": "history/genesis/envs/manicast/stsgcn.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/manipulation.py",
+      "archive": "history/genesis/envs/manipulation.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/nyx_kinematic_patch.py",
+      "archive": "history/genesis/envs/nyx_kinematic_patch.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/object_catalog.py",
+      "archive": "history/genesis/envs/object_catalog.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/pace/__init__.py",
+      "archive": "history/genesis/envs/pace/__init__.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/pace/fast_visual_progress.py",
+      "archive": "history/genesis/envs/pace/fast_visual_progress.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/pace/visual_progress.py",
+      "archive": "history/genesis/envs/pace/visual_progress.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/planning/__init__.py",
+      "archive": "history/genesis/envs/planning/__init__.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/planning/base.py",
+      "archive": "history/genesis/envs/planning/base.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/planning/base_planner.py",
+      "archive": "history/genesis/envs/planning/base_planner.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/planning/curobo_planner.py",
+      "archive": "history/genesis/envs/planning/curobo_planner.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/planning/curobo_worker.py",
+      "archive": "history/genesis/envs/planning/curobo_worker.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/planning/genesis_ik.py",
+      "archive": "history/genesis/envs/planning/genesis_ik.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/planning/genesis_planner.py",
+      "archive": "history/genesis/envs/planning/genesis_planner.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/planning/mplib_planner.py",
+      "archive": "history/genesis/envs/planning/mplib_planner.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/robot/__init__.py",
+      "archive": "history/genesis/envs/robot/__init__.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/robot/arx_x5_robot.py",
+      "archive": "history/genesis/envs/robot/arx_x5_robot.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/robot/base.py",
+      "archive": "history/genesis/envs/robot/base.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/robot/franka_robot.py",
+      "archive": "history/genesis/envs/robot/franka_robot.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/robot/piper_robot.py",
+      "archive": "history/genesis/envs/robot/piper_robot.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/robot/stretch_robot.py",
+      "archive": "history/genesis/envs/robot/stretch_robot.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/robot/ur5_wsg_robot.py",
+      "archive": "history/genesis/envs/robot/ur5_wsg_robot.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/robot/xarm7_robot.py",
+      "archive": "history/genesis/envs/robot/xarm7_robot.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/scene_init.py",
+      "archive": "history/genesis/envs/scene_init.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/scenes/__init__.py",
+      "archive": "history/genesis/envs/scenes/__init__.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/scenes/factory.py",
+      "archive": "history/genesis/envs/scenes/factory.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/scenes/kitchen.py",
+      "archive": "history/genesis/envs/scenes/kitchen.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/table_assets.py",
+      "archive": "history/genesis/envs/table_assets.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/task_bases/__init__.py",
+      "archive": "history/genesis/envs/task_bases/__init__.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/task_bases/blocks_ranking_rgb.py",
+      "archive": "history/genesis/envs/task_bases/blocks_ranking_rgb.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/task_bases/blocks_ranking_size.py",
+      "archive": "history/genesis/envs/task_bases/blocks_ranking_size.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/task_bases/dump_bin.py",
+      "archive": "history/genesis/envs/task_bases/dump_bin.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/task_bases/neutral_avatar_table_work.py",
+      "archive": "history/genesis/envs/task_bases/neutral_avatar_table_work.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/task_bases/place_bread_in_basket.py",
+      "archive": "history/genesis/envs/task_bases/place_bread_in_basket.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/task_bases/place_burger_fries.py",
+      "archive": "history/genesis/envs/task_bases/place_burger_fries.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/task_bases/place_dual_shoes.py",
+      "archive": "history/genesis/envs/task_bases/place_dual_shoes.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/task_bases/place_food_in_skillet.py",
+      "archive": "history/genesis/envs/task_bases/place_food_in_skillet.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/task_bases/put_object_cabinet.py",
+      "archive": "history/genesis/envs/task_bases/put_object_cabinet.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/task_bases/stack_bowls_three.py",
+      "archive": "history/genesis/envs/task_bases/stack_bowls_three.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/__init__.py",
+      "archive": "history/genesis/envs/tasks/__init__.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/blocks_ranking_rgb_assist.py",
+      "archive": "history/genesis/envs/tasks/blocks_ranking_rgb_assist.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/blocks_ranking_rgb_interrupt.py",
+      "archive": "history/genesis/envs/tasks/blocks_ranking_rgb_interrupt.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/blocks_ranking_rgb_neutral.py",
+      "archive": "history/genesis/envs/tasks/blocks_ranking_rgb_neutral.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/blocks_ranking_size_assist.py",
+      "archive": "history/genesis/envs/tasks/blocks_ranking_size_assist.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/blocks_ranking_size_interrupt.py",
+      "archive": "history/genesis/envs/tasks/blocks_ranking_size_interrupt.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/blocks_ranking_size_neutral.py",
+      "archive": "history/genesis/envs/tasks/blocks_ranking_size_neutral.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/categorize_cooperative.py",
+      "archive": "history/genesis/envs/tasks/categorize_cooperative.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/categorize_interrupt.py",
+      "archive": "history/genesis/envs/tasks/categorize_interrupt.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/categorize_neutral.py",
+      "archive": "history/genesis/envs/tasks/categorize_neutral.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/deliver_to_human_easy.py",
+      "archive": "history/genesis/envs/tasks/deliver_to_human_easy.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/dump_bin_assist.py",
+      "archive": "history/genesis/envs/tasks/dump_bin_assist.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/dump_bin_interrupt.py",
+      "archive": "history/genesis/envs/tasks/dump_bin_interrupt.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/dump_bin_neutral.py",
+      "archive": "history/genesis/envs/tasks/dump_bin_neutral.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/dump_bin_xarm_calibrated.py",
+      "archive": "history/genesis/envs/tasks/dump_bin_xarm_calibrated.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/factory_inspect_pack.py",
+      "archive": "history/genesis/envs/tasks/factory_inspect_pack.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/factory_kit_packing.py",
+      "archive": "history/genesis/envs/tasks/factory_kit_packing.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/factory_line_feeding.py",
+      "archive": "history/genesis/envs/tasks/factory_line_feeding.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/frying_with_robot_pour.py",
+      "archive": "history/genesis/envs/tasks/frying_with_robot_pour.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/oil_bottle_recovery.py",
+      "archive": "history/genesis/envs/tasks/oil_bottle_recovery.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/open_microwave.py",
+      "archive": "history/genesis/envs/tasks/open_microwave.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/place_bread_in_basket_assist.py",
+      "archive": "history/genesis/envs/tasks/place_bread_in_basket_assist.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/place_bread_in_basket_interrupt.py",
+      "archive": "history/genesis/envs/tasks/place_bread_in_basket_interrupt.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/place_bread_in_basket_neutral.py",
+      "archive": "history/genesis/envs/tasks/place_bread_in_basket_neutral.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/place_burger_fries_assist.py",
+      "archive": "history/genesis/envs/tasks/place_burger_fries_assist.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/place_burger_fries_interrupt.py",
+      "archive": "history/genesis/envs/tasks/place_burger_fries_interrupt.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/place_burger_fries_neutral.py",
+      "archive": "history/genesis/envs/tasks/place_burger_fries_neutral.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/place_dual_shoes_assist.py",
+      "archive": "history/genesis/envs/tasks/place_dual_shoes_assist.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/place_dual_shoes_interrupt.py",
+      "archive": "history/genesis/envs/tasks/place_dual_shoes_interrupt.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/place_dual_shoes_neutral.py",
+      "archive": "history/genesis/envs/tasks/place_dual_shoes_neutral.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/place_food_in_skillet_assist.py",
+      "archive": "history/genesis/envs/tasks/place_food_in_skillet_assist.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/place_food_in_skillet_interrupt.py",
+      "archive": "history/genesis/envs/tasks/place_food_in_skillet_interrupt.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/place_food_in_skillet_neutral.py",
+      "archive": "history/genesis/envs/tasks/place_food_in_skillet_neutral.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/pour_water.py",
+      "archive": "history/genesis/envs/tasks/pour_water.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/put_object_cabinet_assist.py",
+      "archive": "history/genesis/envs/tasks/put_object_cabinet_assist.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/put_object_cabinet_interrupt.py",
+      "archive": "history/genesis/envs/tasks/put_object_cabinet_interrupt.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/put_object_cabinet_neutral.py",
+      "archive": "history/genesis/envs/tasks/put_object_cabinet_neutral.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/stack_bowls_three_assist.py",
+      "archive": "history/genesis/envs/tasks/stack_bowls_three_assist.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/stack_bowls_three_interrupt.py",
+      "archive": "history/genesis/envs/tasks/stack_bowls_three_interrupt.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/stack_bowls_three_neutral.py",
+      "archive": "history/genesis/envs/tasks/stack_bowls_three_neutral.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/stamp_documents.py",
+      "archive": "history/genesis/envs/tasks/stamp_documents.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/take_from_human_easy.py",
+      "archive": "history/genesis/envs/tasks/take_from_human_easy.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/tasks/take_from_human_safety.py",
+      "archive": "history/genesis/envs/tasks/take_from_human_safety.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/utils.py",
+      "archive": "history/genesis/envs/utils.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "envs/vla_recorder.py",
+      "archive": "history/genesis/envs/vla_recorder.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/eval_v0_smoke/README.md",
+      "archive": "history/genesis/eval_sets/eval_v0_smoke/README.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/eval_v0_smoke/manifest.jsonl",
+      "archive": "history/genesis/eval_sets/eval_v0_smoke/manifest.jsonl",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/eval_v0_smoke/manifest.yaml",
+      "archive": "history/genesis/eval_sets/eval_v0_smoke/manifest.yaml",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/eval_v1_100/README.md",
+      "archive": "history/genesis/eval_sets/eval_v1_100/README.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/eval_v1_100/manifest.jsonl",
+      "archive": "history/genesis/eval_sets/eval_v1_100/manifest.jsonl",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/eval_v1_100/manifest.yaml",
+      "archive": "history/genesis/eval_sets/eval_v1_100/manifest.yaml",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/eval_v2_100_scene_init/.gitignore",
+      "archive": "history/genesis/eval_sets/eval_v2_100_scene_init/.gitignore",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/eval_v2_100_scene_init/README.md",
+      "archive": "history/genesis/eval_sets/eval_v2_100_scene_init/README.md",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/eval_v2_100_scene_init/finalize_scene_init_set.py",
+      "archive": "history/genesis/eval_sets/eval_v2_100_scene_init/finalize_scene_init_set.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/eval_v2_100_scene_init/manifest.jsonl",
+      "archive": "history/genesis/eval_sets/eval_v2_100_scene_init/manifest.jsonl",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/eval_v2_100_scene_init/manifest.yaml",
+      "archive": "history/genesis/eval_sets/eval_v2_100_scene_init/manifest.yaml",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/eval_v2_100_scene_init/submit_scene_init_generation.sh",
+      "archive": "history/genesis/eval_sets/eval_v2_100_scene_init/submit_scene_init_generation.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/eval_v2_5pertask/manifest.jsonl",
+      "archive": "history/genesis/eval_sets/eval_v2_5pertask/manifest.jsonl",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/eval_v2_neutral_demo/manifest.yaml",
+      "archive": "history/genesis/eval_sets/eval_v2_neutral_demo/manifest.yaml",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/nyx_microwave1/manifest.jsonl",
+      "archive": "history/genesis/eval_sets/nyx_microwave1/manifest.jsonl",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/nyx_smoke3/manifest.jsonl",
+      "archive": "history/genesis/eval_sets/nyx_smoke3/manifest.jsonl",
+      "origin": "git_head"
+    },
+    {
+      "source": "eval_sets/nyx_urdf6/manifest.jsonl",
+      "archive": "history/genesis/eval_sets/nyx_urdf6/manifest.jsonl",
+      "origin": "git_head"
+    },
+    {
+      "source": "patches/lerobot-genesis-hr-bench.patch",
+      "archive": "history/genesis/patches/lerobot-genesis-hr-bench.patch",
+      "origin": "git_head"
+    },
+    {
+      "source": "patches/openvla-oft-genesis-hr-bench.patch",
+      "archive": "history/genesis/patches/openvla-oft-genesis-hr-bench.patch",
+      "origin": "git_head"
+    },
+    {
+      "source": "requirements-genesis-latest.txt",
+      "archive": "history/genesis/requirements-genesis-latest.txt",
+      "origin": "git_head"
+    },
+    {
+      "source": "requirements-vla.txt",
+      "archive": "history/genesis/requirements-vla.txt",
+      "origin": "git_head"
+    },
+    {
+      "source": "requirements.txt",
+      "archive": "history/genesis/requirements.txt",
+      "origin": "git_head"
+    },
+    {
+      "source": "retarget/export_and_render_talking.sh",
+      "archive": "history/genesis/retarget/export_and_render_talking.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "retarget/export_motion_from_blender.py",
+      "archive": "history/genesis/retarget/export_motion_from_blender.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "retarget/import_and_export_fbx.py",
+      "archive": "history/genesis/retarget/import_and_export_fbx.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "retarget/mixamo_to_vico.py",
+      "archive": "history/genesis/retarget/mixamo_to_vico.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "retarget/retarget_mapping.json",
+      "archive": "history/genesis/retarget/retarget_mapping.json",
+      "origin": "git_head"
+    },
+    {
+      "source": "retarget/run_blender_export.sh",
+      "archive": "history/genesis/retarget/run_blender_export.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/_dist.sh",
+      "archive": "history/genesis/scripts/_dist.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/aicr_submit.sh",
+      "archive": "history/genesis/scripts/aicr_submit.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/build_diffusion_policy_zarr.py",
+      "archive": "history/genesis/scripts/build_diffusion_policy_zarr.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/build_dp3_zarr.py",
+      "archive": "history/genesis/scripts/build_dp3_zarr.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/build_genesis_hr_bench_rlds.py",
+      "archive": "history/genesis/scripts/build_genesis_hr_bench_rlds.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/cabinet_filing/render_filing_cabinet_scene.py",
+      "archive": "history/genesis/scripts/cabinet_filing/render_filing_cabinet_scene.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/categorize_grasp_fix_validate.py",
+      "archive": "history/genesis/scripts/categorize_grasp_fix_validate.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/categorize_grasp_fix_validate.sbatch",
+      "archive": "history/genesis/scripts/categorize_grasp_fix_validate.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/categorize_grasp_sweep.py",
+      "archive": "history/genesis/scripts/categorize_grasp_sweep.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/categorize_grasp_sweep.sbatch",
+      "archive": "history/genesis/scripts/categorize_grasp_sweep.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/check_genesis_nyx.py",
+      "archive": "history/genesis/scripts/check_genesis_nyx.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/check_latest_genesis_integration.py",
+      "archive": "history/genesis/scripts/check_latest_genesis_integration.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/collect.py",
+      "archive": "history/genesis/scripts/collect.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/collect_vla.sh",
+      "archive": "history/genesis/scripts/collect_vla.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/compare_old_latest_genesis_asset_loading.py",
+      "archive": "history/genesis/scripts/compare_old_latest_genesis_asset_loading.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/compare_pour_water_old_latest_reset.py",
+      "archive": "history/genesis/scripts/compare_pour_water_old_latest_reset.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/convert_genesis_hr_bench_to_lerobot.py",
+      "archive": "history/genesis/scripts/convert_genesis_hr_bench_to_lerobot.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/convert_genesis_hr_bench_to_rdt_hdf5.py",
+      "archive": "history/genesis/scripts/convert_genesis_hr_bench_to_rdt_hdf5.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/convert_vla_h5_to_lerobot.py",
+      "archive": "history/genesis/scripts/convert_vla_h5_to_lerobot.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/download_onedrive_assets.py",
+      "archive": "history/genesis/scripts/download_onedrive_assets.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/env.local.sh.example",
+      "archive": "history/genesis/scripts/env.local.sh.example",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/env.sh",
+      "archive": "history/genesis/scripts/env.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/eval.py",
+      "archive": "history/genesis/scripts/eval.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/eval.sbatch",
+      "archive": "history/genesis/scripts/eval.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/eval_act_hf.py",
+      "archive": "history/genesis/scripts/eval_act_hf.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/eval_expert_set.py",
+      "archive": "history/genesis/scripts/eval_expert_set.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/eval_expert_set.sbatch",
+      "archive": "history/genesis/scripts/eval_expert_set.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/eval_expert_set_cpu.sbatch",
+      "archive": "history/genesis/scripts/eval_expert_set_cpu.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/eval_hf_vla_suite.sh",
+      "archive": "history/genesis/scripts/eval_hf_vla_suite.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/eval_isolated.py",
+      "archive": "history/genesis/scripts/eval_isolated.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/eval_vla.py",
+      "archive": "history/genesis/scripts/eval_vla.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/fetch_objects_zip.sh",
+      "archive": "history/genesis/scripts/fetch_objects_zip.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune.sbatch",
+      "archive": "history/genesis/scripts/finetune.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune.sh",
+      "archive": "history/genesis/scripts/finetune.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune_act.sbatch",
+      "archive": "history/genesis/scripts/finetune_act.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune_act.sh",
+      "archive": "history/genesis/scripts/finetune_act.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune_diffusion_policy.sbatch",
+      "archive": "history/genesis/scripts/finetune_diffusion_policy.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune_diffusion_policy.sh",
+      "archive": "history/genesis/scripts/finetune_diffusion_policy.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune_dp3.sbatch",
+      "archive": "history/genesis/scripts/finetune_dp3.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune_dp3.sh",
+      "archive": "history/genesis/scripts/finetune_dp3.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune_lerobot.sh",
+      "archive": "history/genesis/scripts/finetune_lerobot.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune_lerobot_diffusion.sbatch",
+      "archive": "history/genesis/scripts/finetune_lerobot_diffusion.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune_lerobot_diffusion.sh",
+      "archive": "history/genesis/scripts/finetune_lerobot_diffusion.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune_lerobot_v2.sh",
+      "archive": "history/genesis/scripts/finetune_lerobot_v2.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune_openvla_oft.sh",
+      "archive": "history/genesis/scripts/finetune_openvla_oft.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune_rdt.sh",
+      "archive": "history/genesis/scripts/finetune_rdt.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune_smolvla.sh",
+      "archive": "history/genesis/scripts/finetune_smolvla.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune_vqbet.sbatch",
+      "archive": "history/genesis/scripts/finetune_vqbet.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/finetune_vqbet.sh",
+      "archive": "history/genesis/scripts/finetune_vqbet.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/generate_eval_scene_init.py",
+      "archive": "history/genesis/scripts/generate_eval_scene_init.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/generate_eval_set.py",
+      "archive": "history/genesis/scripts/generate_eval_set.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/__init__.py",
+      "archive": "history/genesis/scripts/hri/__init__.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/capture_eval_obs.py",
+      "archive": "history/genesis/scripts/hri/capture_eval_obs.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/collect_avatar_skeleton.py",
+      "archive": "history/genesis/scripts/hri/collect_avatar_skeleton.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/collect_skeleton.sbatch",
+      "archive": "history/genesis/scripts/hri/collect_skeleton.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/collect_vla_1p2.sbatch",
+      "archive": "history/genesis/scripts/hri/collect_vla_1p2.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/collect_vla_1p2_cpu.sbatch",
+      "archive": "history/genesis/scripts/hri/collect_vla_1p2_cpu.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/collect_vla_range.sbatch",
+      "archive": "history/genesis/scripts/hri/collect_vla_range.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/eval_1p2.sh",
+      "archive": "history/genesis/scripts/hri/eval_1p2.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/eval_hri_inprocess.sbatch",
+      "archive": "history/genesis/scripts/hri/eval_hri_inprocess.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/eval_hri_vla.sbatch",
+      "archive": "history/genesis/scripts/hri/eval_hri_vla.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/eval_multi.sbatch",
+      "archive": "history/genesis/scripts/hri/eval_multi.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/phase_controller.py",
+      "archive": "history/genesis/scripts/hri/phase_controller.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/summarize_results.py",
+      "archive": "history/genesis/scripts/hri/summarize_results.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/train_1p2.sbatch",
+      "archive": "history/genesis/scripts/hri/train_1p2.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/train_act_1p2.sbatch",
+      "archive": "history/genesis/scripts/hri/train_act_1p2.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/train_act_retrain.sbatch",
+      "archive": "history/genesis/scripts/hri/train_act_retrain.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/train_avatar_pose.py",
+      "archive": "history/genesis/scripts/hri/train_avatar_pose.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/train_diffusion_1p2.sbatch",
+      "archive": "history/genesis/scripts/hri/train_diffusion_1p2.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/train_manicast.py",
+      "archive": "history/genesis/scripts/hri/train_manicast.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/train_manicast_models.sbatch",
+      "archive": "history/genesis/scripts/hri/train_manicast_models.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/hri/train_phase_controller.py",
+      "archive": "history/genesis/scripts/hri/train_phase_controller.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/maintain_act_eval_queue.py",
+      "archive": "history/genesis/scripts/maintain_act_eval_queue.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/monitor_act_eval_success.py",
+      "archive": "history/genesis/scripts/monitor_act_eval_success.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/neutral_matrix_render.sh",
+      "archive": "history/genesis/scripts/neutral_matrix_render.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/nyx_envmap_videos.sbatch",
+      "archive": "history/genesis/scripts/nyx_envmap_videos.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/object_pool_grasp_demo.py",
+      "archive": "history/genesis/scripts/object_pool_grasp_demo.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/pace/train_fast_visual_progress_lerobot.py",
+      "archive": "history/genesis/scripts/pace/train_fast_visual_progress_lerobot.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/pace/train_visual_progress.py",
+      "archive": "history/genesis/scripts/pace/train_visual_progress.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/play_motion.py",
+      "archive": "history/genesis/scripts/play_motion.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/preview_factory_scene.py",
+      "archive": "history/genesis/scripts/preview_factory_scene.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/probe_avatar_nenvs.py",
+      "archive": "history/genesis/scripts/probe_avatar_nenvs.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/probe_avatar_palm_down.py",
+      "archive": "history/genesis/scripts/probe_avatar_palm_down.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/probe_latest_genesis_robot_only.py",
+      "archive": "history/genesis/scripts/probe_latest_genesis_robot_only.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/probe_latest_genesis_robot_tasks.py",
+      "archive": "history/genesis/scripts/probe_latest_genesis_robot_tasks.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/probe_neutral_props.py",
+      "archive": "history/genesis/scripts/probe_neutral_props.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/probe_nyx_envmap.py",
+      "archive": "history/genesis/scripts/probe_nyx_envmap.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/probe_nyx_envmap.sbatch",
+      "archive": "history/genesis/scripts/probe_nyx_envmap.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/probe_nyx_urdf_scale.py",
+      "archive": "history/genesis/scripts/probe_nyx_urdf_scale.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/probe_palm_ref_harvest.py",
+      "archive": "history/genesis/scripts/probe_palm_ref_harvest.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/probe_palm_ref_scan.py",
+      "archive": "history/genesis/scripts/probe_palm_ref_scan.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/probe_shoulder_twist_scan.py",
+      "archive": "history/genesis/scripts/probe_shoulder_twist_scan.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/render_all_grasp_videos.sbatch",
+      "archive": "history/genesis/scripts/render_all_grasp_videos.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/render_fax_laptop.py",
+      "archive": "history/genesis/scripts/render_fax_laptop.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/render_neutral_motion_full.py",
+      "archive": "history/genesis/scripts/render_neutral_motion_full.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/render_pour_water_nyx.sbatch",
+      "archive": "history/genesis/scripts/render_pour_water_nyx.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/render_sitting_clap_scene.py",
+      "archive": "history/genesis/scripts/render_sitting_clap_scene.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/render_talking.py",
+      "archive": "history/genesis/scripts/render_talking.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/render_typing.py",
+      "archive": "history/genesis/scripts/render_typing.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/render_writing.py",
+      "archive": "history/genesis/scripts/render_writing.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/run_play_motion.sh",
+      "archive": "history/genesis/scripts/run_play_motion.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/run_task_matrix.py",
+      "archive": "history/genesis/scripts/run_task_matrix.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/run_vla_eval.sh",
+      "archive": "history/genesis/scripts/run_vla_eval.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/setup_aicr_venv.sbatch",
+      "archive": "history/genesis/scripts/setup_aicr_venv.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/smoke_pour_water_robots.py",
+      "archive": "history/genesis/scripts/smoke_pour_water_robots.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/sweep_screwdriver_grasps.sbatch",
+      "archive": "history/genesis/scripts/sweep_screwdriver_grasps.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/sync_assets.sh",
+      "archive": "history/genesis/scripts/sync_assets.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/time_nyx_envmap.py",
+      "archive": "history/genesis/scripts/time_nyx_envmap.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/train_act_qpos_target_20260524_h200_8gpu.sh",
+      "archive": "history/genesis/scripts/train_act_qpos_target_20260524_h200_8gpu.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/train_act_qpos_target_20260524_one_task.sh",
+      "archive": "history/genesis/scripts/train_act_qpos_target_20260524_one_task.sh",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/validate_eval_set_init.py",
+      "archive": "history/genesis/scripts/validate_eval_set_init.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/validate_eval_set_init.sbatch",
+      "archive": "history/genesis/scripts/validate_eval_set_init.sbatch",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/vla_client.py",
+      "archive": "history/genesis/scripts/vla_client.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/vla_data/collect_vla.py",
+      "archive": "history/genesis/scripts/vla_data/collect_vla.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/vla_data/render_h5_review.py",
+      "archive": "history/genesis/scripts/vla_data/render_h5_review.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "scripts/vla_data/scheduler.py",
+      "archive": "history/genesis/scripts/vla_data/scheduler.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "tests/test_authored_mesh_orientations.py",
+      "archive": "history/genesis/tests/test_authored_mesh_orientations.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "tests/test_bounded_joint_paths.py",
+      "archive": "history/genesis/tests/test_bounded_joint_paths.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "tests/test_categorize_grasp_policy.py",
+      "archive": "history/genesis/tests/test_categorize_grasp_policy.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "tests/test_exr_envmap.py",
+      "archive": "history/genesis/tests/test_exr_envmap.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "tests/test_generalized_placement.py",
+      "archive": "history/genesis/tests/test_generalized_placement.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "tests/test_mesh_loading_defaults.py",
+      "archive": "history/genesis/tests/test_mesh_loading_defaults.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "tests/test_neutral_motion_target_distinct.py",
+      "archive": "history/genesis/tests/test_neutral_motion_target_distinct.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "tests/test_object_pool_mappings.py",
+      "archive": "history/genesis/tests/test_object_pool_mappings.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "tests/test_pytest_latest_genesis.py",
+      "archive": "history/genesis/tests/test_pytest_latest_genesis.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "tests/test_pytest_latest_genesis_pour_water.py",
+      "archive": "history/genesis/tests/test_pytest_latest_genesis_pour_water.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "tests/test_scene_visual_contracts.py",
+      "archive": "history/genesis/tests/test_scene_visual_contracts.py",
+      "origin": "git_head"
+    },
+    {
+      "source": "tests/test_vla_collision_success_policy.py",
+      "archive": "history/genesis/tests/test_vla_collision_success_policy.py",
+      "origin": "git_head"
+    }
+  ]
+}

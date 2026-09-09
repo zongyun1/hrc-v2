@@ -1,22 +1,3 @@
-# Genesis HR Bench - Dependencies
-
-# Physics simulation
-genesis-world  # Genesis simulator
-
-# Motion planning
-mplib==0.2.1
-toppra
-
-# Math / transforms
-numpy
-scipy
-transforms3d
-
-# Data
-pyyaml
-imageio
-imageio-ffmpeg
-
-# Optional: GPU support
-# torch
-# torchvision
+# CPU motion playback and interface tests. Isaac Lab/Torch are provided by the runtime.
+numpy>=1.26,<3
+# Lightwheel runtime extras: lw_benchhub_lab3/requirements-extra.txt

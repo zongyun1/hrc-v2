@@ -2,6 +2,7 @@
 
 项目默认 benchmark 已切换为 **LW-BenchHub / Isaac Lab 3**。统一入口为
 `python -m hrc_bench`，配置为 [`configs/lightwheel.json`](configs/lightwheel.json)。
+完整模块职责见 [当前代码架构](docs/architecture.md)。
 可通过同一接口开启或关闭基于 TRUMANS 的人体运动。
 
 目前范围：单环境、单人体、预生成真实 TRUMANS 动作重放；默认任务为
@@ -102,7 +103,8 @@ python -m unittest hrc_bench.test_human -v
 
 - [人体接口 GPU 验证记录](docs/lightwheel_interface_validation.md)
 - [已有脚本避人导航与白色机械臂视频](lw_benchhub_lab3/HUMAN_NAVIGATION.md)
-- [历史 Genesis 文档](LEGACY_GENESIS.md)
+- [历史代码归档](history/README.md)
 
-旧模拟器代码保留作参考；新的默认入口不导入 Genesis。人体读取与蒙皮复用模块的
+旧模拟器的代码、配置、依赖和脚本均归档到 `history/genesis/`，阶段实验归档到
+`history/experiments/`；默认运行和测试仅使用当前 Lightwheel 模块。人体读取与蒙皮复用模块的
 来源见 [PROVENANCE](isaac_human/vendor/PROVENANCE.md)。

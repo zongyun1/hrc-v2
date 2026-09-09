@@ -1,0 +1,5 @@
+{
+  "robocasa": {"url": "https://github.com/robocasa/robocasa.git", "commit": "4f8a2980def75a55dff96b990745b83540425f09"},
+  "robosuite": {"url": "https://github.com/ARISE-Initiative/robosuite.git", "commit": "5ce6643f3092639d08f7b0f90ed1c6a84f50552c"},
+  "tasks": ["PickPlaceCounterToSink", "OpenCabinet", "OpenMicrowave", "NavigateKitchen"]
+}

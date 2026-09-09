@@ -1,0 +1,124 @@
+# Per-host wrapper-script config (see scripts/env.local.sh.example).
+scripts/env.local.sh
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Assets (managed via rclone+OneDrive)
+assets/
+
+# Debug
+*.bak
+*_backup
+debug/
+debug_*
+scripts/launch/
+
+# Data
+data/
+saved_videos/
+output/
+logs/
+tasks.txt
+vla_data*
+!scripts/vla_data/
+!scripts/vla_data/rewrite_instructions.py
+!baseline/rdt_overrides/data/
+!scripts/vla_data/audit_vla_hz.py
+!scripts/vla_data/normalize_vla_hz.py
+*.mp4
+
+# Job logs — committed as empty dir only (see docs/running_jobs.md).
+job_logs/*
+!job_logs/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+.claude/
+AGENT_STATUS.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.key
+*.out
+*.log
+
+# Grasp
+grasp_estimation/output/
+grasp_estimation/outputs/
+grasp_estimation/robot/
+grasp_estimation/__pycache__/
+
+# Retarget data
+retarget/output_motion/
+retarget/output_motion_*/
+retarget/raw_blender/
+retarget/raw_motions
+# Raw mixamo fbx/texture dumps (cabinet_only/, fax_only/, typing_only/, ...)
+retarget/*_only/
+
+# Vendored repos / large local data (e.g. third_party/manicast has its own .git)
+third_party/
+external/
+
+# Human notes
+notes/
+paper/
+
+# VLA checkpoints (downloaded separately, 15+ GB)
+checkpoints/
+
+# Baseline source repos (openvla-oft / 3d_diffusion_policy / diffusion_policy /
+# rdt / lerobot) are tracked as git submodules — see .gitmodules. The per-model
+# HTTP servers live in baseline/servers/ and ARE tracked.
+
+# Local artifacts / scratch
+videos/
+my_data/
+exr_sweep/
+Untitled
+test_*.png
+test_*.mp4
+shove_reaction_mid.png
+
+# RL training outputs
+runs/
+
+# Test-run media artifacts
+tests/outputs/
+tests/test_stretch_output/
+
+# Retarget scratch (raw fbx/intermediate dumps)
+retarget/shove_only/
+
+# Latest-Genesis env + caches (see requirements-genesis-latest.txt)
+.venv*/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+__nyx_cache__/
+nyx_smoke.png
+assets/objects/**/_nyx_merged_*.obj
+assets/objects/**/_nyx_textured_*.glb
+assets/objects/**/*_nyx_s*.urdf
+assets/objects/**/visual/*_nyx_single.obj
+
+# Generated render artifacts
+outputs/
+
+# Diagnostic / sweep scratch (underscore-prefixed one-offs)
+scripts/_*.py
+scripts/_*.sbatch
+
+# HRI scratch experiments
+scratch_hri/

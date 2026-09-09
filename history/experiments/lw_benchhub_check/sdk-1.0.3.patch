@@ -1,0 +1,6 @@
+diff --git a/lw_benchhub/core/tasks/base.py b/lw_benchhub/core/tasks/base.py
+--- a/lw_benchhub/core/tasks/base.py
++++ b/lw_benchhub/core/tasks/base.py
+@@ -25 +25 @@
+-from lightwheel_sdk.loader import ENDPOINT
++from lightwheel_sdk.client import ENDPOINT
