@@ -51,6 +51,11 @@ try:
     from tools.isaaclab3.robot_materials import restore_panda_white
     from lw_benchhub.utils.env import parse_env_cfg, ExecuteMode
     from lightwheel_sdk.client import lw_client
+    import lw_benchhub
+    import isaaclab_arena
+    result['source_paths'] = {'lightwheel': str(Path(lw_benchhub.__file__).resolve()),
+                              'arena': str(Path(isaaclab_arena.__file__).resolve()),
+                              'runner': str(Path(__file__).resolve())}
     lw_client.base_timeout = 60
     player = MotionPlayer.load(args.motion, args.skeleton, args.skin)
     if player.sequence.meta.get('backend') != 'trumans' or player.sequence.meta.get('synthetic_diagnostic'):

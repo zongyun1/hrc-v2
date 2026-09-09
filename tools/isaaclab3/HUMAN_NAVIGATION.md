@@ -1,6 +1,29 @@
 # Lightwheel NavigateKitchen + TRUMANS 避人导航
 
-**最新白色机械臂视频（作业 744897）**：
+## 根目录源码回归：2026-09-09，作业 746078
+
+[新视频](../../outputs/lightwheel/human_746078/preview.mp4) ·
+[停让](../../outputs/lightwheel/human_746078/yield.png) ·
+[恢复](../../outputs/lightwheel/human_746078/resume.png) ·
+[终点](../../outputs/lightwheel/human_746078/preview.png) ·
+[逐项比较](../../outputs/lightwheel/human_746078/regression.json)
+
+使用当前 `hrc-v2/` 根目录 Lightwheel 和 vendored Arena；`result.json` 中记录实际模块路径。
+Slurm `COMPLETED / 0:0`，8 项验收全部通过。与之前白色机械臂作业 `744897` 比较：
+
+- 同一份 motion / skeleton / skin，三项 SHA-256 一致。
+- 1061 个控制步位置记录完全一致，停让与成功状态逐步一致。
+- 0.82 秒停让、6.36 秒恢复；21.22 秒完成，最终目标误差 17.37 cm。
+- 停让位移 4.02 mm，最小保守投影间距 29.04 cm，报告人机接触峰值 0 N。
+- 35 处白色材质绑定有效；人工检查停让、恢复、终点关键帧。
+- 视频 960×720，213 帧，21.3 秒，完整解码通过。
+
+此次未发现根目录重构在该固定避人导航场景中引入回归。
+此演示仍采用显式 stepping 和扩展时长，不是原生 8 秒时限内的 benchmark 成功率。
+视频与详细结果保存在本地 outputs，不上传 Git。
+
+
+**此前白色机械臂视频（作业 744897）**：
 [完整视频](../../outputs/lw_benchhub_lab3/results/human_744897/preview.mp4) ·
 [最终画面](../../outputs/lw_benchhub_lab3/results/human_744897/preview.png) ·
 [结果](../../outputs/lw_benchhub_lab3/results/human_744897/result.json)。
