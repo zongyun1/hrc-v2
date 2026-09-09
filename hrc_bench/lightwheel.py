@@ -8,7 +8,7 @@ def configure_source(root):
     root = Path(root).resolve()
     if not (root/'lw_benchhub').is_dir():
         raise FileNotFoundError(f'Lightwheel source missing: {root}; see README setup')
-    site.addsitedir(str(root.parent/'deps'))
+    site.addsitedir(str(root/'external/isaaclab3/deps'))
     sys.path[:0] = [str(root), str(root/'third_party/IsaacLab-Arena')]
 
 
@@ -23,7 +23,7 @@ def make_env(config, device='cuda:0', cameras=False):
     from lw_benchhub.utils.env import parse_env_cfg, ExecuteMode
     from lightwheel_sdk.client import lw_client
     from .human import TrumanHumanMotion
-    from lw_benchhub_lab3.robot_materials import restore_panda_white
+    from tools.isaaclab3.robot_materials import restore_panda_white
 
     lw_client.base_timeout = 60
     cfg = parse_env_cfg(scene_backend='robocasa', task_backend='robocasa',

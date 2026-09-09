@@ -33,7 +33,7 @@ class BenchmarkConfig:
     seed: int = 0
     num_envs: int = 1
     episode_length_s: float = 12.
-    lightwheel_root: str = 'external/LW-BenchHub'
+    lightwheel_root: str = str(Path(__file__).resolve().parents[1])
     human: HumanMotionConfig = field(default_factory=HumanMotionConfig)
 
     def __post_init__(self):

@@ -11,9 +11,8 @@ dist/
 
 # External dependencies, model assets and generated artifacts
 external/
-third_party/
-assets/
-data/
+/assets/
+/data/
 outputs/
 output/
 logs/
@@ -25,11 +24,6 @@ runs/
 *.out
 job_logs/*
 !job_logs/.gitkeep
-# Local isolated Lightwheel runtime (created by setup.sh)
-/lw_benchhub_lab3/source/
-/lw_benchhub_lab3/deps/
-/lw_benchhub_lab3/home/
-/lw_benchhub_lab3/cache/
 
 # Host configuration and editor state
 .env
@@ -41,3 +35,51 @@ Thumbs.db
 .idea/
 .vscode/
 .claude/
+
+# Native source assets are tracked; LFS payloads are supplied separately.
+!lw_benchhub/**/assets/
+!lw_benchhub/**/assets/**
+!third_party/IsaacLab-Arena/**/assets/
+!third_party/IsaacLab-Arena/**/assets/**
+/lw_benchhub/core/mdp/ckpt/loco.onnx
+/lw_benchhub/core/mdp/ckpt/squat.onnx
+/lw_benchhub/data/assets/bi_so101_follower.usd
+/lw_benchhub/data/assets/double_piper.usd
+/lw_benchhub/data/assets/g1_29dof_with_hand.usd
+/lw_benchhub/data/assets/g1_29dof_with_hand_rev_1_0_wbc.usd
+/lw_benchhub/data/assets/g1_three_fingers.usd
+/lw_benchhub/data/assets/omron_franka.usd
+/lw_benchhub/data/assets/panda_2.usd
+/lw_benchhub/data/assets/piper.usd
+/lw_benchhub/data/assets/so100_follower.usd
+/lw_benchhub/data/assets/so101_follower.usd
+/lw_benchhub/data/assets/so101_follower_yellow.usd
+/lw_benchhub/data/assets/x7s.usd
+/lw_benchhub/data/ckpts/nv_wbc_v0828/gear_decoupled_homie_wbc_v1.onnx
+/lw_benchhub/data/ckpts/nv_wbc_v0904/homie_v2/slip_walk.onnx
+/lw_benchhub/data/ckpts/nv_wbc_v0904/homie_v2/stand.onnx
+/lw_benchhub/data/ckpts/nv_wbc_v0904/homie_v2/walk.onnx
+/lw_benchhub/utils/X7S/urdf/X7S/X7S.usd
+/lw_benchhub/utils/X7S/urdf/X7S/configuration/X7S_base.usd
+/lw_benchhub/utils/X7S/urdf/X7S/configuration/X7S_physics.usd
+/lw_benchhub/utils/X7S/urdf/X7S/configuration/X7S_sensor.usd
+/lw_benchhub/utils/X7S/urdf/X7S/x7s.usd
+/lw_benchhub/utils/piper_description/urdf/piper_description/configuration/piper_description_base.usd
+/lw_benchhub/utils/piper_description/urdf/piper_description/configuration/piper_description_physics.usd
+/lw_benchhub/utils/piper_description/urdf/piper_description/configuration/piper_description_sensor.usd
+/lw_benchhub/utils/piper_description/urdf/piper_description/piper.usd
+/lw_benchhub/utils/piper_description/urdf/piper_description/piper_description.usd
+/third_party/IsaacLab-Arena/docs/images/cloud_xr_sessions_control_panel.png
+/third_party/IsaacLab-Arena/docs/images/franka_kitchen.png
+/third_party/IsaacLab-Arena/docs/images/franka_kitchen_pickup.gif
+/third_party/IsaacLab-Arena/docs/images/g1_galileo_arena_box_pnp_locomanip.gif
+/third_party/IsaacLab-Arena/docs/images/g1_locomanip_pick_and_place_task_view.png
+/third_party/IsaacLab-Arena/docs/images/gr1_open_microwave_task_view.png
+/third_party/IsaacLab-Arena/docs/images/isaac_lab_arena_arch_overview.png
+/third_party/IsaacLab-Arena/docs/images/isaaclab_arena_core_framework.png
+/third_party/IsaacLab-Arena/docs/images/kitchen_gr1_arena.gif
+/third_party/IsaacLab-Arena/docs/images/simulation_view.png
+/third_party/IsaacLab-Arena/docs/images/task_duplications.png
+/third_party/IsaacLab-Arena/docs/images/variation_axis.png
+/third_party/IsaacLab-Arena/isaaclab_arena/tests/test_data/test_demo_gr1_open_microwave.hdf5
+/third_party/IsaacLab-Arena/isaaclab_arena/tests/test_data/test_g1_hdf5_to_lerobot.hdf5

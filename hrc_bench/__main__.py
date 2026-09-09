@@ -56,6 +56,10 @@ def main():
         env = make_env(config, args.device, args.enable_cameras)
         def tensor(value):
             return value.torch if hasattr(value, 'torch') else value
+        import lw_benchhub
+        import isaaclab_arena
+        result['source_paths'] = {'lightwheel': str(Path(lw_benchhub.__file__).resolve()),
+                                  'arena': str(Path(isaaclab_arena.__file__).resolve())}
         result['action_shape'] = list(env.action_space.shape)
         result['human_provenance'] = env.human_motion.provenance
         result['control_dt'] = env.step_dt

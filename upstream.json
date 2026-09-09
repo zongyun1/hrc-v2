@@ -1,0 +1,268 @@
+{
+  "repositories": [
+    {
+      "prefix": "",
+      "commit": "b2bcb2d00edef691f9fcc49039cbf0bcc7464605",
+      "url": "https://github.com/LightwheelAI/LW-BenchHub.git"
+    },
+    {
+      "prefix": "third_party/IsaacLab-Arena",
+      "commit": "c7b70779f103e10d690d1a13863e8d77da7fc782",
+      "url": "https://github.com/isaac-sim/IsaacLab-Arena.git"
+    }
+  ],
+  "lfs_assets": [
+    {
+      "path": "lw_benchhub/core/mdp/ckpt/loco.onnx",
+      "sha256": "e6770b3ee53faebc5c25d92133e0f24a5dcd5f4e6183a5cdaf90c7c75e939992",
+      "size": 1339688,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/core/mdp/ckpt/squat.onnx",
+      "sha256": "abb6f240d13609af43d98d68fd3a60de5abe89d11f48461d37443b9b2ef25896",
+      "size": 1434920,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/data/assets/bi_so101_follower.usd",
+      "sha256": "fd4db63da4187b01fdf171117296fc5f0d09f42673c4fb426e3de24453da75e4",
+      "size": 46531806,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/data/assets/double_piper.usd",
+      "sha256": "19d193bc4ba03bae7c2b7e8ee4684295539b0fd9af2b7bd1a98e91216e573671",
+      "size": 39925803,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/data/assets/g1_29dof_with_hand.usd",
+      "sha256": "32d2a3917bb712289c85b50f4146cfa144d1210970181c5efa0317f416e238cc",
+      "size": 40601107,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/data/assets/g1_29dof_with_hand_rev_1_0_wbc.usd",
+      "sha256": "5020e32fefd2fcd58a4e3dcf9e29eee417d11ea09d091f8d5c5a477da1fc7a24",
+      "size": 55613497,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/data/assets/g1_three_fingers.usd",
+      "sha256": "799cd8f50364d4388540a34c9380185a84f1f433bd7baec5fae31fc3640a7666",
+      "size": 40094469,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/data/assets/omron_franka.usd",
+      "sha256": "174ab15438a345c50110f48f9be34bd48750e6bbcbd7eb5602a98e09d14b58cd",
+      "size": 15996510,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/data/assets/panda_2.usd",
+      "sha256": "628848e71e3e16d277f7f3ab11a7daf83a4463506bc60a149e3ca09cff239256",
+      "size": 10073718,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/data/assets/piper.usd",
+      "sha256": "8037b50c9a6f80663aa882c8cd804f9696adf4f6b02227c6e3464d41a7d60e89",
+      "size": 55037184,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/data/assets/so100_follower.usd",
+      "sha256": "ff6c9923b655ffa8058850d4216a74e84db9b79b851e043bf17babf1c37a0075",
+      "size": 4390966,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/data/assets/so101_follower.usd",
+      "sha256": "c02f7f7e02fd0f4c32ff903a29af25e8336743c196cedfef14e8289b98523ead",
+      "size": 23247661,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/data/assets/so101_follower_yellow.usd",
+      "sha256": "64a877c3b82cdc4a48ab8a1f321a2dd3ef7c55d4b10bce222b58c530d978ae58",
+      "size": 23241268,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/data/assets/x7s.usd",
+      "sha256": "f205825e2e4916440e58f9ec559096358608332a39e51dbc28dc9421e6ba10cf",
+      "size": 65969546,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/data/ckpts/nv_wbc_v0828/gear_decoupled_homie_wbc_v1.onnx",
+      "sha256": "8dbe5649757c2e328c811867d961109ad229ff4938152ea44ff43df621a3fb23",
+      "size": 1960411,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/data/ckpts/nv_wbc_v0904/homie_v2/slip_walk.onnx",
+      "sha256": "e702e9989ecc96ccf46873d1f4b28d1fbf4817122c9455d055f0b478a2b3dbef",
+      "size": 1886682,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/data/ckpts/nv_wbc_v0904/homie_v2/stand.onnx",
+      "sha256": "f645da599d4ca3d29ed273c8f4712620bb680d34977469ca3aeabe5bb9631c18",
+      "size": 1886682,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/data/ckpts/nv_wbc_v0904/homie_v2/walk.onnx",
+      "sha256": "7c82255b6905ffcc4468fa7f8ddcf7b70db168cf1042107ccab887cb6a8e5407",
+      "size": 1886682,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/utils/X7S/urdf/X7S/X7S.usd",
+      "sha256": "f1ce34403016639fae9ad7638eaa44d5c410aeb7b713af653b62059477b0e9f2",
+      "size": 4965,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/utils/X7S/urdf/X7S/configuration/X7S_base.usd",
+      "sha256": "0ead3f2e0b821cb9017b181e25644d2d5800b19bc438d61bdff21fd81346f1d3",
+      "size": 26739226,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/utils/X7S/urdf/X7S/configuration/X7S_physics.usd",
+      "sha256": "3f9f1f113591ddb310cb11aca77163edef90b13ebc98df32aa09cebc1e67f4d0",
+      "size": 8995,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/utils/X7S/urdf/X7S/configuration/X7S_sensor.usd",
+      "sha256": "11b32145f966d02dde2c8b97430c5ee9850205476de042a8659603ef050f7373",
+      "size": 643,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/utils/X7S/urdf/X7S/x7s.usd",
+      "sha256": "fea33208c992f725485a527b95d875c2afd5ee6c6fe251b911022f5b922adfe8",
+      "size": 26746048,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/utils/piper_description/urdf/piper_description/configuration/piper_description_base.usd",
+      "sha256": "c9b90938df35828233cf077f5a8a4073c6c6a86dab2b81be348912b287b29b64",
+      "size": 13238871,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/utils/piper_description/urdf/piper_description/configuration/piper_description_physics.usd",
+      "sha256": "923ff3ff8efd6115219931e7f72b31f8e3dbd7ead6cb9f4576b6644724c98a3e",
+      "size": 5518,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/utils/piper_description/urdf/piper_description/configuration/piper_description_sensor.usd",
+      "sha256": "04b0d38d0540afb8976f66e3d2b87d5560651e2e17f310f396b30d2fef9af983",
+      "size": 645,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/utils/piper_description/urdf/piper_description/piper.usd",
+      "sha256": "20b48500b2c4021fcf8015fb5976896674741fe3235542baeb787c89c4708e00",
+      "size": 13242429,
+      "repository": ""
+    },
+    {
+      "path": "lw_benchhub/utils/piper_description/urdf/piper_description/piper_description.usd",
+      "sha256": "0a40b3cd7b64375d5fa4cca3714ce0432fc6db63aaec097cb9bbf1145678e63a",
+      "size": 1603,
+      "repository": ""
+    },
+    {
+      "path": "third_party/IsaacLab-Arena/docs/images/cloud_xr_sessions_control_panel.png",
+      "sha256": "d55507ad476da7aaf70649a92c6bc23942f5ab4033b5c6aff78ddc7becdfe4b6",
+      "size": 61319,
+      "repository": "third_party/IsaacLab-Arena"
+    },
+    {
+      "path": "third_party/IsaacLab-Arena/docs/images/franka_kitchen.png",
+      "sha256": "6069f2aa9f1f4b27c7cca3dbd7725666a03b05c4fdc41300481006ad7477f809",
+      "size": 820756,
+      "repository": "third_party/IsaacLab-Arena"
+    },
+    {
+      "path": "third_party/IsaacLab-Arena/docs/images/franka_kitchen_pickup.gif",
+      "sha256": "d5f7d411ad844e89103e88243eeb1ca53ff70ed0c3cea6605b81ab0aeecb0663",
+      "size": 16802526,
+      "repository": "third_party/IsaacLab-Arena"
+    },
+    {
+      "path": "third_party/IsaacLab-Arena/docs/images/g1_galileo_arena_box_pnp_locomanip.gif",
+      "sha256": "c4f51be5a3d37810bba5728271f2083c5fb82d7140faa82cf985aa42d7de7c75",
+      "size": 26572037,
+      "repository": "third_party/IsaacLab-Arena"
+    },
+    {
+      "path": "third_party/IsaacLab-Arena/docs/images/g1_locomanip_pick_and_place_task_view.png",
+      "sha256": "b12dc7bb795a468293be5baa71c86ce5c67075d19f1bebde17975ebf9c35891b",
+      "size": 784531,
+      "repository": "third_party/IsaacLab-Arena"
+    },
+    {
+      "path": "third_party/IsaacLab-Arena/docs/images/gr1_open_microwave_task_view.png",
+      "sha256": "27f20922006d1c6083d21f09d09c379102f90b15d7e88026e72fece6f076ef41",
+      "size": 514226,
+      "repository": "third_party/IsaacLab-Arena"
+    },
+    {
+      "path": "third_party/IsaacLab-Arena/docs/images/isaac_lab_arena_arch_overview.png",
+      "sha256": "2f6e30e1fe551d975590abcebb8288341dc363c35f29c50f6bffe2f73a0f0b9e",
+      "size": 177376,
+      "repository": "third_party/IsaacLab-Arena"
+    },
+    {
+      "path": "third_party/IsaacLab-Arena/docs/images/isaaclab_arena_core_framework.png",
+      "sha256": "af1cbbc800899851ecd0cc13a80f4c6be3fcf0eed0f72fbbc9b4f2e5e689aac9",
+      "size": 155129,
+      "repository": "third_party/IsaacLab-Arena"
+    },
+    {
+      "path": "third_party/IsaacLab-Arena/docs/images/kitchen_gr1_arena.gif",
+      "sha256": "070bbaec8a0a75729e0858e29e68554fe98d01375dfca00bcddd445c4a9b2b54",
+      "size": 7578923,
+      "repository": "third_party/IsaacLab-Arena"
+    },
+    {
+      "path": "third_party/IsaacLab-Arena/docs/images/simulation_view.png",
+      "sha256": "19046ff6500f2881f07e5a9fd4bb18b9f6212ca66f5eaa2b126a2aa402dcabdf",
+      "size": 138641,
+      "repository": "third_party/IsaacLab-Arena"
+    },
+    {
+      "path": "third_party/IsaacLab-Arena/docs/images/task_duplications.png",
+      "sha256": "b124f4925ba6eb62789fa4258b459b6e8d38d6391ee3e9d1238f0d43a1abf653",
+      "size": 120697,
+      "repository": "third_party/IsaacLab-Arena"
+    },
+    {
+      "path": "third_party/IsaacLab-Arena/docs/images/variation_axis.png",
+      "sha256": "41ab7d764b9cc90e3a81e6d1ec8e9610519e8ca963d2d27163bef0a52ee37ea5",
+      "size": 4278762,
+      "repository": "third_party/IsaacLab-Arena"
+    },
+    {
+      "path": "third_party/IsaacLab-Arena/isaaclab_arena/tests/test_data/test_demo_gr1_open_microwave.hdf5",
+      "sha256": "154ebea7839ec53e6ac441e18f1404b3fe140c3f004ad7e309519ba37274fa50",
+      "size": 365180,
+      "repository": "third_party/IsaacLab-Arena"
+    },
+    {
+      "path": "third_party/IsaacLab-Arena/isaaclab_arena/tests/test_data/test_g1_hdf5_to_lerobot.hdf5",
+      "sha256": "96f57fd12f334c93e834975a1095aa8fdbfd1313a190dc9a5441dabee342ebe9",
+      "size": 230249655,
+      "repository": "third_party/IsaacLab-Arena"
+    }
+  ]
+}

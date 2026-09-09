@@ -31,3 +31,19 @@ CPU：5 项接口测试（配置/禁用、真实动作时钟/延迟/末帧/重�
 另从隔离提交索引导出完整 Git 树执行 21 项测试，20 项通过、1 项真实资产测试
 因未包含资产而跳过；无人资产预检无需 NumPy/Isaac 可运行。带真实资产的工作区
 已完成上述 21 项 CPU 测试及 GPU 验证。
+
+## 原生源码提升到仓库根目录：2026-09-09
+
+作业 `745720` 使用新根目录运行两个 1 秒 episode，通过标准 timeout / reset 检查，
+共 100 控制步，动作空间 `[1, 11]`，人体复位时钟 `[0, 0, 0]`。
+`source_paths` 确认实际加载：
+
+- `/scratch/jiabenchen_umass/yz/hrc-v2/lw_benchhub/__init__.py`
+- `/scratch/jiabenchen_umass/yz/hrc-v2/third_party/IsaacLab-Arena/isaaclab_arena/__init__.py`
+
+25 项本地 CPU 回归通过；从提交树导出的无资产 checkout 中，23 项通过、2 项跳过。
+648 个迁移源码文件通过语法与幂等检查；42 个上游 LFS 资产在 GPU 端全部通过 SHA-256
+校验。源码完整性检查确认原生跟踪文件（除显式外置的大资产、Git/编辑器配置及未使用
+子模块外）全部纳入本仓库。此运行仍为零动作接口测试，不代表策略成功率。
+
+本地结果：`outputs/benchmark/745720/`。
